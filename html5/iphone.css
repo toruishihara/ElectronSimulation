@@ -1,0 +1,123 @@
+* {
+	margin:0;
+	padding:0;
+}
+body {
+	width: 320px;
+	height:480px;
+	background-image:url(spaceback.png);
+	-webkit-animation: 'stardriver' 24s linear 0s infinite normal;
+}
+@-webkit-keyframes 'stardriver' {
+	0% { background-position: 0px 0px; }
+	100% { background-position: 0px 240px; }
+}
+#gameScreen {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	width: 768px;
+	height: 1024px;
+}
+#restart
+{
+    position:absolute;
+    left:100px;
+    top:700px;
+	width: 200px;
+	height: 60px;
+}
+#grade
+{
+    position:absolute;
+    left:400px;
+    top:700px;
+	width: 200px;
+	height: 60px;
+}
+#gameScreen button {
+	height:40px;
+	font-size:24pt;
+}
+#f0,#f1,#f2,#f3,#f4,#f5,#f6,#f7,#f8,#f9 {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	width: 64px;
+	height: 32px;
+	color: yellow;
+	font-size: 32px;
+	/** background-image:url(flag.png); **/
+}
+#quizMessage {
+	position: absolute;
+	top: 20px;
+	left: 50px;
+	width: 610px;
+	height: 64px;
+	color: white;
+	font-size: medium;
+}
+#quiz {
+	color: white;
+	font-size: 48px;
+}
+#resultMessage {
+	position: absolute;
+	top: 120px;
+	left: 50px;
+	width: 610px;
+	height: 64px;
+	color: yellow;
+	font-size: medium;
+    display: none;
+}
+#result {
+	color: white;
+	font-size: 48px;
+}
+
+.fade {
+	-webkit-animation: 'fade' 2s linear 0s 1 normal;
+}
+@-webkit-keyframes 'fade' {
+	0% { -webkit-transform: scale(1); }
+	10% { -webkit-transform: scale(3); }
+	90% { -webkit-transform: scale(0); }
+	100% { -webkit-transform: scale(0); }
+}
+
+.shake {
+	-webkit-animation: 'shake' 1s linear 0s 2 normal;
+}
+@-webkit-keyframes 'shake' {
+	0% { -webkit-transform: rotate(0deg); }
+	25% { -webkit-transform: rotate(20deg); }
+	75% { -webkit-transform: rotate(-20deg); }
+	100% { -webkit-transform: rotate(0deg); }
+}
+
+.fadeTitle {
+	-webkit-animation: 'fadeTitle' 2s linear 0s 1 normal;
+}
+@-webkit-keyframes 'fadeTitle' {
+	0% { -webkit-transform: scale(1); }
+	90% { -webkit-transform: scale(0); }
+	100% { -webkit-transform: scale(0); }
+}
+
+#tryAgain {
+    background-color:#002233;
+    position: absolute;
+	top: 220px;
+	left: 50px;
+	width: 610px;
+	height: 64px;
+	color: white;
+	font-size: medium;
+
+}
+#tryAgain:hover {
+    background-color:#008899;
+    transitin:background-color 0.5s linear;
+}

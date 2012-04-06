@@ -7,14 +7,20 @@
 body { background-color:#cccccc; }
 canvas { background-color:#ffffff; }
 </style>
+        <link rel="stylesheet" media="screen and (max-device-width: 320px)" href="iphone.css" />
+        <link rel="stylesheet" media="screen and (min-device-width: 321px) and (max-device-width: 2000px)" href="desktop.css" />
+
 </head>
-<body>
+<body onload="load()">
 
 <div>
 	<canvas id="canvas1" width="400" height="400"></canvas>
 </div>
-
 <div>
+	<canvas id="pole1" width="200" height="200"></canvas>
+</div>
+
+<div id="buttons">
 	<input type="button" value="描画" onclick="start()"/>　時間間隔
 	<select name="interval" onchange="period_change(value)">
 		<option value="25">25</option>
@@ -24,6 +30,14 @@ canvas { background-color:#ffffff; }
 	</select>
 	<div id="ball_pos"></div>
 </div>
+<div id="infos">
+zoom=<span id="zoom"></span><br>
+center=<span id="center"></span><br>
+ViewZ=<span id="view_z"></span><br>
+ViewX=<span id="view_x"></span><br>
+ViewY=<span id="view_y"></span><br>
+</div>
+		<!-- <script type="text/javascript" src="gbody.js"></script> -->
 		<script type="text/javascript" src="ele_main.js"></script>
 </body>
 </html>

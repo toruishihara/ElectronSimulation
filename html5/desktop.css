@@ -1,0 +1,24 @@
+* {
+	margin:0;
+	padding:0;
+}
+#canvas1 {
+	position: absolute;
+	top: 10px;
+	left: 10px;
+}
+#pole1 {
+	position: absolute;
+	top: 10px;
+	left: 420px;
+}
+#buttons {
+	position: absolute;
+	top: 220px;
+	left: 420px;
+}
+#infos {
+	position: absolute;
+	top: 260px;
+	left: 420px;
+}

@@ -38,8 +38,8 @@ var g_center = new tuple3d(0,0,0);
 var g_zoom = 10;
 
 var timer1;
-var width = 500;
-var height = 500;
+var width = 400;
+var height = 400;
 var time = 0;
 var interval = 50; //更新間隔
 
@@ -60,6 +60,7 @@ function tuple3d(in_x, in_y, in_z){
 	this.logsp = tuple3d_logsp;
 	this.str = tuple3d_str;
 	this.strsp = tuple3d_strsp;
+	this.clone = tuple3d_clone;
 }
 function tuple3d_dot(tuple) {
 	return this.x*tuple.x + this.y*tuple.y + this.z*tuple.z;
@@ -78,9 +79,9 @@ function tuple3d_cross(tuple) {
 	return new tuple3d(x,y,z);
 }
 function tuple3d_mul(v) {
-	this.x = this.x * v;
-	this.y = this.y * v;
-	this.z = this.z * v;
+	this.x *= v;
+	this.y *= v;
+	this.z *= v;
 }
 function tuple3d_add(tuple) {
 	this.x = this.x + tuple.x;
@@ -122,6 +123,10 @@ function tuple3d_strsp() {
 	var s = "r,th,ph[" + this.x.toFixed(2) + ", " + this.y.toFixed(2) + ", " + this.z.toFixed(2) + "]";
 	return s;
 }
+function tuple3d_clone() {
+	var ret = new tuple3d(this.x, this.y, this.z);
+	return ret;
+}
 /* 3d framework class */
 
 function draw(c) {
@@ -133,9 +138,6 @@ function draw(c) {
 	g_viewPy = g_viewP.cross(axisX);
 	g_viewPy.unify();
 	g_viewPx = g_viewPy.cross(g_viewP);
-	g_viewP.log();
-	g_viewPx.log();
-	g_viewPy.log();
 	for(var i=0; i < lines.length; ++i ) {
 		var str = lines[i];
 		var e = str.split(',');
@@ -154,15 +156,21 @@ function draw(c) {
 function draw_infos() {
 	document.getElementById("zoom").innerText = g_zoom.toFixed(2);
 	document.getElementById("center").innerText = g_center.str();
-	var sp = g_viewP;
+	var sp = g_viewP.clone();
+	var s = sp.str();
 	sp.xy2sp();
-	document.getElementById("view_z").innerText = sp.strsp();
-	sp = g_viewPx;
-	sp.xy2sp();
-	document.getElementById("view_x").innerText = sp.strsp();
-	sp = g_viewPy;
-	sp.xy2sp();
-	document.getElementById("view_y").innerText = sp.strsp();
+	s += sp.strsp();
+	document.getElementById("view_z").innerText = s;
+	var sp2 = g_viewPx.clone();
+	s = sp2.str();
+	sp2.xy2sp();
+	s += sp2.strsp();
+	document.getElementById("view_x").innerText = s;
+	var sp3 = g_viewPy.clone();
+	s = sp3.str();
+	sp3.xy2sp();
+	s += sp3.strsp();
+	document.getElementById("view_y").innerText = s;
 }
 
 function update_all(){
@@ -189,11 +197,14 @@ function mouseDownListner(e) {
 　	canvasOffsetY = canvas.offsetTop;
 　	var x = e.pageX - canvasOffsetX;
 　	var y = e.pageY - canvasOffsetY;
-	moveX = g_viewPx;
+	var moveX = g_viewPx;
+	var x_f = (x - width/2);
+	x_f /= g_zoom;
 	moveX.mul((x - width/2)/g_zoom);
-	moveX.mul(-1);
 	g_center.add(moveX);
-	moveY = g_viewPy;
+	var moveY = g_viewPy;
+	var y_f = (y - height/2);
+	y_f /= g_zoom;
 	moveY.mul((y - height/2)/g_zoom);
 	g_center.add(moveY);
 	clear();

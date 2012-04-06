@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="utf-8"/>
+<title>TestCanvas_AnimeSin1.html</title>
+<style>
+body { background-color:#cccccc; }
+canvas { background-color:#ffffff; }
+</style>
+</head>
+<body>
+
+<div>
+	<canvas id="canvas1" width="400" height="400"></canvas>
+</div>
+
+<div>
+	<input type="button" value="描画" onclick="start()"/>　時間間隔
+	<select name="interval" onchange="period_change(value)">
+		<option value="25">25</option>
+		<option value="50" selected="selected">50</option>
+		<option value="100">100</option>
+		<option value="200">200</option>
+	</select>
+	<div id="ball_pos"></div>
+</div>
+		<script type="text/javascript" src="ele_main.js"></script>
+</body>
+</html>

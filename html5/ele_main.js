@@ -237,6 +237,12 @@ function period_change(value){
 	interval = parseInt(value, 10);
 	start();
 }
+function zoom_change(value){
+	g_zoom = Math.exp((value-20)/10);
+	console.log("value=" + value + " zoom=" + g_zoom);
+	clear();
+	draw();
+}
 
 /* pole */
 var pole_wh = 200;

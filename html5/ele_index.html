@@ -22,12 +22,14 @@ canvas { background-color:#ffffff; }
 
 <div id="buttons">
 	<input type="button" value="描画" onclick="start()"/>　時間間隔
+
 	<select name="interval" onchange="period_change(value)">
 		<option value="25">25</option>
 		<option value="50" selected="selected">50</option>
 		<option value="100">100</option>
 		<option value="200">200</option>
-	</select>
+	</select><br>
+	<input id="zoom_range" type="range" min="0" max="100" value="20" onchange="zoom_change(this.value)" />
 	<div id="ball_pos"></div>
 </div>
 <div id="infos">

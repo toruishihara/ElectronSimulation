@@ -1,3 +1,4 @@
+var lines = new Array();
 /**
 var lines = new Array(15);
 lines[0] = "-10,0,0, 10,0,0";
@@ -16,6 +17,7 @@ lines[12] = "-2,-2,-2, 2,-2,-2";
 lines[13] = "-2,-2,-2, -2,2,-2";
 lines[14] = "-2,-2,-2, -2,-2,2";
 **/
+/**
 var lines = new Array(13);
 lines[0] = "-10,0,0, 10,0,0";
 lines[1] = "0,-10,0, 0,10,0";
@@ -30,6 +32,7 @@ lines[9] = "-2,-2,0, 0,0,-2";
 lines[10] = "2,-2,0, 0,0,-2";
 lines[11] = "-10,0.2,0, 10,0.2,0";
 lines[12] = "-10,-0.2,0, 10,-0.2,0";
+**/
 
 var g_viewP = new tuple3d(1,2,3);
 var g_viewPx;
@@ -129,6 +132,48 @@ function tuple3d_clone() {
 }
 /* 3d framework class */
 
+/* Read STL file */
+var req;
+function dataReceived() {
+	var restr = req.responseText;
+	if (restr == undefined || restr.length == 0) {
+		return;
+	}
+	var ls = restr.split("\n");
+	var cnt = 0;
+	var t0 = new Array(4);
+	var t1 = new Array(4);
+	for (var i=0;i<ls.length;++i) {
+		var t = ls[i].split(/\s+/);
+		if (t[0] == "") {
+			t.shift();
+		}
+		if(t[0] == "vertex") {
+			cnt ++;
+			if (cnt == 1) {
+				t0 = [].concat(t);
+			}
+			if (cnt == 2) {
+				t1 = [].concat(t);
+			}
+			if (cnt == 3) {
+				lines.push(t0[1]+","+t0[2]+","+t0[3]+","+t1[1]+","+t1[2]+","+t1[3]);
+				lines.push(t1[1]+","+t1[2]+","+t1[3]+","+t[1]+","+t[2]+","+t[3]);
+				lines.push(t[1]+","+t[2]+","+t[3]+","+t0[1]+","+t0[2]+","+t0[3]);
+				cnt = 0;
+			}
+		}
+	}
+	draw();
+}
+function loadFile(path) {
+	req = new XMLHttpRequest();
+	req.onreadystatechange = dataReceived;
+	req.open("GET", path, true);
+	req.send(null);
+}
+/* Read STL file */
+
 function draw(c) {
 	var canvas = document.getElementById("canvas1");
 	var c = canvas.getContext("2d");
@@ -215,7 +260,8 @@ function load(){
 	var canvas = document.getElementById("canvas1");
 	canvas.onmousedown = mouseDownListner;
 	clear();
-	draw();
+	//draw();
+	loadFile("bottle.stl");
 	draw_pole();
 }
 
@@ -328,3 +374,4 @@ function setShadow(c, color, blur, offsetX, offsetY){
 	c.shadowOffsetY = offsetY;
 }
 
+		var t = s.split();

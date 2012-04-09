@@ -170,18 +170,20 @@ function dataReceived() {
 			}
 		}
 	}
-	draw();
-	g_center.x = (max_x + min_x)/2;
-	g_center.y = (max_y + min_y)/2;
-	g_center.z = (max_z + min_z)/2;
-	var maxs = max_x - min_x;
-	if (maxs < max_y - min_y) {
-		maxs = max_y - min_y;
+	if (req.readyState == 4) {
+		g_center.x = (max_x + min_x)/2;
+		g_center.y = (max_y + min_y)/2;
+		g_center.z = (max_z + min_z)/2;
+		var maxs = max_x - min_x;
+		if (maxs < max_y - min_y) {
+			maxs = max_y - min_y;
+		}
+		if (maxs < max_z - min_z) {
+			maxs = max_z - min_z;
+		}
+		g_zoom = 200/maxs;
+		draw();
 	}
-	if (maxs < max_z - min_z) {
-		maxs = max_z - min_z;
-	}
-	g_zoom = 100/maxs;
 }
 function loadFile(path) {
 	req = new XMLHttpRequest();
@@ -263,14 +265,10 @@ function mouseDownListner(e) {
 　	canvasOffsetY = canvas.offsetTop;
 　	var x = e.pageX - canvasOffsetX;
 　	var y = e.pageY - canvasOffsetY;
-	var moveX = g_viewPx;
-	var x_f = (x - width/2);
-	x_f /= g_zoom;
+	var moveX = g_viewPx.clone();
 	moveX.mul((x - width/2)/g_zoom);
 	g_center.add(moveX);
-	var moveY = g_viewPy;
-	var y_f = (y - height/2);
-	y_f /= g_zoom;
+	var moveY = g_viewPy.clone();
 	moveY.mul((y - height/2)/g_zoom);
 	g_center.add(moveY);
 	clear();
@@ -392,5 +390,3 @@ function setShadow(c, color, blur, offsetX, offsetY){
 	c.shadowOffsetX = offsetX;
 	c.shadowOffsetY = offsetY;
 }
-
-		var t = s.split();

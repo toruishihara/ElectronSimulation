@@ -1,38 +1,5 @@
-var lines = new Array();
-/**
-var lines = new Array(15);
-lines[0] = "-10,0,0, 10,0,0";
-lines[1] = "0,-10,0, 0,10,0";
-lines[2] = "0,0,-10, 0,0,10";
-lines[3] = "-2,2,2, 2,2,2";
-lines[4] = "2,-2,2, 2,2,2";
-lines[5] = "2,2,-2, 2,2,2";
-lines[6] = "-2,-2,2, 2,-2,2";
-lines[7] = "-2,-2,2, -2,2,2";
-lines[8] = "-2,2,-2, -2,2,2";
-lines[9] = "-2,2,-2, 2,2,-2";
-lines[10] = "2,-2,-2, 2,2,-2";
-lines[11] = "2,-2,-2, 2,-2,2";
-lines[12] = "-2,-2,-2, 2,-2,-2";
-lines[13] = "-2,-2,-2, -2,2,-2";
-lines[14] = "-2,-2,-2, -2,-2,2";
-**/
-/**
-var lines = new Array(13);
-lines[0] = "-10,0,0, 10,0,0";
-lines[1] = "0,-10,0, 0,10,0";
-lines[2] = "0,0,-10, 0,0,10";
-lines[3] = "2,2,0, -2,2,0";
-lines[4] = "-2,2,0, -2,-2,0";
-lines[5] = "-2,-2,0, 2,-2,0";
-lines[6] = "2,-2,0, 2,2,0";
-lines[7] = "2,2,0, 0,0,-2";
-lines[8] = "-2,2,0, 0,0,-2";
-lines[9] = "-2,-2,0, 0,0,-2";
-lines[10] = "2,-2,0, 0,0,-2";
-lines[11] = "-10,0.2,0, 10,0.2,0";
-lines[12] = "-10,-0.2,0, 10,-0.2,0";
-**/
+//var lines = new Array();
+var tris = new Array();
 
 var g_viewP = new tuple3d(1,2,3);
 var g_viewPx;
@@ -47,6 +14,11 @@ var time = 0;
 var interval = 50; //更新間隔
 
 /* 3d framework class */
+function tri3d(in_x0, in_y0, in_z0, in_x1, in_y1, in_z1, in_x2, in_y2, in_z2){
+	this.p0 = new tuple3d(in_x0, in_y0, in_z0);
+	this.p1 = new tuple3d(in_x1, in_y1, in_z1);
+	this.p2 = new tuple3d(in_x2, in_y2, in_z2);
+}
 function tuple3d(in_x, in_y, in_z){
 	this.x = in_x;
 	this.y = in_y;
@@ -134,6 +106,12 @@ function tuple3d_clone() {
 
 /* Read STL file */
 var req;
+var max_x = -999999;
+var max_y = -999999;
+var max_z = -999999;
+var min_x = 999999;
+var min_y = 999999;
+var min_z = 999999;
 function dataReceived() {
 	var restr = req.responseText;
 	if (restr == undefined || restr.length == 0) {
@@ -143,6 +121,7 @@ function dataReceived() {
 	var cnt = 0;
 	var t0 = new Array(4);
 	var t1 = new Array(4);
+	var tri_num = 0;
 	for (var i=0;i<ls.length;++i) {
 		var t = ls[i].split(/\s+/);
 		if (t[0] == "") {
@@ -157,14 +136,52 @@ function dataReceived() {
 				t1 = [].concat(t);
 			}
 			if (cnt == 3) {
-				lines.push(t0[1]+","+t0[2]+","+t0[3]+","+t1[1]+","+t1[2]+","+t1[3]);
-				lines.push(t1[1]+","+t1[2]+","+t1[3]+","+t[1]+","+t[2]+","+t[3]);
-				lines.push(t[1]+","+t[2]+","+t[3]+","+t0[1]+","+t0[2]+","+t0[3]);
+				var x = parseFloat(t[1]);
+				var y = parseFloat(t[2]);
+				var z = parseFloat(t[3]);
+				var tri = new tri3d(
+					parseFloat(t0[1]),parseFloat(t0[2]),parseFloat(t0[3]),
+					parseFloat(t1[1]),parseFloat(t1[2]),parseFloat(t1[3]),
+					x,y,z);
+				tris.push(tri);
 				cnt = 0;
+				tri_num += 1;
+				if (tri_num % 100 == 0 || tri_num < 100) {
+					document.getElementById("tri_num").innerText = tri_num;
+				}
+				if (x > max_x) {
+					max_x = x;
+				}
+				if (y > max_y) {
+					max_y = y;
+				}
+				if (z > max_z) {
+					max_z = z;
+				}
+				if (x < min_x) {
+					min_x = x;
+				}
+				if (y < min_y) {
+					min_y = y;
+				}
+				if (z < min_z) {
+					min_z = z;
+				}
 			}
 		}
 	}
 	draw();
+	g_center.x = (max_x + min_x)/2;
+	g_center.y = (max_y + min_y)/2;
+	g_center.z = (max_z + min_z)/2;
+	var maxs = max_x - min_x;
+	if (maxs < max_y - min_y) {
+		maxs = max_y - min_y;
+	}
+	if (maxs < max_z - min_z) {
+		maxs = max_z - min_z;
+	}
+	g_zoom = 100/maxs;
 }
 function loadFile(path) {
 	req = new XMLHttpRequest();
@@ -183,18 +200,22 @@ function draw(c) {
 	g_viewPy = g_viewP.cross(axisX);
 	g_viewPy.unify();
 	g_viewPx = g_viewPy.cross(g_viewP);
-	for(var i=0; i < lines.length; ++i ) {
-		var str = lines[i];
-		var e = str.split(',');
-		var p0 = new tuple3d(parseFloat(e[0]), parseFloat(e[1]), parseFloat(e[2])); 
+	for(var i=0; i < tris.length; ++i ) {
+		var p0 = tris[i].p0.clone();
 		p0.sub(g_center);
-		var p1 = new tuple3d(parseFloat(e[3]), parseFloat(e[4]), parseFloat(e[5])); 
+		var p1 = tris[i].p1.clone();
 		p1.sub(g_center);
+		var p2 = tris[i].p2.clone();
+		p2.sub(g_center);
 		var x0 = width/2 + g_zoom*p0.dot(g_viewPx);
 		var y0 = height/2 + g_zoom*p0.dot(g_viewPy);
 		var x1 = width/2 + g_zoom*p1.dot(g_viewPx);
 		var y1 = height/2 + g_zoom*p1.dot(g_viewPy);
+		var x2 = width/2 + g_zoom*p2.dot(g_viewPx);
+		var y2 = height/2 + g_zoom*p2.dot(g_viewPy);
 		drawLine(c, x0, y0, x1, y1);
+		drawLine(c, x1, y1, x2, y2);
+		drawLine(c, x2, y2, x0, y0);
 	}
 	draw_infos();
 }
@@ -261,7 +282,7 @@ function load(){
 	canvas.onmousedown = mouseDownListner;
 	clear();
 	//draw();
-	loadFile("bottle.stl");
+	loadFile("a.stl");
 	draw_pole();
 }
 
@@ -339,8 +360,6 @@ function PoleMouseMove(e) {
 	g_viewP.x = 1;
 	g_viewP.z = Math.sqrt(x*x + y*y)*Math.PI/2;
 	g_viewP.y = Math.atan2(y,x);
-	console.log("x=" + x + " y=" + y + " ph=" + g_viewP.z + " th="+g_viewP.y);
-	console.log("x=" + g_viewP.x + " y=" + g_viewP.y + " z=" + g_viewP.z);
 	g_viewP.sp2xy();
 	clear();
 	draw();

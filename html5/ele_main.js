@@ -202,6 +202,8 @@ function draw(c) {
 	g_viewPy = g_viewP.cross(axisX);
 	g_viewPy.unify();
 	g_viewPx = g_viewPy.cross(g_viewP);
+	var w2 = width/2;
+	var h2 = height/2;
 	for(var i=0; i < tris.length; ++i ) {
 		var p0 = tris[i].p0.clone();
 		p0.sub(g_center);
@@ -209,15 +211,13 @@ function draw(c) {
 		p1.sub(g_center);
 		var p2 = tris[i].p2.clone();
 		p2.sub(g_center);
-		var x0 = width/2 + g_zoom*p0.dot(g_viewPx);
-		var y0 = height/2 + g_zoom*p0.dot(g_viewPy);
-		var x1 = width/2 + g_zoom*p1.dot(g_viewPx);
-		var y1 = height/2 + g_zoom*p1.dot(g_viewPy);
-		var x2 = width/2 + g_zoom*p2.dot(g_viewPx);
-		var y2 = height/2 + g_zoom*p2.dot(g_viewPy);
-		drawLine(c, x0, y0, x1, y1);
-		drawLine(c, x1, y1, x2, y2);
-		drawLine(c, x2, y2, x0, y0);
+		var x0 = w2 + g_zoom*p0.dot(g_viewPx);
+		var y0 = h2 + g_zoom*p0.dot(g_viewPy);
+		var x1 = w2 + g_zoom*p1.dot(g_viewPx);
+		var y1 = h2 + g_zoom*p1.dot(g_viewPy);
+		var x2 = w2 + g_zoom*p2.dot(g_viewPx);
+		var y2 = h2 + g_zoom*p2.dot(g_viewPy);
+		drawTri(c, x0, y0, x1, y1, x2, y2);
 	}
 	draw_infos();
 }
@@ -375,6 +375,15 @@ function drawLine(c, x0, y0, x1, y1){
 	c.closePath();
 	c.stroke();
 }
+function drawTri(c, x0, y0, x1, y1, x2, y2){
+	c.beginPath();
+	c.moveTo(x0, y0);
+	c.lineTo(x1, y1);
+	c.lineTo(x2, y2);
+	c.closePath();
+	c.stroke();
+}
+
 
 //c:canvas context
 function fillArc(c, color, x, y, r){

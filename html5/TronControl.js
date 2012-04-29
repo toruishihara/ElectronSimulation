@@ -15,6 +15,13 @@ var Height = 400;
 var Times = 0;
 var Interval = 50; // updating period
 
+function tronColor(r,g,b)
+{
+	this.r = r;
+	this.g = g;
+	this.b = b;
+}
+
 function init() {
 	for (var p=0;p<Math.PI;p+=Math.PI/6) {
 		for (var t=0;t<2*Math.PI;t+=Math.PI/6) {
@@ -36,11 +43,11 @@ function init() {
 			Lines.push(l);
 		}
 	}
-	AddTron(0, Math.PI/2, 'rgb(255,0,0)');
-	AddTron(0.01, Math.PI/2, 'rgb(0,255,0)');
-	AddTron(0.02, Math.PI/2-0.01, 'rgb(0,0,255)');
-	AddTron(0.03, Math.PI/2+0.01, 'rgb(0,255,255)');
-	AddTron(0.3, Math.PI/2+0.01, 'rgb(255,255,0)');
+	//AddTron(0, Math.PI/2, new tronColor(255,0,0));
+	//AddTron(0.01, Math.PI/2, new tronColor(0,255,0));
+	for (var i=0;i<5;++i) {
+		AddTron(Math.PI*2*Math.random(), Math.PI*Math.random(), new tronColor(100*(i%3),30*(i%9),9*(i%27)));
+	}
 }
 
 function draw(c) {
@@ -63,14 +70,24 @@ function draw(c) {
 		var y0 = h2 + ZoomValue*p0.dot(ViewPoleY);
 		var x1 = w2 + ZoomValue*p1.dot(ViewPoleX);
 		var y1 = h2 + ZoomValue*p1.dot(ViewPoleY);
-		drawLine(c, x0, y0, x1, y1);
+		var depth = ViewPole.dot(p0);
+		depth *= -100;
+		depth += 150;
+		var v = depth.toFixed(0);
+		var color = "rgb(" + v + "," + v + "," + v + ")";
+		drawLine(c, x0, y0, x1, y1, color);
 	}
 	for(var i=0; i < Trons.length; ++i ) {
 		var p0 = Trons[i].point.clone();
 		p0.sub(CenterPoint);
 		var x0 = w2 + ZoomValue*p0.dot(ViewPoleX);
 		var y0 = h2 + ZoomValue*p0.dot(ViewPoleY);
-		drawSmallRect(c, x0, y0, Trons[i].color);
+		var depth = ViewPole.dot(p0) + 1;
+		var r = 256 - (256 - Trons[i].color.r)*depth/2;
+		var g = 256 - (256 - Trons[i].color.g)*depth/2;
+		var b = 256 - (256 - Trons[i].color.b)*depth/2;
+		var color = "rgb(" + r.toFixed(0) + "," + g.toFixed(0) + "," + b.toFixed(0) + ")";
+		drawSmallRect(c, x0, y0, color);
 	}
 	drawInfos();
 }
@@ -155,7 +172,8 @@ function zoom_change(value){
 }
 
 //c:canvas context
-function drawLine(c, x0, y0, x1, y1){
+function drawLine(c, x0, y0, x1, y1, color){
+	c.strokeStyle = color;
 	c.beginPath();
 	c.moveTo(x0, y0);
 	c.lineTo(x1, y1);
@@ -190,3 +208,4 @@ function setShadow(c, color, blur, offsetX, offsetY){
 	c.shadowOffsetX = offsetX;
 	c.shadowOffsetY = offsetY;
 }
+

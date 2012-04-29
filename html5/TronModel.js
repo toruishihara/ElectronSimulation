@@ -6,12 +6,12 @@
 // Global variables
 var Trons = new Array(); // Array of Electrons
 
-function tron(in_th, in_sp, in_color)
+function tron(th, sp, color)
 {
-	this.point = new tuple3d(1, in_th, in_sp);
+	this.point = new tuple3d(1, th, sp);
 	this.point.sp2xy();
 	this.velo = new tuple3d(0,0,0); // Velocity
-	this.color = in_color;
+	this.color = color;
 }
 
 function AddTron(th, ph, color){

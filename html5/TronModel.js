@@ -19,6 +19,9 @@ function AddTron(th, ph, color){
 	Trons.push(tr);
 }
 
+function ModelInit() {
+	Trons = new Array();
+}
 function ModelProgress() {
 	for(var i=0;i<Trons.length;++i) {
 		calcNewVelocityOne(i);

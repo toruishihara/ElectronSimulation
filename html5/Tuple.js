@@ -87,8 +87,13 @@ function tuple3d_sp2xy() {
 }
 function tuple3d_xy2sp() {
 	var r = Math.sqrt(this.x*this.x + this.y*this.y + this.z*this.z);
-	var th = Math.atan(this.y/this.x);
-	var ph = Math.acos(this.z/r);
+	var th = Math.atan2(this.y,this.x);
+	var ph;
+	if (r < 0.0000001) {
+		ph = 0;
+	} else {
+		ph = Math.acos(this.z/r);
+	}
 	this.x = r;
 	this.y = th;
 	this.z = ph;
@@ -111,4 +116,5 @@ function tuple3d_clone() {
 	var ret = new tuple3d(this.x, this.y, this.z);
 	return ret;
 }
+
 /* end of 3D framework class */

@@ -2,23 +2,23 @@
 	margin:0;
 	padding:0;
 }
-#canvas1 {
+#sphereCanvas {
 	position: absolute;
-	top: 10px;
-	left: 10px;
+	top: 0px;
+	left: 0px;
 }
-#pole1 {
+#mapCanvas {
 	position: absolute;
-	top: 10px;
-	left: 420px;
+	top: 0px;
+	left: 410px;
 }
 #buttons {
 	position: absolute;
 	top: 220px;
-	left: 420px;
+	left: 410px;
 }
 #infos {
 	position: absolute;
-	top: 260px;
-	left: 420px;
+	top: 280px;
+	left: 410px;
 }

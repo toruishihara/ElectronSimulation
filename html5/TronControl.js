@@ -49,12 +49,9 @@ function init() {
 		}
 	}
 	ModelInit();
-	AddTron(0, Math.PI/2, new tronColor(255,0,0));
-	AddTron(Math.PI/2, Math.PI/2, new tronColor(0,255,0));
-	AddTron(0, 0, new tronColor(0,0,255));
-	//for (var i=0;i<numTrons;++i) {
-	//	AddTron(Math.PI*2*Math.random(), Math.PI*Math.random(), new tronColor(100*(i%3),30*(i%9),9*(i%27)));
-	//}
+	for (var i=0;i<numTrons;++i) {
+		AddTron(Math.PI*2*Math.random(), Math.PI*Math.random(), new tronColor(100*(i%3),30*(i%9),9*(i%27)));
+	}
 }
 function drawViews() {
 	drawSphereView();
@@ -97,34 +94,38 @@ function drawSphereView() {
 	}
 	drawInfos();
 }
+
+// Sinusoidal projection
+function calcMapX(tuple) {
+	var canvas = document.getElementById("mapCanvas");
+	var p = tuple.clone();
+	p.sub(CenterPoint);
+	p.xy2sp();
+	var x = canvas.width/2 + Math.sin(p.z)*2*canvas.width*(p.y/(2*Math.PI))/2;
+	return x;
+}
+function calcMapY(tuple) {
+	var canvas = document.getElementById("mapCanvas");
+	var p = tuple.clone();
+	p.sub(CenterPoint);
+	p.xy2sp();
+	var y = canvas.height*(p.z/Math.PI);
+	return y;
+}
+
 function drawMapView() {
 	var canvas = document.getElementById("mapCanvas");
 	var ctx = canvas.getContext("2d");
 	ctx.lineWidth = 1;
 	for(var i=0; i < Lines.length; ++i ) {
-		var p0 = Lines[i].p0.clone();
-		p0.sub(CenterPoint);
-		p0.xy2sp();
-		var p1 = Lines[i].p1.clone();
-		p1.sub(CenterPoint);
-		p1.xy2sp();
-		var x0 = canvas.width*((p0.y+Math.PI)/(2*Math.PI));
-		var y0 = canvas.height*(p0.z/Math.PI);
-		var x1 = canvas.width*((p1.y+Math.PI)/(2*Math.PI));
-		var y1 = canvas.height*(p1.z/Math.PI);
 		var color = "rgb(128,128,128)";
-		drawLine(ctx, x0, y0, x1, y1, color);
+		drawLine(ctx, calcMapX(Lines[i].p0), calcMapY(Lines[i].p0), 
+			calcMapX(Lines[i].p1), calcMapY(Lines[i].p1), color);
 	}
 	for(var i=0; i < Trons.length; ++i ) {
 		var p0 = Trons[i].point.clone();
-		p0.sub(CenterPoint);
-		p0.xy2sp();
-		var th = p0.y;
-		var ph = p0.z;
-		var x0 = canvas.width*((th+Math.PI)/(2*Math.PI));
-		var y0 = canvas.height*(ph/Math.PI);
 		var color = "rgb(" + Trons[i].color.r.toFixed(0) + "," + Trons[i].color.g.toFixed(0) + "," + Trons[i].color.b.toFixed(0) + ")";
-		drawSmallRect(ctx, x0, y0, color);
+		drawSmallRect(ctx, calcMapX(p0), calcMapY(p0), color);
 	}
 }
 function drawInfos() {

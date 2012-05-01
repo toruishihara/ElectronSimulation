@@ -7,9 +7,9 @@
 
 // Global variables
 var Lines = new Array(); // Lines for sphere
-var ViewPole = new tuple3d(0,0,1);
-var ViewPoleX = new tuple3d(1,0,0);
-var ViewPoleY = new tuple3d(0,1,0);
+var ViewPole;
+var ViewPoleX;
+var ViewPoleY;
 var CenterPoint = new tuple3d(0,0,0);
 var ZoomValue = 180;
 
@@ -28,6 +28,15 @@ function tronColor(r,g,b)
 }
 
 function init() {
+	ViewPole = new tuple3d(-0.3,-0.5,1);
+	ViewPoleX = new tuple3d(1,-0.2,0);
+	ViewPoleX.unify();
+	ViewPoleY = ViewPole.cross(ViewPoleX);
+	ViewPoleY.unify();
+	ViewPole = ViewPoleX.cross(ViewPoleY);
+	ViewPole.unify();
+	ViewPoleX = ViewPoleY.cross(ViewPole);
+	ViewPoleX.unify();
 	for (var p=0;p<Math.PI;p+=Math.PI/6) {
 		for (var t=0;t<2*Math.PI;t+=Math.PI/6) {
 			var p0 = new tuple3d(1, t-Math.PI/6, p); 
@@ -130,8 +139,11 @@ function drawMapView() {
 }
 function drawInfos() {
 	document.getElementById("progress").innerText = Times.toFixed(0);
-	document.getElementById("zoom").innerText = ZoomValue.toFixed(2);
-	document.getElementById("center").innerText = CenterPoint.str();
+	document.getElementById("totalMove").innerText = TotalMove().toFixed(6);
+	document.getElementById("closestPair").innerText = ClosestPair();
+	document.getElementById("closestAngle").innerText = ClosestAngle().toFixed(6);
+	document.getElementById("loneliestPair").innerText = LoneliestPair();
+	document.getElementById("loneliestAngle").innerText = LoneliestAngle().toFixed(6);
 	var sp = ViewPole.clone();
 	var s = sp.str();
 	sp.xy2sp();
@@ -220,31 +232,6 @@ function mouseMoveShpere(e) {
 	ViewPoleX.unify();
 	ViewPoleY = ViewPole.cross(ViewPoleX);
 	ViewPoleY.unify();
-	/*
-	Z1.mul(Math.sin(x));
-	ViewPoleX.add(Z1);
-	X1.mul(x*Math.sin(x));
-	ViewPoleX.add(X1);
-
-	X2.mul(-1*Math.sin(x));
-	ViewPole.add(X2);
-	Z2.mul(x*Math.sin(x));
-	ViewPole.add(X2);
-
-	Z3.mul(Math.sin(y));
-	ViewPoleY.add(Z3);
-	Y1.mul(-1*y*Math.sin(y));
-	ViewPoleY.add(Y1);
-
-	Y2.mul(-1*Math.sin(y));
-	ViewPole.add(Y2);
-	Z4.mul(-1*y*Math.sin(y));
-	ViewPole.add(Z4);
-
-	ViewPole.unify();
-	ViewPoleX.unify();
-	ViewPoleY.unify();
-	*/
 
 	clear();
 	drawViews();
@@ -323,4 +310,3 @@ function setShadow(c, color, blur, offsetX, offsetY){
 	c.shadowOffsetX = offsetX;
 	c.shadowOffsetY = offsetY;
 }
-

@@ -78,7 +78,7 @@ function ModelProgress() {
 			var dot = Math.acos(ti.dot(tj));
 			if (minDot > dot) {
 				minDot = dot;
-				pair = i.toFixed(0) + " and " + j.toFixed(0);
+				pair = i.toFixed(0) + "," + j.toFixed(0);
 			}
 		}
 		if (lonelyDot < minDot) {
@@ -103,8 +103,27 @@ function LoneliestPair() {
 function LoneliestAngle() {
 	return loneliestAngle;
 }
+function ModelMovePole() {
+	var ls = loneliestPair.split(',');
+	var newPoleZ = Trons[ls[0]].point.clone();	
+	var newPoleY = newPoleZ.cross(Trons[ls[1]].point);
+	newPoleY.unify();
+	var newPoleX = newPoleY.cross(newPoleZ);
+	
+	for(var i=0;i<Trons.length;++i) {
+		var p = Trons[i].point.clone();
+		Trons[i].point.x = p.dot(newPoleX);
+		Trons[i].point.y = p.dot(newPoleY);
+		Trons[i].point.z = p.dot(newPoleZ);
+	}
+}
+function save() {
+	var text = outputSTL();
+	location.href = 'data:application/octet-stream,'+encodeURIComponent(text);
+}
 function outputSTL() {
-	console.log("#solid number" + Trons.length);
+	var ret = "";
+	ret = ret + "solid number" + Trons.length + "\n";
 	for(var i=0;i<Trons.length;++i) {
 		for(var j=i+1;j<Trons.length;++j) {
 			for(var k=j+1;k<Trons.length;++k) {
@@ -141,25 +160,26 @@ function outputSTL() {
 					p1 = tmp.clone();
 				}
 				
-				console.log("#facet normal " + n.x.toExponential()
+				ret = ret + "facet normal " + n.x.toExponential()
 				 	+ " " + n.y.toExponential()
-				 	+ " " + n.z.toExponential() );
-				console.log("#outer loop");
-				console.log("#vertex " + p0.x.toExponential()
+				 	+ " " + n.z.toExponential();
+				ret = ret + "outer loop\n";
+				ret = ret + "vertex " + p0.x.toExponential()
 				 	+ " " + p0.y.toExponential()
-				 	+ " " + p0.z.toExponential() );
-				console.log("#vertex " + p1.x.toExponential()
+				 	+ " " + p0.z.toExponential() + "\n";
+				ret = ret + "vertex " + p1.x.toExponential()
 				 	+ " " + p1.y.toExponential()
-				 	+ " " + p1.z.toExponential() );
-				console.log("#vertex " + p2.x.toExponential()
+				 	+ " " + p1.z.toExponential() + "\n";
+				ret = ret + "vertex " + p2.x.toExponential()
 				 	+ " " + p2.y.toExponential()
-				 	+ " " + p2.z.toExponential() );
-				console.log("#endloop");
-				console.log("#endfacet");
+				 	+ " " + p2.z.toExponential() + "\n";
+				ret = ret + "endloop\n";
+				ret = ret + "endfacet\n";
 			}
 		}
 	}
-	console.log("#endsolid number" + Trons.length);
+	ret = ret + "endsolid number" + Trons.length + "\n";
+	return ret;
 }
 
 var ColombK = -0.00001;

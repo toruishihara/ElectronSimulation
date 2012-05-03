@@ -18,13 +18,26 @@ var Width = 400;
 var Height = 400;
 var Times = 0;
 var Interval = 50;
-var numTrons = 2;
+var numTrons = 8;
 
-function tronColor(r,g,b)
+function tronColor(type,p1,p2,p3)
 {
-	this.r = r;
-	this.g = g;
-	this.b = b;
+	this.type = type.concat("");
+	this.p1 = p1;  	// Red or Hue
+	this.p2 = p2;	// Green or Saturation
+	this.p3 = p3;	// Blue or Lightness
+	this.toString = tronColor_toString;
+	this.toStringWithAlpha = tronColor_toStringWithAlpha;
+}
+function tronColor_toString()
+{
+	var str = this.type + "(" + this.p1 + "," + this.p2 + "," + this.p3 + ")";
+	return str;
+}
+function tronColor_toStringWithAlpha(alpha)
+{
+	var str = this.type + "a(" + this.p1 + "," + this.p2 + "," + this.p3 + "," + alpha.toFixed(1) + ")";
+	return str;
 }
 
 function init() {
@@ -59,7 +72,8 @@ function init() {
 	}
 	ModelInit();
 	for (var i=0;i<numTrons;++i) {
-		AddTron(Math.PI*2*Math.random(), Math.PI*Math.random(), new tronColor(100*(i%3),30*(i%9),9*(i%27)));
+		var color = new tronColor("hsl", (i*50)%360, "100%", "50%");
+		AddTron(Math.PI*2*Math.random(), Math.PI*Math.random(), color);
 	}
 }
 function drawViews() {
@@ -82,11 +96,8 @@ function drawSphereView() {
 		var y0 = h2 + -1*ZoomValue*p0.dot(ViewPoleY);
 		var x1 = w2 + ZoomValue*p1.dot(ViewPoleX);
 		var y1 = h2 + -1*ZoomValue*p1.dot(ViewPoleY);
-		var depth = ViewPole.dot(p0);
-		depth *= -100;
-		depth += 150;
-		var v = depth.toFixed(0);
-		var color = "rgb(" + v + "," + v + "," + v + ")";
+		var depth = 0.8*(ViewPole.dot(p0)+1)/2 + 0.2;
+		var color = "rgba(0,0,0," + depth.toFixed(1) + ")";
 		drawLine(ctx, x0, y0, x1, y1, color);
 	}
 	for(var i=0; i < Trons.length; ++i ) {
@@ -94,12 +105,8 @@ function drawSphereView() {
 		p0.sub(CenterPoint);
 		var x0 = w2 + ZoomValue*p0.dot(ViewPoleX);
 		var y0 = h2 + -1*ZoomValue*p0.dot(ViewPoleY);
-		var depth = ViewPole.dot(p0) + 1;
-		var r = 256 - (256 - Trons[i].color.r)*depth/2;
-		var g = 256 - (256 - Trons[i].color.g)*depth/2;
-		var b = 256 - (256 - Trons[i].color.b)*depth/2;
-		var color = "rgb(" + r.toFixed(0) + "," + g.toFixed(0) + "," + b.toFixed(0) + ")";
-		drawSmallRect(ctx, x0, y0, color);
+		var depth = (ViewPole.dot(p0) + 1)/2;
+		drawSmallRect(ctx, x0, y0, Trons[i].color.toStringWithAlpha(depth));
 	}
 	drawInfos();
 }
@@ -121,6 +128,17 @@ function calcMapY(tuple) {
 	var y = canvas.height*(p.z/Math.PI);
 	return y;
 }
+function calcMapXEdge(tuple) {
+	var canvas = document.getElementById("mapCanvas");
+	var p = tuple.clone();
+	p.sub(CenterPoint);
+	p.xy2sp();
+	if (p.y > Math.PI-0.00001) {
+		p.y = -1*Math.PI;
+	}
+	var x = canvas.width/2 + Math.sin(p.z)*2*canvas.width*(p.y/(2*Math.PI))/2;
+	return x;
+}
 
 function drawMapView() {
 	var canvas = document.getElementById("mapCanvas");
@@ -130,11 +148,12 @@ function drawMapView() {
 		var color = "rgb(128,128,128)";
 		drawLine(ctx, calcMapX(Lines[i].p0), calcMapY(Lines[i].p0), 
 			calcMapX(Lines[i].p1), calcMapY(Lines[i].p1), color);
+		drawLine(ctx, calcMapXEdge(Lines[i].p0), calcMapY(Lines[i].p0), 
+			calcMapXEdge(Lines[i].p1), calcMapY(Lines[i].p1), color);
 	}
 	for(var i=0; i < Trons.length; ++i ) {
 		var p0 = Trons[i].point.clone();
-		var color = "rgb(" + Trons[i].color.r.toFixed(0) + "," + Trons[i].color.g.toFixed(0) + "," + Trons[i].color.b.toFixed(0) + ")";
-		drawSmallRect(ctx, calcMapX(p0), calcMapY(p0), color);
+		drawSmallRect(ctx, calcMapX(p0), calcMapY(p0), Trons[i].color.toString());
 	}
 }
 function drawInfos() {
@@ -148,17 +167,17 @@ function drawInfos() {
 	var s = sp.str();
 	sp.xy2sp();
 	s += sp.strsp();
-	document.getElementById("view_z").innerText = s;
+	//document.getElementById("view_z").innerText = s;
 	var sp2 = ViewPoleX.clone();
 	s = sp2.str();
 	sp2.xy2sp();
 	s += sp2.strsp();
-	document.getElementById("view_x").innerText = s;
+	//document.getElementById("view_x").innerText = s;
 	var sp3 = ViewPoleY.clone();
 	s = sp3.str();
 	sp3.xy2sp();
 	s += sp3.strsp();
-	document.getElementById("view_y").innerText = s;
+	//document.getElementById("view_y").innerText = s;
 }
 
 function updateAll(){
@@ -252,6 +271,20 @@ function start(){
 	clearInterval(Timer1);
 	updateAll();
 	Timer1 = setInterval("period()", Interval);
+
+	var help = document.getElementById("sphereHelp");
+	help.style.display = "none";
+	help = document.getElementById("mapHelp");
+	help.style.display = "none";
+	
+}
+function stop(){
+	clearInterval(Timer1);
+}
+function movePole(){
+	ModelMovePole();
+	clear();
+	drawViews();
 }
 
 function period(){
@@ -305,7 +338,7 @@ function fillArc(c, color, x, y, r){
 }
 
 function setShadow(c, color, blur, offsetX, offsetY){
-	c.shadowColor = color; //firefox は必須
+	c.shadowColor = color;
 	c.shadowBlur = blur;
 	c.shadowOffsetX = offsetX;
 	c.shadowOffsetY = offsetY;

@@ -17,7 +17,11 @@ canvas { background-color:#ffffff; }
 <div>
 	<canvas id="mapCanvas" width="400" height="200"></canvas>
 <div id="buttons">
-	<input type="button" value="Draw" onclick="start()"/><br>Number of Electron
+	<input type="button" value="Start" onclick="start()"/>
+	<input type="button" value="Stop" onclick="stop()"/>
+	<input type="button" value="MovePole" onclick="movePole()"/>
+	<input type="button" value="Save" onclick="save()"/>
+	<br>Number of Electron
 	<select name="numOfTrons" onchange="numberChange(value)">
 		<option value="2" selected="selected">2</option>
 		<option value="3">3</option>
@@ -31,6 +35,7 @@ canvas { background-color:#ffffff; }
 		<option value="11">11</option>
 		<option value="12">12</option>
 		<option value="16">16</option>
+		<option value="20">20</option>
 		<option value="24">24</option>
 		<option value="32">32</option>
 	</select><br>

@@ -2,23 +2,59 @@
 	margin:0;
 	padding:0;
 }
+h1 {
+	color: #000000;
+	text-shadow: 5pt 5pt 1pt #BDBDBD;
+	font-size: 20pt;
+}
+#desc {
+	position: absolute;
+	top: 40px;
+	font-size: 10pt;
+	left: 10px;
+}
 #sphereCanvas {
 	position: absolute;
-	top: 0px;
+	top: 200px;
 	left: 0px;
 }
+#sphereHelp {
+	position: absolute;
+	top: 350px;
+	left: 150px;
+	font-size: 100pt;
+	color: blue;
+	opacity:0.5;
+}
+
 #mapCanvas {
 	position: absolute;
-	top: 0px;
+	top: 200px;
 	left: 410px;
 }
+#mapHelp {
+	position: absolute;
+	top: 280px;
+	left: 480px;
+	font-size: 50pt;
+	color: blue;
+	opacity:0.5;
+}
+
 #buttons {
 	position: absolute;
-	top: 220px;
+	top: 420px;
 	left: 410px;
 }
 #infos {
 	position: absolute;
-	top: 280px;
+	top: 480px;
 	left: 410px;
+	font-size: 10pt
+}
+#bottom {
+	position: absolute;
+	top: 610px;
+	left: 10px;
+	font-size: 9pt
 }

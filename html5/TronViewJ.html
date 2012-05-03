@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="utf-8"/>
+<title>複数電子の球面上の動き、力学的シミュレーション</title>
+<style>
+body { background-color:#cccccc; }
+canvas { background-color:#ffffff; }
+</style>
+        <link rel="stylesheet" href="desktop.css" />
+</head>
+<body onload="load()">
+<h1>
+複数電子の球面上の動き、力学的シミュレーション(HTML5)<br>
+</h1>
+<div id="desc">
+シミュレーションの方法（とりあえずSTARTを押してみてください）<br>
+初期条件：複数の電子を球面上にランダムに配置する。<br>
+拘束条件：各電子は１つの球面上しか移動できない。<br>
+手法：ニュートン力学的な計算のみを使用する。<br>
+各電子の動作：各電子はそれぞれの電子間のクローン力を受け、速度ベクトル<b>V</b>を得る。<br>
+<b>V</b>を極座標の成分に分け、<b>r</b>成分を０にする。デルタ時間内に移動する量を計算する。<br>
+移動後も慣性の法則を考慮し<b>V</b>を保存し、次回の計算に用いる。結果の考察は、<a href="ResultJ.html">こちら</a>
+</div>
+	<canvas id="sphereCanvas" width="400" height="400"></canvas>
+	<div id="sphereHelp">⇔</div>
+	<canvas id="mapCanvas" width="400" height="200"></canvas>
+	<div id="mapHelp"> Map View </div>
+<div id="buttons">
+	<input type="button" value="START" onclick="start()"/>
+	<input type="button" value="STOP" onclick="stop()"/>
+	<input type="button" value="xyz軸の最適化" onclick="movePole()"/>
+	<input type="button" value="STLとして保存" onclick="save()"/>
+	<br>電子の数
+		<input type="number"  name="numOfTrons" value="8" min="1" max="129" onchange="numberChange(value)">
+</div>
+<div id="infos">
+計算回数=<span id="progress"></span><br>
+今回の合計電子移動量=<span id="totalMove"></span><br>
+最も近い電子ペア=<span id="closestPair"></span><br>
+　上の電子間角度=<span id="closestAngle"></span><br>
+最も孤立した電子と、近接電子=<span id="loneliestPair"></span><br>
+ 　上の電子間角度=<span id="loneliestAngle"></span><br>
+</div>
+		<script type="text/javascript" src="Tuple.js"></script>
+		<script type="text/javascript" src="TronControl.js"></script>
+		<script type="text/javascript" src="TronModel.js"></script>
+<div id="bottom">
+質問などは、torui@nariuchi.com まで<br>
+定数：クローン力＝0.00001、電子の質量＝１、球の半径＝１、単位時間＝１<br>
+テスト済ブラウザ：Safari v5.1, Chrome 18.0
+</div>
+</body>
+</html>

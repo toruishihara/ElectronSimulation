@@ -6,14 +6,19 @@
 <style>
 body { background-color:#cccccc; }
 canvas { background-color:#ffffff; }
+    div#sphereCanvas{
+        border: none;
+        cursor: pointer;
+        width: 400px;
+        height: 400px;
+        background-color: #EEEEEE;
+    }
 </style>
         <link rel="stylesheet" href="desktop.css" />
 </head>
-<body onload="load()">
+<body onload="loadThree()">
 
-<div>
-	<canvas id="sphereCanvas" width="400" height="400"></canvas>
-</div>
+<div id="sphereCanvas" width="400" height="400"></div>
 <div>
 	<canvas id="mapCanvas" width="400" height="200"></canvas>
 <div id="buttons">
@@ -52,8 +57,9 @@ ViewZ=<span id="view_z"></span><br>
 ViewX=<span id="view_x"></span><br>
 ViewY=<span id="view_y"></span><br>
 </div>
+        <script type="text/javascript" src="Three.js"></script>
 		<script type="text/javascript" src="Tuple.js"></script>
-		<script type="text/javascript" src="TronControl.js"></script>
+		<script type="text/javascript" src="TronControlThree.js"></script>
 		<script type="text/javascript" src="TronModel.js"></script>
 </body>
 </html>

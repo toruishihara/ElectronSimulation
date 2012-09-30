@@ -22,6 +22,8 @@ var numTrons = 8;
 
 var ThreeTrons = new Array();
 
+var g_cyl;
+
 function tronColor(type,p1,p2,p3)
 {
 	this.type = type.concat("");
@@ -405,7 +407,10 @@ function loop() {
         ThreeTrons[i].position.x = p0.x;
         ThreeTrons[i].position.y = p0.y;
         ThreeTrons[i].position.z = p0.z;
-    }    
+    }
+    
+    //g_cyl.rotation.z += Math.PI/12;
+    g_cyl.rotation.y += Math.PI/12;
     
     renderer.clear();
     renderer.render(scene, camera);
@@ -417,15 +422,72 @@ function loadThree() {
     initCamera();
     initScene();    
     initLight();
+    
+    init();
+    initObjectThree();
+}
+
+function create_cylinder(p0, p1, r, col)
+{
+    var material = new THREE.MeshLambertMaterial({
+                                                 color: 0x00ff00,
+                                                 opacity: 0.5
+                                                 });
+    var cylinder = new THREE.Mesh(new THREE.CylinderGeometry(r, r, p0.dis(p1), 0, 0, false), material);
+    cylinder.overdraw = true;
+
+    var v = p0.clone();
+    v.sub(p1);
+    v.xy2sp_y();
+    console.log("ph=" + v.z);
+    cylinder.rotation.z = v.z;
+    cylinder.rotation.y = 0.5*Math.PI + v.y;
+    cylinder.eulerOrder = 'YZX';
+    
+    var v2 = p0.clone();
+    v2.add(p1);
+    v2.mul(0.5);
+    cylinder.position.x = v2.x;
+    cylinder.position.y = v2.y;
+    cylinder.position.z = v2.z;
+    
+    return cylinder;
 }
 
 function initObjectThree() {
+    var geometry = new THREE.Geometry();
+    vect0 = new THREE.Vector3(0, 0, 0);
+    geometry.vertices.push(new THREE.Vertex(vect0));
+    vect1 = new THREE.Vector3(250, 0, 0);
+    geometry.vertices.push(new THREE.Vertex(vect1));
+    var line = new THREE.Line(geometry, new THREE.LineBasicMaterial( { color:0xFF0000, opacity: 1.0, lineWidth:5} ));
+    scene.add( line );
+
+    var geometry = new THREE.Geometry();
+    vect0 = new THREE.Vector3(0, 0, 0);
+    geometry.vertices.push(new THREE.Vertex(vect0));
+    vect1 = new THREE.Vector3(0, 250, 0);
+    geometry.vertices.push(new THREE.Vertex(vect1));
+    var line = new THREE.Line(geometry, new THREE.LineBasicMaterial( { color:0x00FF00, opacity: 1.0, lineWidth:5} ));
+    scene.add( line );
+
+    var geometry = new THREE.Geometry();
+    vect0 = new THREE.Vector3(0, 0, 0);
+    geometry.vertices.push(new THREE.Vertex(vect0));
+    vect1 = new THREE.Vector3(0, 0, 250);
+    geometry.vertices.push(new THREE.Vertex(vect1));
+    var line = new THREE.Line(geometry, new THREE.LineBasicMaterial( { color:0x0000FF, opacity: 1.0, lineWidth:5} ));
+    scene.add( line );
+    
 	for(var i=0; i < Lines.length; ++i ) {
         var geometry = new THREE.Geometry();
 		var p0 = Lines[i].p0.clone();
 		var p1 = Lines[i].p1.clone();
         p0.mul(100);
         p1.mul(100);
+        var cyl = create_cylinder(p0, p1, 2, 0x00ff00);
+        scene.add(cyl);
+        
         vect0 = new THREE.Vector3(p0.x, p0.y, p0.z);
         geometry.vertices.push(new THREE.Vertex(vect0));
         vect1 = new THREE.Vector3(p1.x, p1.y, p1.z);
@@ -441,14 +503,24 @@ function initObjectThree() {
         mat.color.setHSV(((7*i)%32)/32.0, 1.0, 1.0);
         
         ThreeTrons[i] = new THREE.Mesh(
-                                 new THREE.CubeGeometry(5,5,5),                //形状の設定
+                                 new THREE.CubeGeometry(5,5,5), 
                                  mat
                                  );
         scene.add(ThreeTrons[i]);
         ThreeTrons[i].position.set(100*p0.x, 100*p0.y, 100*p0.z);
 
 	}
-	drawInfos();
+    var matc = new THREE.MeshLambertMaterial({color: 0xff00ff});
+    g_cyl = new THREE.Mesh(
+                    new THREE.CylinderGeometry(10, 10, 100, 5, 5, false),
+                    matc);
+    g_cyl.rotation.x = 0.5*Math.PI;
+    //g_cyl.updateMatrix();
+    g_cyl.eulerOrder = "ZYX";
+    
+    scene.add(g_cyl);
+        
+	//drawInfos();
 }
 
 

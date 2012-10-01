@@ -18,15 +18,13 @@ var Width = 400;
 var Height = 400;
 var Times = 0;
 var Interval = 50;
-var numTrons = 8;
+var NumTrons = 8;
 
 var ThreeTrons = new Array();
 
-var g_cyl;
-var g_looping = false;
-var scene;
-var g_camera;
-var g_ThreeCamera;
+var Looping = false;
+var ThreeScene;
+var ThreeCamera;
 
 function tronColor(type,p1,p2,p3)
 {
@@ -79,10 +77,15 @@ function init() {
 		}
 	}
 	ModelInit();
-	for (var i=0;i<numTrons;++i) {
+	for (var i=0;i<NumTrons;++i) {
 		var color = new tronColor("hsl", (i*50)%360, "100%", "50%");
 		AddTron(Math.PI*2*Math.random(), Math.PI*Math.random(), color);
 	}
+    initThree();
+    initScene();    
+    initLight();
+    initCamera();
+    initObjectThree();
 }
 function drawViews() {
     updateThree();
@@ -141,29 +144,10 @@ function drawInfos() {
 	document.getElementById("closestAngle").innerText = ClosestAngle().toFixed(6);
 	document.getElementById("loneliestPair").innerText = LoneliestPair();
 	document.getElementById("loneliestAngle").innerText = LoneliestAngle().toFixed(6);
-	var sp = ViewPole.clone();
-	var s = sp.str();
-	sp.xy2sp();
-	s += sp.strsp();
-	//document.getElementById("view_z").innerText = s;
-	var sp2 = ViewPoleX.clone();
-	s = sp2.str();
-	sp2.xy2sp();
-	s += sp2.strsp();
-	//document.getElementById("view_x").innerText = s;
-	var sp3 = ViewPoleY.clone();
-	s = sp3.str();
-	sp3.xy2sp();
-	s += sp3.strsp();
-	//document.getElementById("view_y").innerText = s;
 }
 
 function updateAll(){
-	clear();
 	drawViews();
-}
-
-function clear(){
 }
 
 var	IsMouseDown = 0;
@@ -179,6 +163,9 @@ function mouseDownShpere(e) {
 　	canvasOffsetY = canvas.offsetTop;
 　	DownX = e.pageX - canvasOffsetX;
 　	DownY = e.pageY - canvasOffsetY;
+    DownPole = ViewPole.clone();
+	DownPoleX = ViewPoleX.clone();
+	DownPoleY = ViewPoleY.clone();
 }
 function mouseUpShpere(e) {
 	IsMouseDown = 0;
@@ -190,17 +177,40 @@ function mouseMoveShpere(e) {
 　	canvasOffsetY = canvas.offsetTop;
     var x = e.pageX - canvasOffsetX;
     var y = e.pageY - canvasOffsetY;
-    g_camera.xy2sp();
-    g_camera.z += (x - DownX)/500;
-    g_camera.y += (y - DownY)/500;
-    g_camera.sp2xy();
-    g_ThreeCamera.position.x = g_camera.x;
-    g_ThreeCamera.position.y = g_camera.y;
-    g_ThreeCamera.position.z = g_camera.z;
-    g_ThreeCamera.lookAt( {x:0, y:0, z:0 } );
-    renderer.clear();
-    renderer.render(scene, g_ThreeCamera);
+	var tmpX = x;
+	var tmpY = y;
+	x -= DownX;
+	y -= DownY;
 	console.log("x=" + x + " y=" + y);
+	x *= -1;
+	x /= ZoomValue;
+	y /= ZoomValue;
+	var X1 = DownPoleX.clone();
+	var Y1 = DownPoleY.clone();
+	var Z1 = DownPole.clone();
+	var Z2 = DownPole.clone();
+    
+	X1.mul(Math.cos(x));
+	Z1.mul(Math.sin(x));
+	ViewPoleX = X1;
+	ViewPoleX.sub(Z1);
+    
+	Y1.mul(Math.cos(y));
+	Z2.mul(Math.sin(y));
+	ViewPoleY = Y1;
+	ViewPoleY.sub(Z2);
+    
+	ViewPole = ViewPoleX.cross(ViewPoleY);
+	ViewPole.unify();
+	ViewPoleX = ViewPoleY.cross(ViewPole);
+	ViewPoleX.unify();
+	ViewPoleY = ViewPole.cross(ViewPoleX);
+	ViewPoleY.unify();
+
+    updateCamera();
+
+    renderer.clear();
+    renderer.render(ThreeScene, ThreeCamera);
 }
 
 function load(){
@@ -209,14 +219,13 @@ function load(){
 	canvas.onmousemove = mouseMoveShpere;
 	canvas.onmouseup = mouseUpShpere;
 	init();
-	clear();
 	drawViews();
 }
 
 function start(){
 	Times = 0;
         
-    g_looping = true;
+    Looping = true;
     loop();
 
 	var help = document.getElementById("sphereHelp");
@@ -226,12 +235,11 @@ function start(){
 	
 }
 function stop(){
-	//clearInterval(Timer1);
+    Looping = false;
 }
 function movePole(){
 	ModelMovePole();
-	clear();
-    g_looping = false;
+    Looping = false;
 	drawViews();
     drawSides();
 }
@@ -243,15 +251,13 @@ function period(){
 }
 
 function numberChange(value){
-	numTrons = parseInt(value, 10);
+	NumTrons = parseInt(value, 10);
 	init();
-	clear();
 	drawViews();
 }
 function zoom_change(value){
 	ZoomValue = Math.exp((value-20)/10);
 	console.log("value=" + value + " zoom=" + ZoomValue);
-	clear();
 	drawViews();
 }
 
@@ -272,7 +278,7 @@ function drawTri(ctx, x0, y0, x1, y1, x2, y2){
 	ctx.closePath();
 	ctx.stroke();
 }
-var RectSize = 8;
+var RectSize = 4;
 function drawSmallRect(ctx, x, y, color){
 	ctx.fillStyle = color;
 	ctx.fillRect(x-RectSize/2, y-RectSize/2, RectSize, RectSize);
@@ -306,26 +312,32 @@ function initThree() {
 }
 
 function initCamera() {
-    g_camera = new tuple3d(400, 0.5, 0.5);
-    g_camera.sp2xy();
-    g_ThreeCamera = new THREE.PerspectiveCamera( 45 , width / height , 1 , 10000 );
-    g_ThreeCamera.position.x = g_camera.x;
-    g_ThreeCamera.position.y = g_camera.y;
-    g_ThreeCamera.position.z = g_camera.z;
-    g_ThreeCamera.up.x = 0;
-    g_ThreeCamera.up.y = 0;
-    g_ThreeCamera.up.z = 1;
-    g_ThreeCamera.lookAt( {x:0, y:0, z:0 } );
-    scene.add(g_ThreeCamera);
+    ThreeCamera = new THREE.PerspectiveCamera( 45 , width / height , 1 , 10000 );
+    ThreeScene.add(ThreeCamera);
+}
+
+function updateCamera() {
+    var pole = ViewPole.clone();
+    pole.mul(400);
+    ThreeCamera.position.x = pole.x;
+    ThreeCamera.position.y = pole.y;
+    ThreeCamera.position.z = pole.z;
+    ThreeCamera.up.x = ViewPoleY.x;
+    ThreeCamera.up.y = ViewPoleY.y;
+    ThreeCamera.up.z = ViewPoleY.z;
+    ThreeCamera.lookAt( {x:0, y:0, z:0 } );
 }
 function initScene() {    
-    scene = new THREE.Scene();
+    ThreeScene = new THREE.Scene();
 }
 var light;
 function initLight() {  
     light = new THREE.DirectionalLight(0xFFFFFF, 1.0, 0);
     light.position.set( 100, 100, 200 );
-    scene.add(light);
+    ThreeScene.add(light);
+    light2 = new THREE.DirectionalLight(0xFFFFFF, 0.5, 0);
+    light2.position.set( -1000, -1000, -2000 );
+    ThreeScene.add(light2);
 }
 
 function updateThree() {
@@ -342,21 +354,14 @@ function loop() {
     ModelProgress();
     updateThree();
     renderer.clear();
-    renderer.render(scene, g_ThreeCamera);
+    renderer.render(ThreeScene, ThreeCamera);
     
     drawMapView();
-    if (g_looping) {
+    drawInfos();
+
+    if (Looping) {
         window.requestAnimationFrame(loop);
     }
-}
-function viewLoop() {
-    camera.position.x -= 10;
-    camera.position.y -= 10;
-    camera.position.z -= 10;
-    
-    renderer.clear();
-    renderer.render(scene, g_ThreeCamera);
-    window.requestAnimationFrame(viewLoop);
 }
 
 function loadThree() {
@@ -364,17 +369,12 @@ function loadThree() {
 	canvas.onmousedown = mouseDownShpere;
 	canvas.onmousemove = mouseMoveShpere;
 	canvas.onmouseup = mouseUpShpere;
-    
-    initThree();
-    initScene();    
-    initLight();
-    initCamera();
-    
     init();
-    initObjectThree();
+
+    updateCamera();
 
     renderer.clear();
-    renderer.render(scene, g_ThreeCamera);
+    renderer.render(ThreeScene, ThreeCamera);
 }
 
 function create_cylinder(p0, p1, r, col)
@@ -388,7 +388,7 @@ function create_cylinder(p0, p1, r, col)
 
     var v = p0.clone();
     v.sub(p1);
-    v.xy2sp_y();
+    v.xy2spy();
     cylinder.rotation.z = v.z;
     cylinder.rotation.y = 0.5*Math.PI + v.y;
     cylinder.eulerOrder = 'YZX';
@@ -410,7 +410,7 @@ function initObjectThree() {
     vect1 = new THREE.Vector3(250, 0, 0);
     geometry.vertices.push(new THREE.Vertex(vect1));
     var line = new THREE.Line(geometry, new THREE.LineBasicMaterial( { color:0xFF0000, opacity: 1.0, lineWidth:5} ));
-    scene.add( line );
+    ThreeScene.add( line );
 
     var geometry = new THREE.Geometry();
     vect0 = new THREE.Vector3(0, 0, 0);
@@ -418,7 +418,7 @@ function initObjectThree() {
     vect1 = new THREE.Vector3(0, 250, 0);
     geometry.vertices.push(new THREE.Vertex(vect1));
     var line = new THREE.Line(geometry, new THREE.LineBasicMaterial( { color:0x00FF00, opacity: 1.0, lineWidth:5} ));
-    scene.add( line );
+    ThreeScene.add( line );
 
     var geometry = new THREE.Geometry();
     vect0 = new THREE.Vector3(0, 0, 0);
@@ -426,7 +426,7 @@ function initObjectThree() {
     vect1 = new THREE.Vector3(0, 0, 250);
     geometry.vertices.push(new THREE.Vertex(vect1));
     var line = new THREE.Line(geometry, new THREE.LineBasicMaterial( { color:0x0000FF, opacity: 1.0, lineWidth:5} ));
-    scene.add( line );
+    ThreeScene.add( line );
     
 	for(var i=0; i < Lines.length; ++i ) {
         var geometry = new THREE.Geometry();
@@ -434,15 +434,13 @@ function initObjectThree() {
 		var p1 = Lines[i].p1.clone();
         p0.mul(100);
         p1.mul(100);
-        //var cyl = create_cylinder(p0, p1, 2, 0x00ff00);
-        //scene.add(cyl);
         
         vect0 = new THREE.Vector3(p0.x, p0.y, p0.z);
         geometry.vertices.push(new THREE.Vertex(vect0));
         vect1 = new THREE.Vector3(p1.x, p1.y, p1.z);
         geometry.vertices.push(new THREE.Vertex(vect1));
         var line = new THREE.Line(geometry, new THREE.LineBasicMaterial( { color:0x000000, opacity: 1.0, lineWidth:5} ));
-        scene.add( line );
+        ThreeScene.add( line );
 	}
 
 	for(var i=0; i < Trons.length; ++i ) {
@@ -455,15 +453,10 @@ function initObjectThree() {
                                  new THREE.CubeGeometry(5,5,5), 
                                  mat
                                  );
-        scene.add(ThreeTrons[i]);
+        ThreeScene.add(ThreeTrons[i]);
         ThreeTrons[i].position.set(100*p0.x, 100*p0.y, 100*p0.z);
 
 	}
-    var matc = new THREE.MeshLambertMaterial({color: 0xff00ff});
-    g_cyl = new THREE.Mesh(
-                    new THREE.CylinderGeometry(10, 10, 100, 5, 5, false),
-                    matc);
-	//drawInfos();
 }
 
 function drawSides() {
@@ -487,12 +480,12 @@ function drawSides() {
                 p0.mul(100);
                 p1.mul(100);
                 var cyl = create_cylinder(p0, p1, 2, 0x00ff00);
-                scene.add(cyl);
+                ThreeScene.add(cyl);
             } else if (dis < shortest*1.5) {
                 p0.mul(100);
                 p1.mul(100);
                 var cyl = create_cylinder(p0, p1, 2, 0x0000ff);
-                scene.add(cyl);
+                ThreeScene.add(cyl);
             }
         }
 	}

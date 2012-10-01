@@ -23,6 +23,10 @@ var numTrons = 8;
 var ThreeTrons = new Array();
 
 var g_cyl;
+var g_looping = false;
+var scene;
+var g_camera;
+var g_ThreeCamera;
 
 function tronColor(type,p1,p2,p3)
 {
@@ -81,38 +85,8 @@ function init() {
 	}
 }
 function drawViews() {
-	drawSphereView();
+    updateThree();
 	drawMapView();
-}
-
-function drawSphereView() {
-	var canvas = document.getElementById("sphereCanvas");
-	var ctx = canvas.getContext("2d");
-	ctx.lineWidth = 1;
-	var w2 = canvas.width/2;
-	var h2 = canvas.height/2;
-	for(var i=0; i < Lines.length; ++i ) {
-		var p0 = Lines[i].p0.clone();
-		p0.sub(CenterPoint);
-		var p1 = Lines[i].p1.clone();
-		p1.sub(CenterPoint);
-		var x0 = w2 + ZoomValue*p0.dot(ViewPoleX);
-		var y0 = h2 + -1*ZoomValue*p0.dot(ViewPoleY);
-		var x1 = w2 + ZoomValue*p1.dot(ViewPoleX);
-		var y1 = h2 + -1*ZoomValue*p1.dot(ViewPoleY);
-		var depth = 0.8*(ViewPole.dot(p0)+1)/2 + 0.2;
-		var color = "rgba(0,0,0," + depth.toFixed(1) + ")";
-		drawLine(ctx, x0, y0, x1, y1, color);
-	}
-	for(var i=0; i < Trons.length; ++i ) {
-		var p0 = Trons[i].point.clone();
-		p0.sub(CenterPoint);
-		var x0 = w2 + ZoomValue*p0.dot(ViewPoleX);
-		var y0 = h2 + -1*ZoomValue*p0.dot(ViewPoleY);
-		var depth = (ViewPole.dot(p0) + 1)/2;
-		drawSmallRect(ctx, x0, y0, Trons[i].color.toStringWithAlpha(depth));
-	}
-	drawInfos();
 }
 
 // Sinusoidal projection
@@ -190,13 +164,6 @@ function updateAll(){
 }
 
 function clear(){
-	//var canvas = document.getElementById("sphereCanvas");
-	//var ctx = canvas.getContext("2d");
-	//ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-	//var canvas = document.getElementById("mapCanvas");
-	//var ctx = canvas.getContext("2d");
-	//ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
 
 var	IsMouseDown = 0;
@@ -212,9 +179,6 @@ function mouseDownShpere(e) {
 　	canvasOffsetY = canvas.offsetTop;
 　	DownX = e.pageX - canvasOffsetX;
 　	DownY = e.pageY - canvasOffsetY;
-	DownPole = ViewPole.clone();
-	DownPoleX = ViewPoleX.clone();
-	DownPoleY = ViewPoleY.clone();
 }
 function mouseUpShpere(e) {
 	IsMouseDown = 0;
@@ -224,40 +188,19 @@ function mouseMoveShpere(e) {
 	var canvas = document.getElementById("sphereCanvas");
 　	canvasOffsetX = canvas.offsetLeft;
 　	canvasOffsetY = canvas.offsetTop;
-　	var x = e.pageX - canvasOffsetX;
-　	var y = e.pageY - canvasOffsetY;
-	var tmpX = x;
-	var tmpY = y;
-	x -= DownX;
-	y -= DownY;
+    var x = e.pageX - canvasOffsetX;
+    var y = e.pageY - canvasOffsetY;
+    g_camera.xy2sp();
+    g_camera.z += (x - DownX)/500;
+    g_camera.y += (y - DownY)/500;
+    g_camera.sp2xy();
+    g_ThreeCamera.position.x = g_camera.x;
+    g_ThreeCamera.position.y = g_camera.y;
+    g_ThreeCamera.position.z = g_camera.z;
+    g_ThreeCamera.lookAt( {x:0, y:0, z:0 } );
+    renderer.clear();
+    renderer.render(scene, g_ThreeCamera);
 	console.log("x=" + x + " y=" + y);
-	x *= -1;
-	x /= ZoomValue;
-	y /= ZoomValue;
-	var X1 = DownPoleX.clone();
-	var Y1 = DownPoleY.clone();
-	var Z1 = DownPole.clone();
-	var Z2 = DownPole.clone();
-
-	X1.mul(Math.cos(x));
-	Z1.mul(Math.sin(x));
-	ViewPoleX = X1;
-	ViewPoleX.sub(Z1);
-
-	Y1.mul(Math.cos(y));
-	Z2.mul(Math.sin(y));
-	ViewPoleY = Y1;
-	ViewPoleY.sub(Z2);
-
-	ViewPole = ViewPoleX.cross(ViewPoleY);
-	ViewPole.unify();
-	ViewPoleX = ViewPoleY.cross(ViewPole);
-	ViewPoleX.unify();
-	ViewPoleY = ViewPole.cross(ViewPoleX);
-	ViewPoleY.unify();
-
-	clear();
-	drawViews();
 }
 
 function load(){
@@ -272,13 +215,9 @@ function load(){
 
 function start(){
 	Times = 0;
-    
-    //initObject();
-    init();
-    initObjectThree();
-    
+        
+    g_looping = true;
     loop();
-
 
 	var help = document.getElementById("sphereHelp");
 	help.style.display = "none";
@@ -292,7 +231,9 @@ function stop(){
 function movePole(){
 	ModelMovePole();
 	clear();
+    g_looping = false;
 	drawViews();
+    drawSides();
 }
 
 function period(){
@@ -364,18 +305,18 @@ function initThree() {
     renderer.setClearColorHex(0xFFFFFF, 1.0);
 }
 
-var scene;
-var camera;
-function initCamera() {  
-    camera = new THREE.PerspectiveCamera( 45 , width / height , 1 , 10000 );
-    camera.position.x = 400;
-    camera.position.y = 20;
-    camera.position.z = 50;
-    camera.up.x = 0;
-    camera.up.y = 0;
-    camera.up.z = 1;
-    camera.lookAt( {x:0, y:0, z:0 } );
-    //scene.add(camera);
+function initCamera() {
+    g_camera = new tuple3d(400, 0.5, 0.5);
+    g_camera.sp2xy();
+    g_ThreeCamera = new THREE.PerspectiveCamera( 45 , width / height , 1 , 10000 );
+    g_ThreeCamera.position.x = g_camera.x;
+    g_ThreeCamera.position.y = g_camera.y;
+    g_ThreeCamera.position.z = g_camera.z;
+    g_ThreeCamera.up.x = 0;
+    g_ThreeCamera.up.y = 0;
+    g_ThreeCamera.up.z = 1;
+    g_ThreeCamera.lookAt( {x:0, y:0, z:0 } );
+    scene.add(g_ThreeCamera);
 }
 function initScene() {    
     scene = new THREE.Scene();
@@ -386,21 +327,8 @@ function initLight() {
     light.position.set( 100, 100, 200 );
     scene.add(light);
 }
-var cube = Array();
-function initObject(){
-    for(var i=0; i<3; i++){
-        cube[i] = new THREE.Mesh(
-                                 new THREE.CubeGeometry(50,50,50),                //形状の設定
-                                 new THREE.MeshLambertMaterial({color: 0xff0000}) //材質の設定
-                                 );
-        scene.add(cube[i]);
-        cube[i].position.set(0,-100+100*i,0);
-    }
-}
-var t=0;
-function loop() {
-    t++;
-    ModelProgress();
+
+function updateThree() {
 	for(var i=0; i < Trons.length; ++i ) {
 		var p0 = Trons[i].point.clone();
         p0.mul(100);
@@ -408,29 +336,51 @@ function loop() {
         ThreeTrons[i].position.y = p0.y;
         ThreeTrons[i].position.z = p0.z;
     }
+}
+
+function loop() {
+    ModelProgress();
+    updateThree();
+    renderer.clear();
+    renderer.render(scene, g_ThreeCamera);
     
-    //g_cyl.rotation.z += Math.PI/12;
-    g_cyl.rotation.y += Math.PI/12;
+    drawMapView();
+    if (g_looping) {
+        window.requestAnimationFrame(loop);
+    }
+}
+function viewLoop() {
+    camera.position.x -= 10;
+    camera.position.y -= 10;
+    camera.position.z -= 10;
     
     renderer.clear();
-    renderer.render(scene, camera);
-    window.requestAnimationFrame(loop);
+    renderer.render(scene, g_ThreeCamera);
+    window.requestAnimationFrame(viewLoop);
 }
 
 function loadThree() {
+	var canvas = document.getElementById("sphereCanvas");
+	canvas.onmousedown = mouseDownShpere;
+	canvas.onmousemove = mouseMoveShpere;
+	canvas.onmouseup = mouseUpShpere;
+    
     initThree();
-    initCamera();
     initScene();    
     initLight();
+    initCamera();
     
     init();
     initObjectThree();
+
+    renderer.clear();
+    renderer.render(scene, g_ThreeCamera);
 }
 
 function create_cylinder(p0, p1, r, col)
 {
     var material = new THREE.MeshLambertMaterial({
-                                                 color: 0x00ff00,
+                                                 color: col,
                                                  opacity: 0.5
                                                  });
     var cylinder = new THREE.Mesh(new THREE.CylinderGeometry(r, r, p0.dis(p1), 0, 0, false), material);
@@ -439,7 +389,6 @@ function create_cylinder(p0, p1, r, col)
     var v = p0.clone();
     v.sub(p1);
     v.xy2sp_y();
-    console.log("ph=" + v.z);
     cylinder.rotation.z = v.z;
     cylinder.rotation.y = 0.5*Math.PI + v.y;
     cylinder.eulerOrder = 'YZX';
@@ -485,8 +434,8 @@ function initObjectThree() {
 		var p1 = Lines[i].p1.clone();
         p0.mul(100);
         p1.mul(100);
-        var cyl = create_cylinder(p0, p1, 2, 0x00ff00);
-        scene.add(cyl);
+        //var cyl = create_cylinder(p0, p1, 2, 0x00ff00);
+        //scene.add(cyl);
         
         vect0 = new THREE.Vector3(p0.x, p0.y, p0.z);
         geometry.vertices.push(new THREE.Vertex(vect0));
@@ -500,7 +449,7 @@ function initObjectThree() {
 		var p0 = Trons[i].point.clone();
         
         mat = new THREE.MeshLambertMaterial({color: 0xff0000});
-        mat.color.setHSV(((7*i)%32)/32.0, 1.0, 1.0);
+        mat.color.setHSV(Trons[i].color.p1/360.0, 1.0, 1.0);
         
         ThreeTrons[i] = new THREE.Mesh(
                                  new THREE.CubeGeometry(5,5,5), 
@@ -514,13 +463,38 @@ function initObjectThree() {
     g_cyl = new THREE.Mesh(
                     new THREE.CylinderGeometry(10, 10, 100, 5, 5, false),
                     matc);
-    g_cyl.rotation.x = 0.5*Math.PI;
-    //g_cyl.updateMatrix();
-    g_cyl.eulerOrder = "ZYX";
-    
-    scene.add(g_cyl);
-        
 	//drawInfos();
 }
 
+function drawSides() {
+    var shortest = 1000;
+	for(var i=0; i < Trons.length; ++i ) {
+        for(var j=i+1; j < Trons.length; ++j ) {
+            var p0 = Trons[i].point.clone();
+            var p1 = Trons[j].point.clone();
+            var dis = p0.dis(p1);
+            if (dis < shortest) {
+                shortest = dis;
+            }
+        }
+	}
+	for(var i=0; i < Trons.length; ++i ) {
+        for(var j=i+1; j < Trons.length; ++j ) {
+            var p0 = Trons[i].point.clone();
+            var p1 = Trons[j].point.clone();
+            var dis = p0.dis(p1);
+            if (dis < shortest*1.01) {
+                p0.mul(100);
+                p1.mul(100);
+                var cyl = create_cylinder(p0, p1, 2, 0x00ff00);
+                scene.add(cyl);
+            } else if (dis < shortest*1.5) {
+                p0.mul(100);
+                p1.mul(100);
+                var cyl = create_cylinder(p0, p1, 2, 0x0000ff);
+                scene.add(cyl);
+            }
+        }
+	}
+}    
 

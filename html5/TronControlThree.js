@@ -19,6 +19,7 @@ var Height = 400;
 var Times = 0;
 var Interval = 50;
 var NumTrons = 8;
+var Limit = 0.00000000001;
 
 var ThreeTrons = new Array();
 var ThreeSides = new Array();
@@ -78,12 +79,22 @@ function init() {
 		}
 	}
 	ModelInit();
-    initThree();
+    addTronsOnModel();
+
     initScene();    
     initLight();
     initCamera();
     initObjectThree();
 }
+
+function addTronsOnModel() {
+    for (var i=0;i<NumTrons;++i) {
+        var color = new tronColor("hsl", (i*50)%360, "100%", "50%");
+        AddTron(Math.PI*2*Math.random(), Math.PI*Math.random(), color);
+    }
+}
+
+
 function drawViews() {
     updateThree();
     renderer.clear();
@@ -224,11 +235,11 @@ function tourLoop() {
     var x = 0;
     var y = 0;
     if (tour_t < 320) {
-        x = 0.01;
+        x = 0.02;
     } else if (tour_t < 640) {
-        y = 0.01;
+        y = 0.02;
     } else if (tour_t < 960) {
-        x = y = 0.005;
+        x = y = 0.01;
     }
     
 	var X1 = ViewPoleX.clone();
@@ -277,12 +288,6 @@ function start(){
         
     Looping = true;
     loop();
-
-	//var help = document.getElementById("sphereHelp");
-	//help.style.display = "none";
-	//help = document.getElementById("mapHelp");
-	//help.style.display = "none";
-	
 }
 function stop(){
     Looping = false;
@@ -304,7 +309,7 @@ function numberChange(value){
 	NumTrons = parseInt(value, 10);
     removeTrons();
     ModelInit();
-    addTrons();
+    drawTrons();
 	drawViews();
 }
 function zoom_change(value){
@@ -417,12 +422,15 @@ function loop() {
 }
 
 function loadThree() {
+    initThree();
+
 	var canvas = document.getElementById("sphereCanvas");
 	canvas.onmousedown = mouseDownShpere;
 	canvas.onmousemove = mouseMoveShpere;
 	canvas.onmouseup = mouseUpShpere;
+    
     init();
-    addTrons();
+    drawTrons();
     
     updateCamera();
 
@@ -497,11 +505,7 @@ function initObjectThree() {
 	}
 }
 
-function addTrons() {
-    for (var i=0;i<NumTrons;++i) {
-		var color = new tronColor("hsl", (i*50)%360, "100%", "50%");
-		AddTron(Math.PI*2*Math.random(), Math.PI*Math.random(), color);
-	}
+function drawTrons() {
 
 	for(var i=0; i < Trons.length; ++i ) {
 		var p0 = Trons[i].point.clone();
@@ -512,7 +516,6 @@ function addTrons() {
         ThreeTrons[i] = new THREE.Mesh(new THREE.CubeGeometry(5,5,5), mat);
         ThreeScene.add(ThreeTrons[i]);
         ThreeTrons[i].position.set(100*p0.x, 100*p0.y, 100*p0.z);
-
 	}
 }
 
@@ -550,17 +553,103 @@ function drawSides() {
 	}
 } 
 
-function removeSides() {
-    for (var i=0;i<ThreeSide.length;++i) {
+function hideSides() {
+    for (var i=0;i<ThreeSides.length;++i) {
         ThreeScene.remove(ThreeSides[i]);
     }
     ThreeSides = new Array();
 }
 
-function removeTrons() {
+function hideTrons() {
     for (var i=0;i<ThreeTrons.length;++i) {
         ThreeScene.remove(ThreeTrons[i]);
     }
     ThreeTrons = new Array();
 }
 
+var phase = 0;
+var calc_cnt = 0;
+var story_tour_cnt = 0;
+
+function storyLoop()
+{
+    //console.log("phase=" + phase + " cnt=" + calc_cnt + " cnt2=" + story_tour_cnt);
+    if (phase == 0) {
+        calc_cnt++;
+        ModelProgress();
+        updateThree();
+        drawMapView();
+        drawInfos();
+        if (TotalMove() < Limit && calc_cnt > 100) {
+            phase = 1;
+        }
+    } else {
+        if (story_tour_cnt == 0) {
+            drawSides();
+        }
+        story_tour_cnt ++;
+        var x = 0;
+        var y = 0;
+        if (story_tour_cnt < 320) {
+            x = 0.02;
+        } else if (story_tour_cnt < 640) {
+            y = 0.02;
+        } else if (story_tour_cnt < 960) {
+            x = y = 0.01;
+        }
+        
+        var X1 = ViewPoleX.clone();
+        var Y1 = ViewPoleY.clone();
+        var Z1 = ViewPole.clone();
+        var Z2 = ViewPole.clone();
+        
+        X1.mul(Math.cos(x));
+        Z1.mul(Math.sin(x));
+        ViewPoleX = X1;
+        ViewPoleX.sub(Z1);
+        
+        Y1.mul(Math.cos(y));
+        Z2.mul(Math.sin(y));
+        ViewPoleY = Y1;
+        ViewPoleY.sub(Z2);
+        
+        ViewPole = ViewPoleX.cross(ViewPoleY);
+        ViewPole.unify();
+        ViewPoleX = ViewPoleY.cross(ViewPole);
+        ViewPoleX.unify();
+        ViewPoleY = ViewPole.cross(ViewPoleX);
+        ViewPoleY.unify();
+        
+        updateCamera();
+        if (story_tour_cnt > 960) {
+            hideSides();
+            calc_cnt = 0;
+            story_tour_cnt = 0;
+            phase = 0;
+            hideTrons();
+            ModelInit();
+            NumTrons ++;
+            addTronsOnModel();
+            drawTrons();
+        }
+            
+    }
+    renderer.clear();
+    renderer.render(ThreeScene, ThreeCamera);
+    
+    window.requestAnimationFrame(storyLoop);
+}
+
+function story() {
+	NumTrons = 4;
+    init();
+    hideTrons();
+    ModelInit();
+    addTronsOnModel();
+    drawTrons();
+	drawViews();
+
+    Looping = true;
+    Limit = 0.000001;
+    storyLoop();
+}

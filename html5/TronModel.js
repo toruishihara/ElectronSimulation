@@ -5,6 +5,7 @@
 
 // Global variables
 var Trons = new Array(); // Array of Electrons
+//var TronsVelo = new Array(); // Trons' velocity
 
 // static variables
 var totalMove = 0;
@@ -44,12 +45,12 @@ function ModelProgress() {
 	for(var i=0;i<Trons.length;++i) {
 		totalMove += progressOne(i);
 	}
+    updateClosest();
+    updateLoneliest();
 	times ++;
-	if (times > 1000 && totalMove < 0.00001 && outputDone == 0) {
-		outputSTL();
-		outputDone = 1;
-	}
+}
 
+function updateClosest() {
 	// find closest pair
 	var minDot = huge;
 	for(var i=0;i<Trons.length;++i) {
@@ -65,7 +66,9 @@ function ModelProgress() {
 		}
 	}
 	closestAngle = 180*minDot/Math.PI;
+}
 
+function updateLoneliest() {
 	// find loneliest
 	var lonelyDot = -1*huge;
 	for(var i=0;i<Trons.length;++i) {
@@ -115,6 +118,10 @@ function ModelMovePole() {
 		Trons[i].point.x = p.dot(newPoleX);
 		Trons[i].point.y = p.dot(newPoleY);
 		Trons[i].point.z = p.dot(newPoleZ);
+		var v = Trons[i].velo.clone();
+		Trons[i].velo.x = v.dot(newPoleX);
+		Trons[i].velo.y = v.dot(newPoleY);
+		Trons[i].velo.z = v.dot(newPoleZ);
 	}
 }
 function save() {
@@ -205,6 +212,7 @@ function calcNewVelocityOne(idx)
 	newVelo.sub(r);
 	tron.velo.add(newVelo);
 }
+
 // return moving distance
 function progressOne(idx)
 {

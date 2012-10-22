@@ -84,6 +84,7 @@ function init() {
     initScene();    
     initLight();
     initCamera();
+    updateCamera();
     initObjectThree();
 }
 
@@ -285,7 +286,15 @@ function load(){
 
 function start(){
 	Times = 0;
-        
+    init();
+    
+    hideTrons();
+    ModelInit();
+    addTronsOnModel();
+    
+    drawTrons();
+	drawViews();
+
     Looping = true;
     loop();
 }
@@ -297,6 +306,8 @@ function movePole(){
     Looping = false;
 	drawViews();
     drawSides();
+    //var s = JSON.sringify(ThreeScene);
+    //console.log(s);
 }
 
 function period(){
@@ -467,25 +478,25 @@ function create_cylinder(p0, p1, r, col)
 function initObjectThree() {
     var geometry = new THREE.Geometry();
     vect0 = new THREE.Vector3(0, 0, 0);
-    geometry.vertices.push(new THREE.Vertex(vect0));
+    geometry.vertices.push(vect0);
     vect1 = new THREE.Vector3(250, 0, 0);
-    geometry.vertices.push(new THREE.Vertex(vect1));
+    geometry.vertices.push(vect1);
     var line = new THREE.Line(geometry, new THREE.LineBasicMaterial( { color:0xFF0000, opacity: 1.0, lineWidth:5} ));
     ThreeScene.add( line );
 
     var geometry = new THREE.Geometry();
     vect0 = new THREE.Vector3(0, 0, 0);
-    geometry.vertices.push(new THREE.Vertex(vect0));
+    geometry.vertices.push(vect0);
     vect1 = new THREE.Vector3(0, 250, 0);
-    geometry.vertices.push(new THREE.Vertex(vect1));
+    geometry.vertices.push(vect1);
     var line = new THREE.Line(geometry, new THREE.LineBasicMaterial( { color:0x00FF00, opacity: 1.0, lineWidth:5} ));
     ThreeScene.add( line );
 
     var geometry = new THREE.Geometry();
     vect0 = new THREE.Vector3(0, 0, 0);
-    geometry.vertices.push(new THREE.Vertex(vect0));
+    geometry.vertices.push(vect0);
     vect1 = new THREE.Vector3(0, 0, 250);
-    geometry.vertices.push(new THREE.Vertex(vect1));
+    geometry.vertices.push(vect1);
     var line = new THREE.Line(geometry, new THREE.LineBasicMaterial( { color:0x0000FF, opacity: 1.0, lineWidth:5} ));
     ThreeScene.add( line );
 
@@ -497,9 +508,9 @@ function initObjectThree() {
         p1.mul(100);
         
         vect0 = new THREE.Vector3(p0.x, p0.y, p0.z);
-        geometry.vertices.push(new THREE.Vertex(vect0));
+        geometry.vertices.push(vect0);
         vect1 = new THREE.Vector3(p1.x, p1.y, p1.z);
-        geometry.vertices.push(new THREE.Vertex(vect1));
+        geometry.vertices.push(vect1);
         var line = new THREE.Line(geometry, new THREE.LineBasicMaterial( { color:0x666666, opacity: 0.5, lineWidth:5} ));
         ThreeScene.add( line );
 	}
@@ -585,6 +596,7 @@ function storyLoop()
         }
     } else {
         if (story_tour_cnt == 0) {
+            ModelMovePole();
             drawSides();
         }
         story_tour_cnt ++;
@@ -627,9 +639,12 @@ function storyLoop()
             story_tour_cnt = 0;
             phase = 0;
             hideTrons();
-            ModelInit();
+            //ModelInit();
             NumTrons ++;
-            addTronsOnModel();
+            //addTronsOnModel();
+            var color = new tronColor("hsl", (NumTrons*50)%360, "100%", "50%");
+            AddTron(Math.PI*2*Math.random(), Math.PI*Math.random(), color);
+
             drawTrons();
         }
             
@@ -641,15 +656,17 @@ function storyLoop()
 }
 
 function story() {
-	NumTrons = 4;
+	NumTrons = 3;
     init();
+    
     hideTrons();
     ModelInit();
     addTronsOnModel();
+
     drawTrons();
 	drawViews();
 
     Looping = true;
-    Limit = 0.000001;
+    Limit = 0.00001;
     storyLoop();
 }

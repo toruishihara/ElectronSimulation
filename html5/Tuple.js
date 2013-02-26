@@ -18,6 +18,7 @@ function tuple3d(in_x, in_y, in_z){
 	this.z = in_z;
 	this.dot = tuple3d_dot;
 	this.unify = tuple3d_unify;
+	this.inSphere = tuple3d_inSphere;
 	this.setLength = tuple3d_setLength;
 	this.cross = tuple3d_cross;
 	this.mul = tuple3d_mul;
@@ -45,6 +46,15 @@ function tuple3d_unify() {
 	this.x = this.x / len;
 	this.y = this.y / len;
 	this.z = this.z / len;
+}
+function tuple3d_inSphere() {
+	var len2 = this.x*this.x + this.y*this.y + this.z*this.z;
+	var len = Math.sqrt(len2);
+    if (len > 1.0) {
+        this.x = this.x / len;
+        this.y = this.y / len;
+        this.z = this.z / len;
+    }
 }
 function tuple3d_setLength(newLength) {
 	var len2 = this.x*this.x + this.y*this.y + this.z*this.z;

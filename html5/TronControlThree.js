@@ -19,7 +19,7 @@ var Height = 400;
 var Times = 0;
 var Interval = 50;
 var NumTrons = 8;
-var Limit = 0.00000000001;
+var Limit = 0.000000001;
 
 var ThreeTrons = new Array();
 var ThreeSides = new Array();
@@ -92,6 +92,7 @@ function addTronsOnModel() {
     for (var i=0;i<NumTrons;++i) {
         var color = new tronColor("hsl", (i*50)%360, "100%", "50%");
         AddTron(Math.PI*2*Math.random(), Math.PI*Math.random(), color);
+        //AddTron(Math.PI*2*Math.random(), Math.PI*0.5, color);
     }
 }
 
@@ -149,9 +150,14 @@ function drawMapView() {
 		drawSmallRect(ctx, calcMapX(p0), calcMapY(p0), Trons[i].color.toString());
 	}
 }
+function clearMapView() {
+	var canvas = document.getElementById("mapCanvas");
+	var ctx = canvas.getContext("2d");
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
 function drawInfos() {
-	document.getElementById("progress").innerText = Times.toFixed(0);
-	document.getElementById("totalMove").innerText = TotalMove().toFixed(6);
+	document.getElementById("progress").innerText = NumTrons.toFixed(0);
+	document.getElementById("totalMove").innerText = TotalMove().toFixed(8);
 	document.getElementById("closestPair").innerText = ClosestPair();
 	document.getElementById("closestAngle").innerText = ClosestAngle().toFixed(6);
 	document.getElementById("loneliestPair").innerText = LoneliestPair();
@@ -516,8 +522,24 @@ function initObjectThree() {
 	}
 }
 
-function drawTrons() {
+function drawDot(p, color, size) {
+    var p0 = p.clone();
 
+    mat = new THREE.MeshLambertMaterial({color: 0xff0000});
+    mat.color.setHSV(color/360.0, 1.0, 1.0);
+
+    var ThreeP = new THREE.Mesh(new THREE.CubeGeometry(size, size, size), mat);
+    ThreeScene.add(ThreeP);
+    ThreeP.position.set(100*p0.x, 100*p0.y, 100*p0.z);
+    return ThreeP;
+}
+
+function hideDot(obj)
+{
+    ThreeScene.remove(obj);
+}
+
+function drawTrons() {
 	for(var i=0; i < Trons.length; ++i ) {
 		var p0 = Trons[i].point.clone();
         
@@ -585,6 +607,7 @@ var story_tour_cnt = 0;
 function storyLoop()
 {
     //console.log("phase=" + phase + " cnt=" + calc_cnt + " cnt2=" + story_tour_cnt);
+    var wait = 0;
     if (phase == 0) {
         calc_cnt++;
         ModelProgress();
@@ -596,7 +619,10 @@ function storyLoop()
         }
     } else {
         if (story_tour_cnt == 0) {
-            ModelMovePole();
+            hideTrons();
+
+            //ModelMovePole();
+            drawTrons();
             drawSides();
         }
         story_tour_cnt ++;
@@ -639,11 +665,12 @@ function storyLoop()
             story_tour_cnt = 0;
             phase = 0;
             hideTrons();
+            //clearMapView();
             //ModelInit();
             NumTrons ++;
             //addTronsOnModel();
             var color = new tronColor("hsl", (NumTrons*50)%360, "100%", "50%");
-            AddTron(Math.PI*2*Math.random(), Math.PI*Math.random(), color);
+            launchTron(color);
 
             drawTrons();
         }
@@ -651,22 +678,33 @@ function storyLoop()
     }
     renderer.clear();
     renderer.render(ThreeScene, ThreeCamera);
-    
+
     window.requestAnimationFrame(storyLoop);
 }
 
 function story() {
-	NumTrons = 3;
+	NumTrons = 2;
     init();
     
     hideTrons();
     ModelInit();
-    addTronsOnModel();
+    //addTronsOnModel();
+
+    var color = new tronColor("hsl", (0*50)%360, "100%", "50%");
+    AddTron(0.0, 0.0, color);
+    var color2 = new tronColor("hsl", (1*50)%360, "100%", "50%");
+    AddTron(0.0, Math.PI, color2);
 
     drawTrons();
 	drawViews();
 
     Looping = true;
-    Limit = 0.00001;
+    Limit = 0.000001;
     storyLoop();
+}
+
+function launchTron(color) {
+    var p = FindFreePoint();
+    p.xy2sp();
+    AddTron(p.y, p.z, color);
 }

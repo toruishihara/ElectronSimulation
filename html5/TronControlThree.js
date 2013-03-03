@@ -660,6 +660,7 @@ function storyLoop()
         
         updateCamera();
         if (story_tour_cnt > 960) {
+            logPoints();
             hideSides();
             calc_cnt = 0;
             story_tour_cnt = 0;

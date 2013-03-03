@@ -72,13 +72,14 @@ function updateClosest() {
 }
 
 function FindFreePoint() {
+    var fine = 1024.0;
 	var minDot = 1.0;
     var size = 1;
 	var freePoint = new tuple3d(0,0,0);
-	for(var ph=0;ph<Math.PI;ph+=Math.PI/10.0) {
-        var thInc = Math.PI/(10.0*Math.sin(ph));
+	for(var ph=0;ph<Math.PI;ph+=Math.PI/fine) {
+        var thInc = Math.PI/(fine*Math.sin(ph));
 		for( var th=0;th<2*Math.PI;th+=thInc) {
-            console.log("ph=" + ph + " th=" + th + " thi=" + thInc);
+            //console.log("ph=" + ph + " th=" + th + " thi=" + thInc);
 			var p = new tuple3d(1, th, ph);
 			var closestIndex;
 			var maxDot = -1.0;
@@ -90,13 +91,13 @@ function FindFreePoint() {
 				if (dot > maxDot) {
 					maxDot = dot;
 					closestIndex = i;
-					console.log("closest=" + i + " dot=" + dot);
+					//console.log("closest=" + i + " dot=" + dot);
 				}
 			}
             if (minDot > maxDot) {
                 minDot = maxDot;
                 freePoint = p.clone();
-                console.log("dot=" + maxDot);
+                //console.log("dot=" + maxDot);
                 size ++;
                 //var dot2 = drawDot(p, 0.0, size);
             }
@@ -162,6 +163,23 @@ function ModelMovePole() {
 		Trons[i].velo.y = v.dot(newPoleY);
 		Trons[i].velo.z = v.dot(newPoleZ);
 	}
+}
+function logPoints() {
+    var str = "N" + Trons.length + "=[";
+    for(var i=0;i<Trons.length;++i) {
+        var p = Trons[i].point.clone();
+        str += p.x + "," + p.y + "," + p.z;
+        if (i != Trons.length-1) {
+            str += ", ";
+        }
+    }
+    str += "]";
+    console.log(str);
+
+    var a1 = ClosestAngle().toFixed(6);
+    var a2 = LoneliestAngle().toFixed(6);
+    console.log("Ninfo" + Trons.length + "=" + a1 + "," + a2);
+
 }
 function save() {
 	var text = outputSTL();

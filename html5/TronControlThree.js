@@ -152,6 +152,8 @@ function drawMapView() {
 }
 function clearMapView() {
 	var canvas = document.getElementById("mapCanvas");
+	canvas.addEventListener("webglcontextlost", function(event) { event.preventDefault(); }, false);
+	canvas.addEventListener("webglcontextrestored", setupWebGLStateAndResources, false);
 	var ctx = canvas.getContext("2d");
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
@@ -199,7 +201,7 @@ function mouseMoveShpere(e) {
 	var tmpY = y;
 	x -= DownX;
 	y -= DownY;
-	console.log("x=" + x + " y=" + y);
+	//console.log("x=" + x + " y=" + y);
 	x *= -1;
 	x /= ZoomValue;
 	y /= ZoomValue;
@@ -285,6 +287,10 @@ function load(){
 	canvas.onmousedown = mouseDownShpere;
 	canvas.onmousemove = mouseMoveShpere;
 	canvas.onmouseup = mouseUpShpere;
+
+	canvas.addEventListener("webglcontextlost", function(event) { event.preventDefault(); }, false);
+	canvas.addEventListener("webglcontextrestored", setupWebGLStateAndResources, false);
+
 	init();
 	drawViews();
     
@@ -331,7 +337,7 @@ function numberChange(value){
 }
 function zoom_change(value){
 	ZoomValue = Math.exp((value-20)/10);
-	console.log("value=" + value + " zoom=" + ZoomValue);
+	//console.log("value=" + value + " zoom=" + ZoomValue);
 	drawViews();
 }
 

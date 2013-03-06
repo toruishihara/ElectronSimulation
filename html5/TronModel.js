@@ -165,6 +165,7 @@ function ModelMovePole() {
 	}
 }
 function logPoints() {
+    var fn = "~/tgit/Tron" + Trons.length + ".txt";
     var str = "N" + Trons.length + "=[";
     for(var i=0;i<Trons.length;++i) {
         var p = Trons[i].point.clone();
@@ -172,14 +173,17 @@ function logPoints() {
         if (i != Trons.length-1) {
             str += ", ";
         }
+        console.log(str);
     }
-    str += "]";
+    str += "]\n";
     console.log(str);
+   // FileWrite(fn, str);
 
     var a1 = ClosestAngle().toFixed(6);
     var a2 = LoneliestAngle().toFixed(6);
     console.log("Ninfo" + Trons.length + "=" + a1 + "," + a2);
-
+    str += "Ninfo" + Trons.length + "=" + a1 + "," + a2 + "\n";
+    document.getElementById("result").innerText += str;
 }
 function save() {
 	var text = outputSTL();

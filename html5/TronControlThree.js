@@ -20,6 +20,7 @@ var Times = 0;
 var Interval = 50;
 var NumTrons = 8;
 var Limit = 0.000000001;
+var StoryLimit = 0.000000001;
 
 var ThreeTrons = new Array();
 var ThreeSides = new Array();
@@ -95,7 +96,6 @@ function addTronsOnModel() {
         //AddTron(Math.PI*2*Math.random(), Math.PI*0.5, color);
     }
 }
-
 
 function drawViews() {
     updateThree();
@@ -330,7 +330,6 @@ function period(){
 
 function numberChange(value){
 	NumTrons = parseInt(value, 10);
-    removeTrons();
     ModelInit();
     drawTrons();
 	drawViews();
@@ -421,8 +420,8 @@ function initLight() {
 }
 
 function updateThree() {
-	for(var i=0; i < Trons.length; ++i ) {
-		var p0 = Trons[i].point.clone();
+    for(var i=0; i < Trons.length; ++i ) {
+	var p0 = Trons[i].point.clone();
         p0.mul(100);
         ThreeTrons[i].position.x = p0.x;
         ThreeTrons[i].position.y = p0.y;
@@ -666,7 +665,7 @@ function storyLoop()
         
         updateCamera();
         if (story_tour_cnt > 960) {
-            logPoints();
+            logJson();
             hideSides();
             calc_cnt = 0;
             story_tour_cnt = 0;
@@ -690,6 +689,22 @@ function storyLoop()
 }
 
 function story() {
+    return storyCleanStart();
+}
+
+function storyStart() {
+    init();
+    NumTrons = Trons.length;
+    console.log("n=" + NumTrons);
+    drawTrons();
+    drawViews();
+
+    Looping = true;
+    Limit = StoryLimit;
+    storyLoop();
+}
+
+function storyCleanStart() {
 	NumTrons = 2;
     init();
     
@@ -706,7 +721,7 @@ function story() {
 	drawViews();
 
     Looping = true;
-    Limit = 0.000001;
+    Limit = StoryLimit;
     storyLoop();
 }
 
@@ -715,3 +730,28 @@ function launchTron(color) {
     p.xy2sp();
     AddTron(p.y, p.z, color);
 }
+
+function clear() {
+    storyClearStart();
+}
+
+function readJson() {
+    hideTrons();
+    ModelInit();
+    var jsonObj = JSON.parse(nfile);
+    for(var i=0;i<jsonObj.num;++i) {
+        var p = new tuple3d(jsonObj.vertex[3*i], jsonObj.vertex[3*i+1], jsonObj.vertex[3*i+2]);
+        p.xy2sp();
+        var color = new tronColor("hsl", (i*50)%360, "100%", "50%");
+        AddTron(p.y, p.z, color);
+    }
+    NumTrons = Trons.length;
+    console.log("N=" + NumTrons);
+    drawTrons();
+    drawViews();
+
+    Looping = true;
+    Limit = StoryLimit;
+    storyLoop();
+}
+

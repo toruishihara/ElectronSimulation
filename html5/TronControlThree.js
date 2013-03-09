@@ -20,7 +20,7 @@ var Times = 0;
 var Interval = 50;
 var NumTrons = 8;
 var Limit = 0.000000001;
-var StoryLimit = 0.000000001;
+var StoryLimit = 0.0000000001;
 
 var ThreeTrons = new Array();
 var ThreeSides = new Array();
@@ -738,7 +738,7 @@ function clear() {
 function readJson() {
     hideTrons();
     ModelInit();
-    var jsonObj = JSON.parse(nfile);
+    var jsonObj = JSON.parse(results[30]);
     for(var i=0;i<jsonObj.num;++i) {
         var p = new tuple3d(jsonObj.vertex[3*i], jsonObj.vertex[3*i+1], jsonObj.vertex[3*i+2]);
         p.xy2sp();

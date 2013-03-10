@@ -159,7 +159,7 @@ function clearMapView() {
 }
 function drawInfos() {
 	document.getElementById("progress").innerText = NumTrons.toFixed(0);
-	document.getElementById("totalMove").innerText = TotalMove().toFixed(8);
+	document.getElementById("totalMove").innerText = TotalMove().toFixed(12);
 	document.getElementById("closestPair").innerText = ClosestPair();
 	document.getElementById("closestAngle").innerText = ClosestAngle().toFixed(6);
 	document.getElementById("loneliestPair").innerText = LoneliestPair();
@@ -685,7 +685,9 @@ function storyLoop()
     renderer.clear();
     renderer.render(ThreeScene, ThreeCamera);
 
-    window.requestAnimationFrame(storyLoop);
+    if (Looping) {
+    	window.requestAnimationFrame(storyLoop);
+    }
 }
 
 function story() {
@@ -738,7 +740,8 @@ function clear() {
 function readJson() {
     hideTrons();
     ModelInit();
-    var jsonObj = JSON.parse(results[30]);
+    var num = document.getElementsByName('num')[0].value;
+    var jsonObj = JSON.parse(results[num]);
     for(var i=0;i<jsonObj.num;++i) {
         var p = new tuple3d(jsonObj.vertex[3*i], jsonObj.vertex[3*i+1], jsonObj.vertex[3*i+2]);
         p.xy2sp();
@@ -749,9 +752,5 @@ function readJson() {
     console.log("N=" + NumTrons);
     drawTrons();
     drawViews();
-
-    Looping = true;
-    Limit = StoryLimit;
-    storyLoop();
 }
 

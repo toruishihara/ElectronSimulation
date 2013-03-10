@@ -147,6 +147,7 @@ function LoneliestAngle() {
 	return loneliestAngle;
 }
 function ModelMovePole() {
+        updateLoneliest();
 	var ls = loneliestPair.split(',');
 	var newPoleZ = Trons[ls[0]].point.clone();	
 	var newPoleY = newPoleZ.cross(Trons[ls[1]].point);

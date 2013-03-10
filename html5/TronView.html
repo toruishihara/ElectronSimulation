@@ -27,7 +27,6 @@ canvas { background-color:#ffffff; }
 	<input type="button" value="MovePole" onclick="movePole()"/>
 	<input type="button" value="Spins" onclick="tour()"/>
 	<input type="button" value="Story" onclick="story()"/>
-	<input type="button" value="ReadJson" onclick="readJson()"/>
 	<input type="button" value="Clear" onclick="clear()"/>
 	<br>Number of Electron
 	<select name="numOfTrons" onchange="numberChange(value)">
@@ -50,6 +49,8 @@ canvas { background-color:#ffffff; }
 		<option value="64">64</option>
 		<option value="122">122</option>
 	</select><br>
+	<input name="num" type="text" value="24" maxlength=4>
+	<input type="button" value="ReadJson" onclick="readJson()"/><br>
 	<div id="ball_pos"></div>
 </div>
 <div id="infos">
@@ -59,9 +60,6 @@ Closest pair=<span id="closestPair"></span><br>
 Closest distance(digree)=<span id="closestAngle"></span><br>
 Loniest one and its closest pair=<span id="loneliestPair"></span><br>
  distance(digree)=<span id="loneliestAngle"></span><br>
-ViewZ=<span id="view_z"></span><br>
-ViewX=<span id="view_x"></span><br>
-ViewY=<span id="view_y"></span><br>
 </div>
 <div style="height:200px; width:800px; overflow-y:scroll; overflow-x:scroll;">
 <div id="result"></div>

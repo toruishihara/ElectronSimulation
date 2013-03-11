@@ -15,7 +15,7 @@ h1 {
 }
 #sphereCanvas {
 	position: absolute;
-	top: 200px;
+	top: 20px;
 	left: 0px;
 }
 #sphereHelp {
@@ -58,3 +58,16 @@ h1 {
 	left: 10px;
 	font-size: 9pt
 }
+#imageList {
+	position: absolute;
+	top: 440px;
+	left: 0px;
+	width: 1000px;
+	height: 210px;
+	overflow-x: scroll;
+}
+.tableItem {
+	width: 200px;
+	height: 200px;
+}
+

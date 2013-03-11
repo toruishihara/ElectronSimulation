@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="utf-8"/>
+<title>Electron on sphere movement simulaton </title>
+<style>
+body { background-color:#cccccc; }
+canvas { background-color:#ffffff; }
+    div#sphereCanvas{
+        border: none;
+        cursor: pointer;
+        width: 400px;
+        height: 400px;
+        background-color: #EEEEEE;
+    }
+</style>
+        <link rel="stylesheet" href="desktop.css" />
+</head>
+<body onload="loadThree()">
+
+<div id="sphereCanvas" width="400" height="400"></div>
+
+<div id="imageList">
+<table id="imageTable">
+<tr>
+<td><img class="tableItem" src="img/n4.png"></td>
+<td><img class="tableItem" src="img/n5.png"></td>
+<td><img class="tableItem" src="img/n6.png" height="200px"></td>
+<td><img class="tableItem" src="img/n7.png" height="200px"></td>
+<td><img class="tableItem" src="img/n8.png" height="200px"></td>
+<td><img class="tableItem" src="img/n9.png" height="200px"></td>
+<td><img class="tableItem" src="img/n10.png" height="200px"></td>
+<td><img class="tableItem" src="img/n11.png" height="200px"></td>
+<td><img class="tableItem" src="img/n12.png" height="200px"</td>
+<td><img class="tableItem" src="img/n20.png" height="200px"></td>
+<td><img class="tableItem" src="img/n24.png" height="200px"></td>
+<td><img class="tableItem" src="img/n32.png" height="200px"></td>
+</tr>
+</table>
+</div>
+</body>
+        <script type="text/javascript" src="Three.js"></script>
+	<script type="text/javascript" src="Tuple.js"></script>
+	<script type="text/javascript" src="TronControlThree.js"></script>
+	<script type="text/javascript" src="TronModel.js"></script>
+	<script type="text/javascript" src="jsutil.js"></script>
+	<script type="text/javascript" src="results.js"></script>
+</html>

@@ -694,8 +694,7 @@ function story() {
     return storyCleanStart();
 }
 
-function storyStart() {
-    init();
+function storyContinue() {
     NumTrons = Trons.length;
     console.log("n=" + NumTrons);
     drawTrons();

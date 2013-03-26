@@ -16,11 +16,12 @@ var loneliestPair = "";
 var loneliestAngle = 360;
 var outputDone = 0;
 var times = 0;
+var initVelo = 0.01;
 
 // defines
 var huge = 9999999999;
 
-// struct
+// construct
 function tron(th, sp, color)
 {
 	this.point = new tuple3d(1, th, sp);
@@ -29,10 +30,32 @@ function tron(th, sp, color)
 	this.color = color;
 }
 
+function tronWithVelo(th, sp, color)
+{
+	this.point = new tuple3d(0, 0, 0);
+	this.velo = new tuple3d(initVelo, th, sp); // Velocity
+	this.velo.sp2xy();
+this.point.log();
+this.velo.log();
+	this.color = color;
+}
+
 // Public functions
 function AddTron(th, ph, color){
 	var tr = new tron(th, ph, color);
 	Trons.push(tr);
+}
+function AddTronWithVelo(th, ph, color){
+	var tr = new tronWithVelo(th, ph, color);
+	Trons.push(tr);
+}
+function MoveTron(n, x, y, z){
+	Trons[n].point.x = x;
+	Trons[n].point.y = y;
+	Trons[n].point.z = z;
+	Trons[n].velo.x = 0;
+	Trons[n].velo.y = 0;
+	Trons[n].velo.z = 0;
 }
 function ModelInit() {
 	Trons = new Array();
@@ -42,14 +65,14 @@ function ModelProgress() {
 	for(var i=0;i<Trons.length;++i) {
 		calcNewVelocityOne(i);
 	}
-    totalMove = 0;
-    for(var i=0;i<Trons.length;++i) {
-        totalMove += progressOne(i);
-    }
-    if (times % 20 == 0) {
-        updateClosest();
-        updateLoneliest();
-    }
+    	totalMove = 0;
+    	for(var i=0;i<Trons.length;++i) {
+        	totalMove += progressOne(i);
+    	}
+    	if (times % 20 == 0) {
+        	updateClosest();
+        	updateLoneliest();
+    	}
 	times ++;
 }
 
@@ -275,16 +298,18 @@ function calcNewVelocityOne(idx)
 		var d = Trons[i].point.clone();
 		d.sub(tron.point);
 		var len2 = d.length2();
-		if (len2 < 0.0000001) continue;
+		if (len2 < 0.0000001) {
+			len2 = 0.0000001;
+		}
 		var len = Math.sqrt(len2);
 		d.mul(ColombK/(len*len2));
 		newVelo.add(d);
 	}
-	var r = tron.point.clone();
-	r.unify();
-	rComp = r.dot(newVelo);
-	r.setLength(rComp);
-	newVelo.sub(r);
+	//var r = tron.point.clone();
+	//r.unify();
+	//rComp = r.dot(newVelo);
+	//r.setLength(rComp);
+	//newVelo.sub(r);
 	tron.velo.add(newVelo);
 }
 
@@ -293,17 +318,19 @@ function progressOne(idx)
 {
 	var oldTron = Trons[idx].point.clone();
 	var tron = Trons[idx];
-    var len;
-    var shakeV;
+    	var len;
+    	var shakeV;
 
 	tron.point.add(tron.velo);
-	tron.point.unify();
+
+	//tron.point.unify();
+	tron.point.inSphere();
+
 	oldTron.sub(tron.point);
 	len = oldTron.length();
-    //shakeV = new tuple3d(Shake*len*(Math.random()-0.5), Shake*len*(Math.random()-0.5), Shake*len*(Math.random()-0.5));
-    //tron.point.add(shakeV);
-	tron.point.inSphere();
-    return len;
+    	//shakeV = new tuple3d(Shake*len*(Math.random()-0.5), Shake*len*(Math.random()-0.5), Shake*len*(Math.random()-0.5));
+    	//tron.point.add(shakeV);
+    	return len;
 }
 
 function _sleep(time){

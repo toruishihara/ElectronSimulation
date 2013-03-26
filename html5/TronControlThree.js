@@ -690,6 +690,93 @@ function storyLoop()
     }
 }
 
+function movieLoop()
+{
+    //console.log("phase=" + phase + " cnt=" + calc_cnt + " cnt2=" + story_tour_cnt);
+    var wait = 0;
+    if (phase == 0) {
+        calc_cnt++;
+        ModelProgress();
+        updateThree();
+        drawMapView();
+        drawInfos();
+        if (TotalMove() < Limit && calc_cnt > 100) {
+            phase = 1;
+        }
+	if (calc_cnt > 1000) {
+            phase = 1;
+            hideTrons();
+	    readJsonAndMove(NumTrons);
+            drawTrons();
+	}
+    } else {
+        if (story_tour_cnt == 0) {
+            hideTrons();
+
+            //ModelMovePole();
+            drawTrons();
+            drawSides();
+        }
+        story_tour_cnt ++;
+        var x = 0;
+        var y = 0;
+        if (story_tour_cnt < 320) {
+            x = 0.02;
+        } else if (story_tour_cnt < 640) {
+            y = 0.02;
+        } else if (story_tour_cnt < 960) {
+            x = y = 0.01;
+        }
+        
+        var X1 = ViewPoleX.clone();
+        var Y1 = ViewPoleY.clone();
+        var Z1 = ViewPole.clone();
+        var Z2 = ViewPole.clone();
+        
+        X1.mul(Math.cos(x));
+        Z1.mul(Math.sin(x));
+        ViewPoleX = X1;
+        ViewPoleX.sub(Z1);
+        
+        Y1.mul(Math.cos(y));
+        Z2.mul(Math.sin(y));
+        ViewPoleY = Y1;
+        ViewPoleY.sub(Z2);
+        
+        ViewPole = ViewPoleX.cross(ViewPoleY);
+        ViewPole.unify();
+        ViewPoleX = ViewPoleY.cross(ViewPole);
+        ViewPoleX.unify();
+        ViewPoleY = ViewPole.cross(ViewPoleX);
+        ViewPoleY.unify();
+        
+        updateCamera();
+        if (story_tour_cnt > 960) {
+            logJson();
+            hideSides();
+            calc_cnt = 0;
+            story_tour_cnt = 0;
+            phase = 0;
+            hideTrons();
+            //clearMapView();
+            //ModelInit();
+            NumTrons ++;
+            //addTronsOnModel();
+            var color = new tronColor("hsl", (NumTrons*50)%360, "100%", "50%");
+            launchTronFromCenter(color);
+
+            drawTrons();
+        }
+            
+    }
+    renderer.clear();
+    renderer.render(ThreeScene, ThreeCamera);
+
+    if (Looping) {
+    	window.requestAnimationFrame(movieLoop);
+    }
+}
+
 function story() {
     return storyCleanStart();
 }
@@ -706,7 +793,7 @@ function storyContinue() {
 }
 
 function storyCleanStart() {
-	NumTrons = 2;
+    NumTrons = 2;
     init();
     
     hideTrons();
@@ -719,11 +806,31 @@ function storyCleanStart() {
     AddTron(0.0, Math.PI, color2);
 
     drawTrons();
-	drawViews();
+    drawViews();
 
     Looping = true;
     Limit = StoryLimit;
     storyLoop();
+}
+
+function movie() {
+    NumTrons = 2;
+    init();
+    
+    hideTrons();
+    ModelInit();
+
+    var color = new tronColor("hsl", (0*50)%360, "100%", "50%");
+    AddTron(0.0, 0.0, color);
+    var color2 = new tronColor("hsl", (1*50)%360, "100%", "50%");
+    AddTronWithVelo(0.0, Math.PI, color2);
+
+    drawTrons();
+    drawViews();
+
+    Looping = true;
+    Limit = StoryLimit;
+    movieLoop();
 }
 
 function launchTron(color) {
@@ -732,14 +839,24 @@ function launchTron(color) {
     AddTron(p.y, p.z, color);
 }
 
+function launchTronFromCenter(color) {
+    var p = FindFreePoint();
+    p.xy2sp();
+    AddTronWithVelo(p.y, p.z, color);
+}
+
 function clear() {
     storyClearStart();
 }
 
 function readJson() {
+    var num = document.getElementsByName('num')[0].value;
+    return readJsonImpl(num);
+}
+
+function readJsonImpl(num) {
     hideTrons();
     ModelInit();
-    var num = document.getElementsByName('num')[0].value;
     var jsonObj = JSON.parse(results[num]);
     for(var i=0;i<jsonObj.num;++i) {
         var p = new tuple3d(jsonObj.vertex[3*i], jsonObj.vertex[3*i+1], jsonObj.vertex[3*i+2]);
@@ -753,3 +870,10 @@ function readJson() {
     drawViews();
 }
 
+function readJsonAndMove(num) {
+    var jsonObj = JSON.parse(results[num]);
+    for(var i=0;i<jsonObj.num;++i) {
+        var p = new tuple3d(jsonObj.vertex[3*i], jsonObj.vertex[3*i+1], jsonObj.vertex[3*i+2]);
+        MoveTron(i, p.x, p.y, p.z);
+    }
+}

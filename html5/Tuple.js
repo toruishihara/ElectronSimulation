@@ -26,7 +26,7 @@ function tuple3d(in_x, in_y, in_z){
 	this.sub = tuple3d_sub;
 	this.length = tuple3d_length;
 	this.length2 = tuple3d_length2;
-    this.dis = tuple3d_dis;
+    	this.dis = tuple3d_dis;
 	this.xy2sp = tuple3d_xy2sp;
 	this.sp2xy = tuple3d_sp2xy;
 	this.xy2spy = tuple3d_xy2spy;
@@ -50,11 +50,11 @@ function tuple3d_unify() {
 function tuple3d_inSphere() {
 	var len2 = this.x*this.x + this.y*this.y + this.z*this.z;
 	var len = Math.sqrt(len2);
-    if (len > 1.0) {
-        this.x = this.x / len;
-        this.y = this.y / len;
-        this.z = this.z / len;
-    }
+    	if (len > 1.0) {
+       		this.x = this.x / len;
+        	this.y = this.y / len;
+        	this.z = this.z / len;
+    	}
 }
 function tuple3d_setLength(newLength) {
 	var len2 = this.x*this.x + this.y*this.y + this.z*this.z;
@@ -141,6 +141,9 @@ function tuple3d_xy2spy() {
 
 function tuple3d_log() {
 	console.log(" x=" + this.x + " y=" + this.y + " z=" + this.z);
+}
+function tuple3d_log(str) {
+	console.log(str + " x=" + this.x + " y=" + this.y + " z=" + this.z);
 }
 function tuple3d_logsp() {
 	console.log(" r=" + this.x + " th=" + this.y + " ph=" + this.z);

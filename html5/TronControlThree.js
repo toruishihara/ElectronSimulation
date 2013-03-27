@@ -20,7 +20,7 @@ var Times = 0;
 var Interval = 50;
 var NumTrons = 8;
 var Limit = 0.000000001;
-var StoryLimit = 0.0000000001;
+var StoryLimit = 0.000001;
 
 var ThreeTrons = new Array();
 var ThreeSides = new Array();
@@ -708,6 +708,7 @@ function movieLoop()
             hideTrons();
 	    readJsonAndMove(NumTrons);
             drawTrons();
+	    _sleep(1000);
 	}
     } else {
         if (story_tour_cnt == 0) {
@@ -716,6 +717,7 @@ function movieLoop()
             //ModelMovePole();
             drawTrons();
             drawSides();
+	    _sleep(1000);
         }
         story_tour_cnt ++;
         var x = 0;
@@ -815,6 +817,7 @@ function storyCleanStart() {
 
 function movie() {
     NumTrons = 2;
+    ColombK = -0.0001;
     init();
     
     hideTrons();

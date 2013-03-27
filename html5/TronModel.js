@@ -17,6 +17,7 @@ var loneliestAngle = 360;
 var outputDone = 0;
 var times = 0;
 var initVelo = 0.01;
+var ColombK = -0.00001;
 
 // defines
 var huge = 9999999999;
@@ -35,8 +36,6 @@ function tronWithVelo(th, sp, color)
 	this.point = new tuple3d(0, 0, 0);
 	this.velo = new tuple3d(initVelo, th, sp); // Velocity
 	this.velo.sp2xy();
-this.point.log();
-this.velo.log();
 	this.color = color;
 }
 
@@ -95,7 +94,7 @@ function updateClosest() {
 }
 
 function FindFreePoint() {
-    var fine = 1024.0;
+    var fine = 512.0;
 	var minDot = 1.0;
     var size = 1;
 	var freePoint = new tuple3d(0,0,0);
@@ -288,7 +287,6 @@ function outputSTL() {
 	return ret;
 }
 
-var ColombK = -0.00001;
 function calcNewVelocityOne(idx)
 {
 	var tron = Trons[idx];
@@ -333,10 +331,10 @@ function progressOne(idx)
     	return len;
 }
 
-function _sleep(time){
+function _sleep(millisec){
     var d1 = new Date().getTime();
     var d2 = new Date().getTime();
-    while( d2 < d1 + time ){
+    while( d2 < d1 + millisec ){
         d2=new Date().getTime();
     }
     return;

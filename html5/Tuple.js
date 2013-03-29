@@ -27,6 +27,7 @@ function tuple3d(in_x, in_y, in_z){
 	this.length = tuple3d_length;
 	this.length2 = tuple3d_length2;
     	this.dis = tuple3d_dis;
+    	this.dis2 = tuple3d_dis2;
 	this.xy2sp = tuple3d_xy2sp;
 	this.sp2xy = tuple3d_sp2xy;
 	this.xy2spy = tuple3d_xy2spy;
@@ -95,6 +96,12 @@ function tuple3d_dis(tuple) {
     var dy = this.y - tuple.y;
     var dz = this.z - tuple.z;
     return Math.sqrt(dx*dx + dy*dy + dz*dz);
+}
+function tuple3d_dis2(tuple) {
+    var dx = this.x - tuple.x;
+    var dy = this.y - tuple.y;
+    var dz = this.z - tuple.z;
+    return dx*dx + dy*dy + dz*dz;
 }
 function tuple3d_sp2xy() {
 	var r = this.x;

@@ -19,8 +19,8 @@ var Height = 400;
 var Times = 0;
 var Interval = 50;
 var NumTrons = 8;
-var Limit = 0.000000001;
-var StoryLimit = 0.000001;
+var Limit = 0.0000001;
+var StoryLimit = 0.0000001;
 
 var ThreeTrons = new Array();
 var ThreeSides = new Array();
@@ -697,12 +697,15 @@ function movieLoop()
     if (phase == 0) {
         calc_cnt++;
         ModelProgress();
-        updateThree();
-        drawMapView();
-        drawInfos();
+	if (calc_cnt % 20 == 1) {
+            updateThree();
+            drawMapView();
+            drawInfos();
+	}
         if (TotalMove() < Limit && calc_cnt > 100) {
             phase = 1;
         }
+	/*
 	if (calc_cnt > 1000) {
             phase = 1;
             hideTrons();
@@ -710,6 +713,7 @@ function movieLoop()
             drawTrons();
 	    _sleep(1000);
 	}
+	*/
     } else {
         if (story_tour_cnt == 0) {
             hideTrons();

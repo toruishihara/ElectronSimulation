@@ -15,8 +15,15 @@ h1 {
 }
 #sphereCanvas {
 	position: absolute;
-	top: 20px;
+	top: 0px;
 	left: 0px;
+}
+#underDesc {
+	position: absolute;
+	top: 400px;
+	left: 50px;
+	font-size: 20pt
+	background-color: #FFFFFF;
 }
 #sphereHelp {
 	position: absolute;
@@ -30,7 +37,7 @@ h1 {
 #mapCanvas {
 	position: absolute;
 	top: 200px;
-	left: 410px;
+	left: 610px;
 }
 #mapHelp {
 	position: absolute;
@@ -43,12 +50,12 @@ h1 {
 
 #buttons {
 	position: absolute;
-	top: 420px;
+	top: 520px;
 	left: 410px;
 }
 #infos {
 	position: absolute;
-	top: 480px;
+	top: 580px;
 	left: 410px;
 	font-size: 10pt
 }

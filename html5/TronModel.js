@@ -17,7 +17,7 @@ var loneliestAngle = 360;
 var outputDone = 0;
 var times = 0;
 var initVelo = 0.01;
-var ColombK = -1;
+var ColombK = -0.00001;
 
 // defines
 var huge = 9999999999;
@@ -94,7 +94,7 @@ function updateClosest() {
 }
 
 function FindFreePoint() {
-    var fine = 512.0;
+    var fine = 1024.0;
 	var minDot = 1.0;
     var size = 1;
 	var freePoint = new tuple3d(0,0,0);
@@ -305,12 +305,12 @@ function calcNewVelocityOne(idx)
 		newVelo.add(d);
 	}
 	var r = tron.point.clone();
-	if (r.length2() > 1.0) {
+	//if (r.length2() > 1.0) {
 		r.unify();
 		rComp = r.dot(newVelo);
 		r.setLength(rComp);
 		newVelo.sub(r);
-	}
+	//}
 	tron.velo.add(newVelo);
 }
 

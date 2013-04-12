@@ -879,11 +879,29 @@ function readJsonImpl(num) {
 }
 
 function readJsonAndMove(num) {
-    var jsonObj = JSON.parse(results[num]);
-    for(var i=0;i<jsonObj.num;++i) {
-        var p = new tuple3d(jsonObj.vertex[3*i], jsonObj.vertex[3*i+1], jsonObj.vertex[3*i+2]);
-        MoveTron(i, p.x, p.y, p.z);
-    }
-    var str = "N=" + num + " " + jsonObj.str;
-    document.getElementById("underDesc").innerText = str;
+    	var jsonObj = JSON.parse(results[num]);
+    	for(var i=0;i<jsonObj.num;++i) {
+        	var p = new tuple3d(jsonObj.vertex[3*i], jsonObj.vertex[3*i+1], jsonObj.vertex[3*i+2]);
+        	MoveTron(i, p.x, p.y, p.z);
+    	}
+    	var str = "N=" + num + " " + jsonObj.str;
+    	var underD = document.getElementById("underDesc");
+	if (underD != null) {
+		underD.innerText = str;
+	}
+}
+
+function selItem(num) {
+    	console.log("num=" + num);
+    	hideTrons();
+    	hideSides();
+    	ModelInit();
+    	for(var i=0;i<num;++i) {
+        	var color = new tronColor("hsl", (i*50)%360, "100%", "50%");
+        	AddTron(0, 0, color);
+	}
+	readJsonAndMove(num);
+    	drawTrons();
+    	drawSides();
+	tour();
 }

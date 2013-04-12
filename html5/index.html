@@ -19,22 +19,21 @@ canvas { background-color:#ffffff; }
 <body onload="loadThree()">
 
 <div id="sphereCanvas" width="400" height="400"></div>
-
+Simulation Results, click each image for 3D view
 <div id="imageList">
 <table id="imageTable">
-<tr>
-<td><img class="tableItem" src="img/n4.png"></td>
-<td><img class="tableItem" src="img/n5.png"></td>
-<td><img class="tableItem" src="img/n6.png" height="200px"></td>
-<td><img class="tableItem" src="img/n7.png" height="200px"></td>
-<td><img class="tableItem" src="img/n8.png" height="200px"></td>
-<td><img class="tableItem" src="img/n9.png" height="200px"></td>
-<td><img class="tableItem" src="img/n10.png" height="200px"></td>
-<td><img class="tableItem" src="img/n11.png" height="200px"></td>
-<td><img class="tableItem" src="img/n12.png" height="200px"</td>
-<td><img class="tableItem" src="img/n20.png" height="200px"></td>
-<td><img class="tableItem" src="img/n24.png" height="200px"></td>
-<td><img class="tableItem" src="img/n32.png" height="200px"></td>
+<tr onclick="selItem(4)"><td>N=4</td><td><img class="tableItem" src="img/n4.png"></td><td>Tetrahedron</td></tr>
+<tr onclick="selItem(5)"><td>N=5</td><td><img class="tableItem" src="img/n5.png"></td><td>Bipyramid(3)</td></tr>
+<tr onclick="selItem(6)"><td>N=6</td><td><img class="tableItem" src="img/n6.png"></td><td>Octahedron</td></tr>
+<tr onclick="selItem(7)"><td>N=7</td><td><img class="tableItem" src="img/n7.png"</td><td>Pentagonal Bipyramid</td></tr>
+<tr onclick="selItem(8)"><td>N=8</td><td><img class="tableItem" src="img/n8.png"</td><td>Antiprism(4)</td></tr>
+<tr onclick="selItem(9)"><td>N=9</td><td><img class="tableItem" src="img/n9.png"</td><td>Triaugmented Triangular Prism</td></tr>
+<tr onclick="selItem(10)"><td>N=10</td><td><img class="tableItem" src="img/n10.png"</td><td>Antiprisim(4) + 2 Pyramids</td></tr>
+<tr onclick="selItem(11)"><td>N=11</td><td><img class="tableItem" src="img/n11.png"</td><td></td></tr>
+<tr onclick="selItem(12)"><td>N=12</td><td><img class="tableItem" src="img/n12.png"</td><td>Icosahedron</td></tr>
+<tr onclick="selItem(20)"><td>N=20</td><td><img class="tableItem" src="img/n20.png"</td><td></td></tr>
+<tr onclick="selItem(24)"><td>N=24</td><td><img class="tableItem" src="img/n24.png"</td><td>Snub Cube</td></tr>
+<tr onclick="selItem(32)"><td>N=32</td><td><img class="tableItem" src="img/n32.png"</td><td>Explosive lens</td></tr>
 </tr>
 </table>
 </div>

@@ -15,8 +15,8 @@ h1 {
 }
 #sphereCanvas {
 	position: absolute;
-	top: 0px;
-	left: 0px;
+	top: 30px;
+	left: 20px;
 }
 #underDesc {
 	position: absolute;
@@ -68,13 +68,14 @@ h1 {
 #imageList {
 	position: absolute;
 	top: 440px;
-	left: 0px;
-	width: 1000px;
-	height: 210px;
-	overflow-x: scroll;
+	left: 20px;
+	width: 400px;
+	height: 400px;
+	overflow-y: scroll;
+	background-color: #DDDDFF;
 }
 .tableItem {
-	width: 200px;
-	height: 200px;
+	width: 100px;
+	height: 100px;
 }
 

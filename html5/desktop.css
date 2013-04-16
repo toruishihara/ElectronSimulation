@@ -7,45 +7,60 @@ h1 {
 	text-shadow: 5pt 5pt 1pt #BDBDBD;
 	font-size: 20pt;
 }
+#leftBox {
+	position: absolute;
+	top: 3em;
+	left: 1em;
+	width: 400px;
+	height: 480px;
+}
+#rightBox {
+	position: absolute;
+	top: 3em;
+	left: 450px;
+	width: 400px;
+}
 #desc {
 	position: absolute;
 	top: 40px;
 	font-size: 10pt;
 	left: 10px;
 }
+#titleDesc {
+	position: absolute;
+	top: 0px;
+	left: 20px;
+	height: 50px;
+}
+#sphereTitle {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	width: 400px;
+	height: 20px;
+	background-color: #DDFFFF;
+}
 #sphereCanvas {
 	position: absolute;
 	top: 30px;
-	left: 20px;
+	left: 0px;
+	width: 400px;
+	height: 400px;
 }
 #underDesc {
 	position: absolute;
-	top: 400px;
-	left: 50px;
-	font-size: 20pt
-	background-color: #FFFFFF;
-}
-#sphereHelp {
-	position: absolute;
-	top: 350px;
-	left: 150px;
-	font-size: 100pt;
-	color: blue;
-	opacity:0.5;
+	top: 430px;
+	left: 0px;
+	font-size: 18pt;
+	width: 400px;
+	height: 24px;
+	background-color: #DDDDDD;
 }
 
 #mapCanvas {
 	position: absolute;
 	top: 200px;
 	left: 610px;
-}
-#mapHelp {
-	position: absolute;
-	top: 280px;
-	left: 480px;
-	font-size: 50pt;
-	color: blue;
-	opacity:0.5;
 }
 
 #buttons {
@@ -65,14 +80,25 @@ h1 {
 	left: 10px;
 	font-size: 9pt
 }
+#resultsDesc {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	height: 30px;
+}
 #imageList {
 	position: absolute;
-	top: 440px;
-	left: 20px;
+	top: 3em;
+	left: 0em;
 	width: 400px;
-	height: 400px;
+	height: 420px;
 	overflow-y: scroll;
 	background-color: #DDDDFF;
+}
+#detailDesc {
+	position: absolute;
+	top: 540px;
+	left: 20px;
 }
 .tableItem {
 	width: 100px;

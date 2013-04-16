@@ -459,6 +459,11 @@ function loadThree() {
     renderer.clear();
     renderer.render(ThreeScene, ThreeCamera);
 }
+function loadIndexThree() {
+	loadThree();	
+	var n = Math.floor( 4 + Math.random() * 16 );
+	selItem(n);
+}
 
 function create_cylinder(p0, p1, r, col)
 {

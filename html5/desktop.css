@@ -7,6 +7,9 @@ h1 {
 	text-shadow: 5pt 5pt 1pt #BDBDBD;
 	font-size: 20pt;
 }
+#body {
+	background-color: #DDDDDD;
+}
 #leftBox {
 	position: absolute;
 	top: 3em;
@@ -23,7 +26,7 @@ h1 {
 }
 #desc {
 	position: absolute;
-	top: 40px;
+	top: 420px;
 	font-size: 10pt;
 	left: 10px;
 }
@@ -39,7 +42,6 @@ h1 {
 	left: 10px;
 	width: 400px;
 	height: 20px;
-	background-color: #DDFFFF;
 }
 #sphereCanvas {
 	position: absolute;
@@ -60,8 +62,9 @@ h1 {
 
 #mapCanvas {
 	position: absolute;
-	top: 200px;
-	left: 610px;
+	top: 50px;
+	left: 450px;
+	background-color: #FFFFFF;
 }
 
 #buttons {

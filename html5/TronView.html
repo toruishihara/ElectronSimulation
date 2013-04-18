@@ -3,23 +3,12 @@
 <head>
 <meta charset="utf-8"/>
 <title>Electron on sphere movement simulaton </title>
-<style>
-body { background-color:#cccccc; }
-canvas { background-color:#ffffff; }
-    div#sphereCanvas{
-        border: none;
-        cursor: pointer;
-        width: 600px;
-        height: 400px;
-        background-color: #EEEEEE;
-    }
-</style>
-        <link rel="stylesheet" href="desktop.css" />
+<link rel="stylesheet" href="desktop.css" />
 </head>
-<body onload="loadThree()">
+<body id="body" onload="loadThree()">
 
-<div id="sphereCanvas" width="600" height="400"></div>
-<div id="underDesc" width="600" height="50"></div>
+<div id="sphereCanvas" width="400" height="400"></div>
+<div id="underDesc" width="400" height="50"></div>
 <div>
 	<canvas id="mapCanvas" width="400" height="200"></canvas>
 <div id="buttons">

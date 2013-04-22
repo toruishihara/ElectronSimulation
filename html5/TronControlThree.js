@@ -409,14 +409,15 @@ function updateCamera() {
 function initScene() {    
     ThreeScene = new THREE.Scene();
 }
-var light;
 function initLight() {  
-    light = new THREE.DirectionalLight(0xFFFFFF, 1.0, 0);
+    var light = new THREE.PointLight(0xFFFFFF, 1.0, 0);
     light.position.set( 100, 100, 200 );
     ThreeScene.add(light);
-    light2 = new THREE.DirectionalLight(0xFFFFFF, 1.0, 0);
-    light2.position.set( -1000, -1000, -2000 );
-    ThreeScene.add(light2);
+    //var light2 = new THREE.PointlLight(0x888888, 1.0, 0);
+    //light2.position.set( -1000, -1000, -2000 );
+    //ThreeScene.add(light2);
+    var ambientLight = new THREE.AmbientLight(0x666666);
+    ThreeScene.add(ambientLight);
 }
 
 function updateThree() {
@@ -467,10 +468,7 @@ function loadIndexThree() {
 
 function create_cylinder(p0, p1, r, col)
 {
-    var material = new THREE.MeshLambertMaterial({
-                                                 color: col,
-                                                 opacity: 1.0
-                                                 });
+    var material = new THREE.MeshLambertMaterial({ color: col, ambient: col, opacity: 1.0 });
     var cylinder = new THREE.Mesh(new THREE.CylinderGeometry(r, r, p0.dis(p1), 0, 0, false), material);
     cylinder.overdraw = true;
 
@@ -498,7 +496,7 @@ function initObjectThree() {
     vect1 = new THREE.Vector3(250, 0, 0);
     geometry.vertices.push(vect1);
     var line = new THREE.Line(geometry, new THREE.LineBasicMaterial( { color:0xFF0000, opacity: 1.0, lineWidth:5} ));
-    //ThreeScene.add( line );
+    ThreeScene.add( line );
 
     var geometry = new THREE.Geometry();
     vect0 = new THREE.Vector3(0, 0, 0);
@@ -506,7 +504,7 @@ function initObjectThree() {
     vect1 = new THREE.Vector3(0, 250, 0);
     geometry.vertices.push(vect1);
     var line = new THREE.Line(geometry, new THREE.LineBasicMaterial( { color:0x00FF00, opacity: 1.0, lineWidth:5} ));
-    //ThreeScene.add( line );
+    ThreeScene.add( line );
 
     var geometry = new THREE.Geometry();
     vect0 = new THREE.Vector3(0, 0, 0);
@@ -514,7 +512,7 @@ function initObjectThree() {
     vect1 = new THREE.Vector3(0, 0, 250);
     geometry.vertices.push(vect1);
     var line = new THREE.Line(geometry, new THREE.LineBasicMaterial( { color:0x0000FF, opacity: 1.0, lineWidth:5} ));
-    //ThreeScene.add( line );
+    ThreeScene.add( line );
 
 	for(var i=0; i < Lines.length; ++i ) {
         var geometry = new THREE.Geometry();
@@ -535,8 +533,11 @@ function initObjectThree() {
 function drawDot(p, color, size) {
     var p0 = p.clone();
 
-    mat = new THREE.MeshLambertMaterial({color: 0xff0000});
-    mat.color.setHSV(color/360.0, 1.0, 1.0);
+    console.log("MeshBasicMaterial");
+    //mat = new THREE.MeshLambertMaterial({color:0xff0000});
+    mat = new THREE.MeshBasicMaterial({color:0xff0000});
+    //mat.color.setHSV(color/360.0, 1.0, 1.0);
+    //mat.ambient.setHSV(color/360.0, 1.0, 1.0);
 
     var ThreeP = new THREE.Mesh(new THREE.CubeGeometry(size, size, size), mat);
     ThreeScene.add(ThreeP);
@@ -555,6 +556,7 @@ function drawTrons() {
         
         mat = new THREE.MeshLambertMaterial({color: 0xff0000});
         mat.color.setHSV(Trons[i].color.p1/360.0, 1.0, 1.0);
+        mat.ambient.setHSV(Trons[i].color.p1/360.0, 1.0, 1.0);
         
         ThreeTrons[i] = new THREE.Mesh(new THREE.CubeGeometry(5,5,5), mat);
         ThreeScene.add(ThreeTrons[i]);

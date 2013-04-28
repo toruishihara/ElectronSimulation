@@ -74,13 +74,33 @@ function init() {
 		}
 	}
 	ModelInit();
-    addTronsOnModel();
+    	addTronsOnModel();
 
-    initScene();    
-    initLight();
-    initCamera();
-    updateCamera();
-    initObjectThree();
+    	initScene();    
+    	initLight();
+    	initCamera();
+    	updateCamera();
+    	initObjectThree();
+	//testCylinder();
+}
+function testCylinder() {
+	var col = 0xff00ff;
+	var c = createCylinder(0,0,0,0, 50,0,0,5, col, false);
+	ThreeScene.add(c);
+	c = createCylinder(50,0,0,5, 50,50,0,5, col, false);
+	ThreeScene.add(c);
+	c = createCylinder(50,50,0,5, 50,50,50,15, col, false);
+	ThreeScene.add(c);
+	c = createCylinder(50,0,50,5, 50,50,50,15, col, false);
+	ThreeScene.add(c);
+	c = createCylinder(0,50,50,5, 50,50,50,15, col, false);
+	ThreeScene.add(c);
+	c = createCylinder(50,0,0,5, 50,0,50,5, col, false);
+	ThreeScene.add(c);
+	c = createCylinder(0,0,0,0, 0,50,0,5, col, false);
+	ThreeScene.add(c);
+	c = createCylinder(0,0,0,0, 0,0,50,5, col, false);
+	ThreeScene.add(c);
 }
 
 function addTronsOnModel() {

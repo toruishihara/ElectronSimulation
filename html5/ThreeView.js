@@ -19,7 +19,6 @@ function ThreeViewLoad() {
 	canvas.onmouseup = mouseUpShpere;
 
 	canvas.addEventListener("webglcontextlost", function(event) { event.preventDefault(); }, false);
-//	canvas.addEventListener("webglcontextrestored", setupWebGLStateAndResources, false);
 }
 
 function initThree() {
@@ -128,8 +127,26 @@ function mouseMoveShpere(e) {
     renderer.render(ThreeScene, ThreeCamera);
 }
 
+function createCylinder(x0,y0,z0,r0, x1,y1,z1,r1, col, open)
+{
+	var v = new THREE.Vector3(x0-x1, y0-y1, z0-z1);
+	var len = v.length();
+	var material = new THREE.MeshLambertMaterial({ color:col, ambient:col, opacity:1.0 });
+	var cylinder = new THREE.Mesh(new THREE.CylinderGeometry(r0, r1, len, 0, 0, open), material);
+	cylinder.overdraw = true;
 
-
+	if (len > 0.001) {
+		cylinder.rotation.z = Math.acos(v.y/len);
+		cylinder.rotation.y = 0.5*Math.PI + Math.atan2(v.x, v.z);
+		cylinder.eulerOrder = 'YZX';
+	}
+    
+	cylinder.position.x = (x1+x0)/2;
+	cylinder.position.y = (y1+y0)/2;
+	cylinder.position.z = (z1+z0)/2;
+    
+	return cylinder;
+}
 
 function create_cylinder(p0, p1, r, col)
 {

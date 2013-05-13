@@ -22,12 +22,18 @@ function ThreeViewLoad() {
 }
 
 function initThree() {
-    width = document.getElementById('sphereCanvas').clientWidth;
-    height = document.getElementById('sphereCanvas').clientHeight;  
-    renderer = new THREE.WebGLRenderer({antialias: true});
-    renderer.setSize(width, height );
-    document.getElementById('sphereCanvas').appendChild(renderer.domElement);
-    renderer.setClearColorHex(0xFFFFFF, 1.0);
+    	width = document.getElementById('sphereCanvas').clientWidth;
+    	height = document.getElementById('sphereCanvas').clientHeight;  
+    	renderer = new THREE.WebGLRenderer({antialias: true});
+    	renderer.setSize(width, height );
+    	document.getElementById('sphereCanvas').appendChild(renderer.domElement);
+    	renderer.setClearColorHex(0xFFFFFF, 1.0);
+
+    	initScene();    
+    	initLight();
+    	initCamera();
+    	updateCamera();
+    	initObjectThree();
 }
 
 function initCamera() {

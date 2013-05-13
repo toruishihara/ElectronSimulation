@@ -7,6 +7,13 @@ h1 {
 	text-shadow: 5pt 5pt 1pt #BDBDBD;
 	font-size: 20pt;
 }
+div {
+	position: absolute;
+}
+#small {
+	color: #000000;
+	font-size: 9pt;
+}
 #body {
 	background-color: #DDDDDD;
 }
@@ -27,6 +34,12 @@ h1 {
 #desc {
 	position: absolute;
 	top: 420px;
+	font-size: 10pt;
+	left: 10px;
+}
+#randomDesc {
+	position: absolute;
+	top: 720px;
 	font-size: 10pt;
 	left: 10px;
 }
@@ -65,18 +78,6 @@ h1 {
 	top: 50px;
 	left: 450px;
 	background-color: #FFFFFF;
-}
-
-#buttons {
-	position: absolute;
-	top: 480px;
-	left: 40px;
-}
-#infos {
-	position: absolute;
-	top: 560px;
-	left: 40px;
-	font-size: 10pt
 }
 #bottom {
 	position: absolute;

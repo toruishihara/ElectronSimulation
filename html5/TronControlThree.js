@@ -75,12 +75,6 @@ function init() {
 	}
 	ModelInit();
     	addTronsOnModel();
-
-    	initScene();    
-    	initLight();
-    	initCamera();
-    	updateCamera();
-    	initObjectThree();
 	//testCylinder();
 }
 function testCylinder() {
@@ -233,28 +227,36 @@ function tourLoop() {
 }
 
 function load(){
-	ThreeViewLoad();
 	init();
 	drawViews();
-    
 }
 
 function start(){
 	Times = 0;
-    init();
+    	//init();
     
-    hideTrons();
-    ModelInit();
-    addTronsOnModel();
+    	hideTrons();
+    	//ModelInit();
+    	//addTronsOnModel();
     
-    drawTrons();
+    	drawTrons();
 	drawViews();
 
-    Looping = true;
-    loop();
+    	Looping = true;
+    	loop();
 }
 function stop(){
     Looping = false;
+}
+function reset() {
+    	Looping = false;
+    	init();
+    	initThree();
+    	drawTrons();
+    	updateCamera();
+    	renderer.clear();
+    	renderer.render(ThreeScene, ThreeCamera);
+	drawViews();
 }
 function movePole(){
 	ModelMovePole();
@@ -336,16 +338,14 @@ function loop() {
 }
 
 function loadThree() {
-    	initThree();
-    
-	ThreeViewLoad();
     	init();
+    	initThree();
+	ThreeViewLoad();
     	drawTrons();
-    
     	updateCamera();
-
     	renderer.clear();
     	renderer.render(ThreeScene, ThreeCamera);
+	drawViews();
 }
 function loadIndexThree() {
 	loadThree();

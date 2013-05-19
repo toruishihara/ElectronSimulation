@@ -6,24 +6,23 @@
 <link rel="stylesheet" href="desktop.css" />
 </head>
 <body id="body" onload="loadThree()">
-
-<div id="sphereCanvas" width="400" height="400"></div>
-<div id="underDesc" width="400" height="50"></div>
+<div id="sphereCanvas" style="top:50px;"></div>
+<div id="underDesc" style="top:450px;width:400px;height:30px;background-color:#FFEEEE"></div>
 <div>
-	<canvas id="mapCanvas" width="400" height="200"></canvas>
-<div id="buttons" top="450" left="20">
+	<canvas id="mapCanvas" onload="drawMapView()"></canvas>
+</div>
+<div style="top:500px;left:20px;width:100%;">	
+<div>
 	<input type="button" value="Start" onclick="start()"/>
 	<input type="button" value="Stop" onclick="stop()"/>
 	<input type="button" value="MovePole" onclick="movePole()"/>
 	<input type="button" value="Spins" onclick="tour()"/><br>
-	<input type="button" value="Story" onclick="story()"/>
+	<input type="button" value="Story" onclick="story()" style="background-color:#FFFF00"/>
 	<input type="button" value="Clear" onclick="clear()"/>
 	<input type="button" value="Continue" onclick="storyContinue()"/>
-	<input type="button" value="Movie" onclick="movie()"/><br>
+	<input type="button" value="Movie" onclick="movie()" style="background-color:#FF0000"/><br>
 	<input name="num" type="text" value="24" maxlength=4>
 	<input type="button" value="ReadJson" onclick="readJson()"/><br>
-</div>
-<div id="infos">
 progress=<span id="progress"></span><br>
 Total Movement in this step=<span id="totalMove"></span><br>
 Closest pair=<span id="closestPair"></span><br>
@@ -31,8 +30,7 @@ Closest distance(digree)=<span id="closestAngle"></span><br>
 Loniest one and its closest pair=<span id="loneliestPair"></span><br>
 distance(digree)=<span id="loneliestAngle"></span><br>
 </div>
-<div id="result">
-</div>
+<div id="result" style="top:200px;left:20px;width:100%;background-color:#FFFFFF">
 </div>
         <script type="text/javascript" src="Three.js"></script>
         <script type="text/javascript" src="ThreeView.js"></script>

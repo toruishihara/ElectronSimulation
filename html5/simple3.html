@@ -1,0 +1,86 @@
+<html>
+<body>
+<div id="ThreeCanvas" style="height:200px;width:200px;background-color:#eeeeee">
+<script type="text/javascript" src="http://www.nariuchi.com/3d/Three.js"></script>
+<script type="text/javascript">
+<!--
+var ThreeCanvas = document.getElementById("ThreeCanvas");
+var Width = ThreeCanvas.clientWidth;
+var Height = ThreeCanvas.clientHeight;  
+var ThreeCamera = new THREE.PerspectiveCamera( 45 , Width / Height , 1 , 10000 );
+var ThreeRenderer = new THREE.WebGLRenderer({antialias: true});
+var ThreeScene = new THREE.Scene();
+var Distance = 3000;
+function onLoad() {
+	ThreeRenderer.setSize(Width, Height );
+	ThreeCanvas.appendChild(ThreeRenderer.domElement);
+	ThreeRenderer.setClearColorHex(0xFFFFFF, 1.0);
+
+	var light = new THREE.PointLight(0xFFFFFF, 1.0, 0);
+	light.position.set( 100, 100, 200 );
+	ThreeScene.add(light);
+	var ambientLight = new THREE.AmbientLight(0x888888);
+	ThreeScene.add(ambientLight);
+
+	ThreeScene.add(ThreeCamera);
+	ThreeCamera.position.z = 100;
+	ThreeCamera.up.x = 0;
+	ThreeCamera.up.y = 0;
+	ThreeCamera.up.z = 1;
+ 
+	var col = 0xff0000;
+  	var mat = new THREE.MeshLambertMaterial({ color:col, ambient:col, opacity:1.0 });
+	var cyl = createCylinder(0,0,100,10, 100,100,0,10, col, false); 
+	ThreeScene.add(cyl);
+	cyl = createCylinder(0,0,100,10, -100,100,0,10, col, false); 
+	ThreeScene.add(cyl);
+	cyl = createCylinder(0,0,100,10, 100,-100,0,10, col, false); 
+	ThreeScene.add(cyl);
+	cyl = createCylinder(0,0,100,10, -100,-100,0,10, col, false); 
+	ThreeScene.add(cyl);
+	cyl = createCylinder(100,100,0,10, -100,100,0,10, col, false); 
+	ThreeScene.add(cyl);
+	cyl = createCylinder(100,100,0,10, 100,-100,0,10, col, false); 
+	ThreeScene.add(cyl);
+	cyl = createCylinder(100,-100,0,10, -100,-100,0,10, col, false); 
+	ThreeScene.add(cyl);
+	cyl = createCylinder(-100,100,0,10, -100,-100,0,10, col, false); 
+	ThreeScene.add(cyl);
+	window.requestAnimationFrame(loop);
+}
+function loop() {
+	Distance -= 5;
+	ThreeCamera.position.x = Distance;
+	ThreeCamera.position.z = 0.1*Distance;
+	ThreeCamera.lookAt( {x:0, y:0, z:85 } );
+
+	ThreeRenderer.clear();
+	ThreeRenderer.render(ThreeScene, ThreeCamera);
+	window.requestAnimationFrame(loop);
+}
+function createCylinder(x0,y0,z0,r0, x1,y1,z1,r1, col, open)
+{
+    var v = new THREE.Vector3(x0-x1, y0-y1, z0-z1);
+	var len = v.length();
+	var material = new THREE.MeshLambertMaterial({ color:col, ambient:col, opacity:1.0 });
+	var cylinder = new THREE.Mesh(new THREE.CylinderGeometry(r0, r1, len, 0, 0, open), material);
+	cylinder.overdraw = true;
+
+	if (len > 0.001) {
+		cylinder.rotation.z = Math.acos(v.y/len);
+		cylinder.rotation.y = 0.5*Math.PI + Math.atan2(v.x, v.z);
+		cylinder.eulerOrder = 'YZX';
+	}
+    
+	cylinder.position.x = (x1+x0)/2;
+	cylinder.position.y = (y1+y0)/2;
+	cylinder.position.z = (z1+z0)/2;
+    
+	return cylinder;
+}
+onLoad();
+//->
+</script>
+</div>
+</body>
+</html>

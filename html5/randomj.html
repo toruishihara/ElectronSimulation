@@ -21,15 +21,17 @@
 	<br><br>電子の数
 		<input type="number"  name="numOfTrons" value="8" min="1" max="256" onchange="numberChange(value)"><br><br>
   <div style="width:100%;">
-計算回数=<span id="progress"></span><br>
+電子数=<span id="progress"></span><br>
 今回の合計電子移動量=<span id="totalMove"></span><br>
 最も近い電子ペア=<span id="closestPair"></span><br>
 　上の電子間角度=<span id="closestAngle"></span><br>
 最も孤立した電子と、近接電子=<span id="loneliestPair"></span><br>
  　上の電子間角度=<span id="loneliestAngle"></span><br>
+最も近い電子ペア同士と、その距離の1.01倍以内にある電子ペアは緑の線分で表示<br>
+その距離の1.42倍以内の電子ペアは青の線分で表示しています。<br>
+ドラッグで回転します。<br>
  　<div id="small">
 テスト済ブラウザ：Chrome26,FireFox17<br>
-上のWebGL表示は、ドラッグで回転します。<br>
 シミュレーションの方法（とりあえずSTARTを押してみてください）<br>
 初期条件：複数の電子を球面上にランダムに配置する。<br>
 拘束条件：各電子は１つの球面上しか移動できない。<br>

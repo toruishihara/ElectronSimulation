@@ -1,0 +1,53 @@
+<html>
+<body>
+<div id="ThreeCanvas" style="height:200px;width:200px;background-color:#eeeeee">
+<script type="text/javascript" src="http://www.nariuchi.com/3d/Three.js"></script>
+<script type="text/javascript">
+<!--
+var ThreeCanvas = document.getElementById("ThreeCanvas");
+var Width = ThreeCanvas.clientWidth;
+var Height = ThreeCanvas.clientHeight;  
+var ThreeCamera = new THREE.PerspectiveCamera( 45 , Width / Height , 1 , 10000 );
+var ThreeRenderer = new THREE.WebGLRenderer({antialias: true});
+var ThreeScene = new THREE.Scene();
+var Theta = 0;
+function onLoad() {
+	ThreeRenderer.setSize(Width, Height );
+	ThreeCanvas.appendChild(ThreeRenderer.domElement);
+	ThreeRenderer.setClearColorHex(0xFFFFFF, 1.0);
+
+	var light = new THREE.PointLight(0xFFFFFF, 1.0, 0);
+	light.position.set( 100, 100, 200 );
+	ThreeScene.add(light);
+	var ambientLight = new THREE.AmbientLight(0x888888);
+	ThreeScene.add(ambientLight);
+
+	ThreeScene.add(ThreeCamera);
+	ThreeCamera.position.z = 100;
+	ThreeCamera.up.x = 0;
+	ThreeCamera.up.y = 0;
+	ThreeCamera.up.z = 1;
+ 
+	var col = 0xff0000;
+  	var mat = new THREE.MeshLambertMaterial({ color:col, ambient:col, opacity:1.0 });
+	var box = new THREE.Mesh(new THREE.CubeGeometry(100,100,100), mat);
+	ThreeScene.add(box);
+	box.position.set(0,0,0);	
+	window.requestAnimationFrame(loop);
+}
+function loop() {
+	Theta += 0.05;
+	ThreeCamera.position.x = 300*Math.sin(Theta);
+	ThreeCamera.position.y = 300*Math.cos(Theta);
+	ThreeCamera.lookAt( {x:0, y:0, z:0 } );
+
+	ThreeRenderer.clear();
+	ThreeRenderer.render(ThreeScene, ThreeCamera);
+	window.requestAnimationFrame(loop);
+}
+onLoad();
+//->
+</script>
+</div>
+</body>
+</html>

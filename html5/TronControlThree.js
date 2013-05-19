@@ -99,7 +99,7 @@ function testCylinder() {
 
 function addTronsOnModel() {
     for (var i=0;i<NumTrons;++i) {
-        var color = new tronColor("hsl", (i*50)%360, "100%", "50%");
+        var color = new tronColor("hsl", (i*47)%360, "100%", "50%");
         AddTron(Math.PI*2*Math.random(), Math.PI*Math.random(), color);
         //AddTron(Math.PI*2*Math.random(), Math.PI*0.5, color);
     }
@@ -233,17 +233,17 @@ function load(){
 
 function start(){
 	Times = 0;
-    	//init();
+	init();
     
-    	hideTrons();
-    	//ModelInit();
-    	//addTronsOnModel();
+	hideTrons();
+	ModelInit();
+	addTronsOnModel();
     
-    	drawTrons();
+	drawTrons();
 	drawViews();
 
-    	Looping = true;
-    	loop();
+	Looping = true;
+	loop();
 }
 function stop(){
     Looping = false;
@@ -262,7 +262,7 @@ function movePole(){
 	ModelMovePole();
     Looping = false;
 	drawViews();
-    drawSides();
+    drawEdges();
     //var s = JSON.sringify(ThreeScene);
     //console.log(s);
 }
@@ -324,17 +324,19 @@ function setShadow(c, color, blur, offsetX, offsetY){
 }
 
 function loop() {
-    ModelProgress();
-    updateThree();
-    renderer.clear();
-    renderer.render(ThreeScene, ThreeCamera);
+	hideEdges();
+    	ModelProgress();
+    	updateThree();
+	drawEdges();
+    	renderer.clear();
+    	renderer.render(ThreeScene, ThreeCamera);
     
-    drawMapView();
-    drawInfos();
+    	drawMapView();
+    	drawInfos();
 
-    if (Looping) {
-        window.requestAnimationFrame(loop);
-    }
+    	if (Looping) {
+        	window.requestAnimationFrame(loop);
+    	}
 }
 
 function loadThree() {
@@ -363,8 +365,10 @@ function storyLoop()
     var wait = 0;
     if (phase == 0) {
         calc_cnt++;
+	hideEdges();
         ModelProgress();
         updateThree();
+	drawEdges();
         drawMapView();
         drawInfos();
         if (TotalMove() < Limit && calc_cnt > 100) {
@@ -376,7 +380,7 @@ function storyLoop()
 
             //ModelMovePole();
             drawTrons();
-            drawSides();
+            drawEdges();
         }
         story_tour_cnt ++;
         var x = 0;
@@ -414,7 +418,7 @@ function storyLoop()
         updateCamera();
         if (story_tour_cnt > LoopNum) {
             logJson();
-            hideSides();
+            hideEdges();
             calc_cnt = 0;
             story_tour_cnt = 0;
             phase = 0;
@@ -423,7 +427,7 @@ function storyLoop()
             //ModelInit();
             NumTrons ++;
             //addTronsOnModel();
-            var color = new tronColor("hsl", (NumTrons*50)%360, "100%", "50%");
+            var color = new tronColor("hsl", (NumTrons*47)%360, "100%", "50%");
             launchTron(color);
 
             drawTrons();
@@ -448,7 +452,9 @@ function movieLoop()
         document.getElementById("underDesc").innerText = str;
         ModelProgress();
 	if (calc_cnt % 20 <= 20) {
+            hideEdges();
             updateThree();
+            drawEdges();
             drawMapView();
             drawInfos();
 	}
@@ -457,9 +463,11 @@ function movieLoop()
         }
 	if (calc_cnt > 1000) {
             phase = 1;
+            hideEdges();
             hideTrons();
 	    readJsonAndMove(NumTrons);
             drawTrons();
+            drawEdges();
 	    _sleep(500);
 	}
     } else {
@@ -468,7 +476,7 @@ function movieLoop()
 
             //ModelMovePole();
             drawTrons();
-            drawSides();
+            drawEdges();
 	    _sleep(500);
         }
         story_tour_cnt ++;
@@ -509,7 +517,7 @@ function movieLoop()
 	}
         if (story_tour_cnt > LoopNum) {
             logJson();
-            hideSides();
+            hideEdges();
             calc_cnt = 0;
             story_tour_cnt = 0;
             phase = 0;
@@ -518,7 +526,7 @@ function movieLoop()
             //ModelInit();
             NumTrons ++;
             //addTronsOnModel();
-            var color = new tronColor("hsl", (NumTrons*50)%360, "100%", "50%");
+            var color = new tronColor("hsl", (NumTrons*47)%360, "100%", "50%");
             launchTron(color);
 
             drawTrons();
@@ -556,9 +564,9 @@ function storyCleanStart() {
     ModelInit();
     //addTronsOnModel();
 
-    var color = new tronColor("hsl", (0*50)%360, "100%", "50%");
+    var color = new tronColor("hsl", (0*47)%360, "100%", "50%");
     AddTron(0.0, 0.0, color);
-    var color2 = new tronColor("hsl", (1*50)%360, "100%", "50%");
+    var color2 = new tronColor("hsl", (1*47)%360, "100%", "50%");
     AddTron(0.0, Math.PI, color2);
 
     drawTrons();
@@ -576,9 +584,9 @@ function movie() {
     hideTrons();
     ModelInit();
 
-    var color = new tronColor("hsl", (0*50)%360, "100%", "50%");
+    var color = new tronColor("hsl", (0*47)%360, "100%", "50%");
     AddTron(0.0, 0.0, color);
-    var color2 = new tronColor("hsl", (1*50)%360, "100%", "50%");
+    var color2 = new tronColor("hsl", (1*47)%360, "100%", "50%");
     AddTron(0.0, Math.PI, color2);
 
     drawTrons();
@@ -617,7 +625,7 @@ function readJsonImpl(num) {
     for(var i=0;i<jsonObj.num;++i) {
         var p = new tuple3d(jsonObj.vertex[3*i], jsonObj.vertex[3*i+1], jsonObj.vertex[3*i+2]);
         p.xy2sp();
-        var color = new tronColor("hsl", (i*50)%360, "100%", "50%");
+        var color = new tronColor("hsl", (i*47)%360, "100%", "50%");
         AddTron(p.y, p.z, color);
     }
     NumTrons = Trons.length;
@@ -642,14 +650,14 @@ function readJsonAndMove(num) {
 function selItem(num) {
     	console.log("num=" + num);
     	hideTrons();
-    	hideSides();
+    	hideEdges();
     	ModelInit();
     	for(var i=0;i<num;++i) {
-        	var color = new tronColor("hsl", (i*50)%360, "100%", "50%");
+        	var color = new tronColor("hsl", (i*47)%360, "100%", "50%");
         	AddTron(0, 0, color);
 	}
 	readJsonAndMove(num);
     	drawTrons();
-    	drawSides();
+    	drawEdges();
 	tour();
 }

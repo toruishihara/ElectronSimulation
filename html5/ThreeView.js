@@ -1,5 +1,5 @@
 var ThreeTrons = new Array();
-var ThreeSides = new Array();
+var ThreeEdges = new Array();
 var ThreeScene;
 var ThreeCamera;
 var width, height;
@@ -252,7 +252,7 @@ function drawTrons() {
 	}
 }
 
-function drawSides() {
+function drawEdges() {
     var shortest = 1000;
 	for(var i=0; i < Trons.length; ++i ) {
         for(var j=i+1; j < Trons.length; ++j ) {
@@ -274,23 +274,23 @@ function drawSides() {
                 p1.mul(100);
                 var cyl = create_cylinder(p0, p1, 2, 0x00ff00);
                 ThreeScene.add(cyl);
-                ThreeSides.push(cyl);
-            } else if (dis < shortest*1.5) {
+                ThreeEdges.push(cyl);
+            } else if (dis < shortest*1.42) {
                 p0.mul(100);
                 p1.mul(100);
                 var cyl = create_cylinder(p0, p1, 1.5, 0x0000ff);
                 ThreeScene.add(cyl);
-                ThreeSides.push(cyl);
+                ThreeEdges.push(cyl);
             }
         }
 	}
 } 
 
-function hideSides() {
-    for (var i=0;i<ThreeSides.length;++i) {
-        ThreeScene.remove(ThreeSides[i]);
+function hideEdges() {
+    for (var i=0;i<ThreeEdges.length;++i) {
+        ThreeScene.remove(ThreeEdges[i]);
     }
-    ThreeSides = new Array();
+    ThreeEdges = new Array();
 }
 
 function hideTrons() {

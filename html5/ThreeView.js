@@ -3,7 +3,7 @@ var ThreeEdges = new Array();
 var ThreeScene;
 var ThreeCamera;
 var width, height;
-var renderer;
+var Renderer;
 
 var	IsMouseDown = 0;
 var	DownX = 0;
@@ -24,10 +24,10 @@ function ThreeViewLoad() {
 function initThree() {
     	width = document.getElementById('sphereCanvas').clientWidth;
     	height = document.getElementById('sphereCanvas').clientHeight;  
-    	renderer = new THREE.WebGLRenderer({antialias: true});
-    	renderer.setSize(width, height );
-    	document.getElementById('sphereCanvas').appendChild(renderer.domElement);
-    	renderer.setClearColorHex(0xFFFFFF, 1.0);
+    	Renderer = new THREE.WebGLRenderer({antialias: true});
+    	Renderer.setSize(width, height );
+    	document.getElementById('sphereCanvas').appendChild(Renderer.domElement);
+    	Renderer.setClearColorHex(0xFFFFFF, 1.0);
 
     	initScene();    
     	initLight();
@@ -43,7 +43,7 @@ function initCamera() {
 
 function updateCamera() {
     var pole = ViewPole.clone();
-    pole.mul(270);
+    pole.mul(330);
     ThreeCamera.position.x = pole.x;
     ThreeCamera.position.y = pole.y;
     ThreeCamera.position.z = pole.z;
@@ -68,7 +68,7 @@ function initLight() {
 
 function updateThree() {
     for(var i=0; i < Trons.length; ++i ) {
-	var p0 = Trons[i].point.clone();
+		var p0 = Trons[i].point.clone();
         p0.mul(100);
         ThreeTrons[i].position.x = p0.x;
         ThreeTrons[i].position.y = p0.y;
@@ -129,8 +129,8 @@ function mouseMoveShpere(e) {
 
     updateCamera();
 
-    renderer.clear();
-    renderer.render(ThreeScene, ThreeCamera);
+    Renderer.clear();
+    Renderer.render(ThreeScene, ThreeCamera);
 }
 
 function createCylinder(x0,y0,z0,r0, x1,y1,z1,r1, col, open)
@@ -175,6 +175,16 @@ function create_cylinder(p0, p1, r, col)
     cylinder.position.z = v2.z;
     
     return cylinder;
+}
+
+function addLine(p0, p1, col) {
+    var geometry = new THREE.Geometry();
+    vect0 = new THREE.Vector3(100*p0.x, 100*p0.y, 100*p0.z);
+    geometry.vertices.push(vect0);
+    vect1 = new THREE.Vector3(100*p1.x, 100*p1.y, 100*p1.z);
+    geometry.vertices.push(vect1);
+    var line = new THREE.Line(geometry, new THREE.LineBasicMaterial( { color:col, opacity: 1.0, lineWidth:5} ));
+    ThreeScene.add( line );
 }
 
 function initObjectThree() {
@@ -222,10 +232,7 @@ function drawDot(p, color, size) {
     var p0 = p.clone();
 
     console.log("MeshBasicMaterial");
-    //mat = new THREE.MeshLambertMaterial({color:0xff0000});
-    mat = new THREE.MeshBasicMaterial({color:0xff0000});
-    //mat.color.setHSV(color/360.0, 1.0, 1.0);
-    //mat.ambient.setHSV(color/360.0, 1.0, 1.0);
+    mat = new THREE.MeshBasicMaterial({color:color});
 
     var ThreeP = new THREE.Mesh(new THREE.CubeGeometry(size, size, size), mat);
     ThreeScene.add(ThreeP);
@@ -253,6 +260,7 @@ function drawTrons() {
 }
 
 function drawEdges() {
+	drawFaces();
     var shortest = 1000;
 	for(var i=0; i < Trons.length; ++i ) {
         for(var j=i+1; j < Trons.length; ++j ) {
@@ -300,3 +308,71 @@ function hideTrons() {
     ThreeTrons = new Array();
 }
  
+function drawFaces() {
+    var shortest = 1000;
+	for(var i=0; i < Trons.length; ++i ) {
+       	for(var j=i+1; j < Trons.length; ++j ) {
+       		var p0 = Trons[i].point.clone();
+       		var p1 = Trons[j].point.clone();
+       		var dis = p0.dis(p1);
+       		if (dis < shortest) {
+           		shortest = dis;
+       		}
+       	}
+	}
+	for(var i=0; i < Trons.length; ++i ) {
+       	var p0 = Trons[i].point.clone();
+		addLine(CenterPoint, p0, 0xFFFF00);
+       	for(var j=i+1; j < Trons.length; ++j ) {
+       		var p1 = Trons[j].point.clone();
+       		var dis01 = p0.dis(p1);
+       		if (dis01 < shortest*1.42) {
+       			for(var k=j+1; k < Trons.length; ++k ) {
+       				var p2 = Trons[k].point.clone();
+       				var dis02 = p0.dis(p2);
+       				var dis12 = p1.dis(p2);
+					if (dis02 < shortest*1.42 && dis12 < shortest*1.42) {
+						addLine(CenterPoint, p1, 0x88FF88);
+						addLine(CenterPoint, p2, 0x88FF88);
+    Renderer.clear();
+    Renderer.render(ThreeScene, ThreeCamera);
+						var p01 = p0.clone();
+						p01.add(p1);
+						p01.unify();
+						p01.setLength(1/p01.dot(p0));
+						addLine(CenterPoint, p01, 0xFF8888);
+						var cr01 = p0.cross(p1);
+						var cr12 = p1.cross(p2);
+
+						var p12 = p1.clone();
+						p12.add(p2);
+						p12.unify();
+						p12.setLength(1/p12.dot(p1));
+
+						cr01.add(p01);
+						addLine(p01, cr01, 0x00FF00);
+						cr01 = p0.cross(p1);
+						cr01.mul(-1);
+						cr01.add(p01);
+						addLine(p01, cr01, 0x00FF00);
+
+						cr01 = p0.cross(p1);
+						cr01.unify();
+						cr12 = p1.cross(p2);
+						cr12.unify();
+						var d0112 = p12.clone();
+						d0112.sub(p01);
+						var s = d0112.dot(cr01) - d0112.dot(cr12)*cr01.dot(cr12);
+						s /= (1.0 - cr01.dot(cr12)*cr01.dot(cr12));
+						var ps = p01.clone();
+						cr01.mul(s);
+						ps.add(cr01);
+						drawDot(ps, 0x000000, 2);
+    Renderer.clear();
+    Renderer.render(ThreeScene, ThreeCamera);
+					}
+				}
+           	}
+       	}
+	}
+} 

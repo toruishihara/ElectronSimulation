@@ -107,8 +107,8 @@ function addTronsOnModel() {
 
 function drawViews() {
     updateThree();
-    renderer.clear();
-    renderer.render(ThreeScene, ThreeCamera);
+    Renderer.clear();
+    Renderer.render(ThreeScene, ThreeCamera);
 
 	drawMapView();
 }
@@ -218,8 +218,8 @@ function tourLoop() {
 	ViewPoleY.unify();
 
     updateCamera();
-    renderer.clear();
-    renderer.render(ThreeScene, ThreeCamera);
+    Renderer.clear();
+    Renderer.render(ThreeScene, ThreeCamera);
     
     if (tour_t < LoopNum) {
         window.requestAnimationFrame(tourLoop);
@@ -254,8 +254,8 @@ function reset() {
     	initThree();
     	drawTrons();
     	updateCamera();
-    	renderer.clear();
-    	renderer.render(ThreeScene, ThreeCamera);
+    	Renderer.clear();
+    	Renderer.render(ThreeScene, ThreeCamera);
 	drawViews();
 }
 function movePole(){
@@ -328,8 +328,8 @@ function loop() {
     	ModelProgress();
     	updateThree();
 	drawEdges();
-    	renderer.clear();
-    	renderer.render(ThreeScene, ThreeCamera);
+    	Renderer.clear();
+    	Renderer.render(ThreeScene, ThreeCamera);
     
     	drawMapView();
     	drawInfos();
@@ -345,8 +345,8 @@ function loadThree() {
 	ThreeViewLoad();
     	drawTrons();
     	updateCamera();
-    	renderer.clear();
-    	renderer.render(ThreeScene, ThreeCamera);
+    	Renderer.clear();
+    	Renderer.render(ThreeScene, ThreeCamera);
 	drawViews();
 }
 function loadIndexThree() {
@@ -434,8 +434,8 @@ function storyLoop()
         }
             
     }
-    renderer.clear();
-    renderer.render(ThreeScene, ThreeCamera);
+    Renderer.clear();
+    Renderer.render(ThreeScene, ThreeCamera);
 
     if (Looping) {
     	window.requestAnimationFrame(storyLoop);
@@ -533,8 +533,8 @@ function movieLoop()
         }
             
     }
-    renderer.clear();
-    renderer.render(ThreeScene, ThreeCamera);
+    Renderer.clear();
+    Renderer.render(ThreeScene, ThreeCamera);
 
     if (Looping) {
     	window.requestAnimationFrame(movieLoop);

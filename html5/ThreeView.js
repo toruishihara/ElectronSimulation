@@ -43,7 +43,8 @@ function initCamera() {
 
 function updateCamera() {
     var pole = ViewPole.clone();
-    pole.mul(330);
+    //pole.mul(330);
+    pole.mul(500);
     ThreeCamera.position.x = pole.x;
     ThreeCamera.position.y = pole.y;
     ThreeCamera.position.z = pole.z;
@@ -139,7 +140,7 @@ function createCylinder(x0,y0,z0,r0, x1,y1,z1,r1, col, open)
 	var len = v.length();
 	var material = new THREE.MeshLambertMaterial({ color:col, ambient:col, opacity:1.0 });
 	var cylinder = new THREE.Mesh(new THREE.CylinderGeometry(r0, r1, len, 0, 0, open), material);
-	cylinder.overdraw = true;
+	//cylinder.overdraw = true;
 
 	if (len > 0.001) {
 		cylinder.rotation.z = Math.acos(v.y/len);
@@ -158,7 +159,7 @@ function create_cylinder(p0, p1, r, col)
 {
     var material = new THREE.MeshLambertMaterial({ color:col, ambient:col, opacity:1.0 });
     var cylinder = new THREE.Mesh(new THREE.CylinderGeometry(r, r, p0.dis(p1), 0, 0, false), material);
-    cylinder.overdraw = true;
+    //cylinder.overdraw = true;
 
     var v = p0.clone();
     v.sub(p1);
@@ -250,8 +251,8 @@ function drawTrons() {
 		var p0 = Trons[i].point.clone();
         
         mat = new THREE.MeshLambertMaterial({color: 0xff0000});
-        mat.color.setHSV(Trons[i].color.p1/360.0, 1.0, 1.0);
-        mat.ambient.setHSV(Trons[i].color.p1/360.0, 1.0, 1.0);
+        mat.color.setHSL(Trons[i].color.p1/360.0, 1.0, .5);
+        mat.ambient.setHSL(Trons[i].color.p1/360.0, 1.0, .5);
         
         ThreeTrons[i] = new THREE.Mesh(new THREE.CubeGeometry(5,5,5), mat);
         ThreeScene.add(ThreeTrons[i]);
@@ -307,8 +308,139 @@ function hideTrons() {
     }
     ThreeTrons = new Array();
 }
+
+var cnt2 = 0;
+function drawTriangle(p0, p1, p2) {
+	var h1 = p1.clone(); 
+	h1.sub(p0);
+	var h2 = p2.clone(); 
+	h2.sub(p0);
+	var n = h1.cross(h2);
+	n.unify();
+	var col = Math.floor(Math.abs(n.x)*255) << 16;
+	col += Math.floor(Math.abs(n.y)*255) << 8;
+	col += Math.floor(Math.abs(n.z)*255);
+	var tri;
+	if (n.dot(p0) > 0.0) {
+		tri = createTriangle(
+			100*p0.x, 100*p0.y, 100*p0.z,
+			100*p1.x, 100*p1.y, 100*p1.z,
+			100*p2.x, 100*p2.y, 100*p2.z,
+			col);
+	} else {
+		tri = createTriangle(
+			100*p2.x, 100*p2.y, 100*p2.z,
+			100*p1.x, 100*p1.y, 100*p1.z,
+			100*p0.x, 100*p0.y, 100*p0.z,
+			col);
+		n.mul(-1.0);
+	}
+    ThreeScene.add(tri);
+
+	// Add lines around triangle for debugging
+	var d = 0.01;
+	var diff = new tuple3d(
+		d - Math.random()*2*d,
+		d - Math.random()*2*d,
+		d - Math.random()*2*d);
+	var p0d = p0.clone();
+	var p1d = p1.clone();
+	var p2d = p2.clone();
+	p0d.add(diff);
+	p1d.add(diff);
+	p2d.add(diff);
+	addLine(p0d, p1d, col);
+	addLine(p1d, p2d, col);
+	addLine(p2d, p0d, col);
+
+	// Add noamrl line around triangle for debugging
+	n.mul(0.2);
+	var c = p0.clone();
+	c.add(p1);
+	c.add(p2);
+	c.mul(1/3.0);
+	n.add(c);
+	addLine(c, n, col);
+}
  
+function createTriangle(x0,y0,z0, x1,y1,z1, x2,y2,z2, col) {
+    var geometry = new THREE.Geometry();
+    var vect0 = new THREE.Vector3(x0, y0, z0);
+    var vect1 = new THREE.Vector3(x1, y1, z1);
+    var vect2 = new THREE.Vector3(x2, y2, z2);
+	var face = new THREE.Face3( 
+		geometry.vertices.push(vect0)-1,
+		geometry.vertices.push(vect1)-1,
+		geometry.vertices.push(vect2)-1);
+
+	geometry.faces.push(face);
+	geometry.computeFaceNormals();
+	var mat = new THREE.MeshLambertMaterial({color:col, ambient:col, 
+		opacity:0.5,
+		side:THREE.FrontSide, transparent:true });
+	var tri = new THREE.Mesh( geometry, mat );
+    return tri;
+}
+
+function createTriangleOld(x0,y0,z0, x1,y1,z1, x2,y2,z2, col) {
+    var geometry = new THREE.Geometry();
+    var vect0 = new THREE.Vector3(x0, y0, z0);
+    var vect1 = new THREE.Vector3(x1, y1, z1);
+    var vect2 = new THREE.Vector3(x2, y2, z2);
+	var d01 = vect1.clone();
+	d01.sub(vect0);
+	var d12 = vect2.clone();
+	d12.sub(vect1);
+	var d20 = vect0.clone();
+	d20.sub(vect2);
+    var n = d12.clone();
+	n.cross(d20);
+	n.normalize();
+	var face;
+	face = new THREE.Face3( 
+		geometry.vertices.push(vect0)-1,
+		geometry.vertices.push(vect1)-1,
+		geometry.vertices.push(vect2)-1);
+	geometry.faces.push(face);
+
+	geometry.computeFaceNormals();
+	var material = new THREE.MeshBasicMaterial({color:col, opacity:0.1, side:THREE.DoubleSide });
+	var tri = new THREE.Mesh( geometry, material );
+    return tri;
+}
+
+function drawFaces2() {
+	var t;
+	t = createTriangle(-100,-100,-100, -100,100,100, -100,100,-100, 0x00FF00);
+    ThreeScene.add(t);
+	t = createTriangle(-100,-100,-100, -100,100,100, -100,-100,100, 0x00FF00);
+    ThreeScene.add(t);
+	t = createTriangle(100,-100,-100, 100,100,100, 100,100,-100, 0x00FF00);
+    ThreeScene.add(t);
+	t = createTriangle(100,-100,-100, 100,100,100, 100,-100,100, 0x00FF00);
+    ThreeScene.add(t);
+
+	t = createTriangle(-100,100,-100, 100,100,100, 100,100,-100, 0xFFFF00);
+    ThreeScene.add(t);
+	t = createTriangle(-100,100,-100, 100,100,100, -100,100,100, 0xFFFF00);
+    ThreeScene.add(t);
+	t = createTriangle(-100,-100,-100, 100,-100,100, 100,-100,-100, 0xFFFF00);
+    ThreeScene.add(t);
+	t = createTriangle(-100,-100,-100, 100,-100,100, -100,-100,100, 0xFFFF00);
+    ThreeScene.add(t);
+
+	t = createTriangle(-100,-100,100, 100,100,100, 100,-100,100, 0xFF00FF);
+    ThreeScene.add(t);
+	t = createTriangle(-100,-100,100, 100,100,100, -100,100,100, 0xFF00FF);
+    ThreeScene.add(t);
+	t = createTriangle(-100,-100,-100, 100,100,-100, 100,-100,-100, 0xFF00FF);
+    ThreeScene.add(t);
+	t = createTriangle(-100,-100,-100, 100,100,-100, -100,100,-100, 0xFF00FF);
+    ThreeScene.add(t);
+}
+
 function drawFaces() {
+	// Find shortest pair
     var shortest = 1000;
 	for(var i=0; i < Trons.length; ++i ) {
        	for(var j=i+1; j < Trons.length; ++j ) {
@@ -320,41 +452,56 @@ function drawFaces() {
        		}
        	}
 	}
+	var cnt = 0;
 	for(var i=0; i < Trons.length; ++i ) {
        	var p0 = Trons[i].point.clone();
-		addLine(CenterPoint, p0, 0xFFFF00);
+		//addLine(CenterPoint, p0, 0xFF0000);
        	for(var j=i+1; j < Trons.length; ++j ) {
+       	//for(var j=0; j < Trons.length; ++j ) {
        		var p1 = Trons[j].point.clone();
+			//addLine(CenterPoint, p1, 0xFFFF00);
        		var dis01 = p0.dis(p1);
-       		if (dis01 < shortest*1.42) {
+       		if (dis01 < shortest*1.42 && dis01 > 0.00001) {
        			for(var k=j+1; k < Trons.length; ++k ) {
+       			//for(var k=0; k < Trons.length; ++k ) {
        				var p2 = Trons[k].point.clone();
+					//addLine(CenterPoint, p2, 0x0000FF);
        				var dis02 = p0.dis(p2);
        				var dis12 = p1.dis(p2);
 					if (dis02 < shortest*1.42 && dis12 < shortest*1.42) {
-						addLine(CenterPoint, p1, 0x88FF88);
-						addLine(CenterPoint, p2, 0x88FF88);
-    Renderer.clear();
-    Renderer.render(ThreeScene, ThreeCamera);
 						var p01 = p0.clone();
 						p01.add(p1);
+						if (p01.length2() < 0.00001) {
+							continue;
+						}
 						p01.unify();
 						p01.setLength(1/p01.dot(p0));
-						addLine(CenterPoint, p01, 0xFF8888);
 						var cr01 = p0.cross(p1);
 						var cr12 = p1.cross(p2);
 
 						var p12 = p1.clone();
 						p12.add(p2);
+						if (p12.length2() < 0.00001) {
+							continue;
+						}
 						p12.unify();
 						p12.setLength(1/p12.dot(p1));
 
-						cr01.add(p01);
-						addLine(p01, cr01, 0x00FF00);
-						cr01 = p0.cross(p1);
-						cr01.mul(-1);
-						cr01.add(p01);
-						addLine(p01, cr01, 0x00FF00);
+						var p20 = p2.clone();
+						p20.add(p0);
+						if (p20.length2() < 0.00001) {
+							continue;
+						}
+
+						// test only
+						cnt = cnt + 1;
+						if (cnt > 999) {
+							continue;
+						}
+						// test only
+
+						p20.unify();
+						p20.setLength(1/p20.dot(p2));
 
 						cr01 = p0.cross(p1);
 						cr01.unify();
@@ -362,14 +509,21 @@ function drawFaces() {
 						cr12.unify();
 						var d0112 = p12.clone();
 						d0112.sub(p01);
+
+						// http://d.hatena.ne.jp/obelisk2/20101228/1293521247
 						var s = d0112.dot(cr01) - d0112.dot(cr12)*cr01.dot(cr12);
 						s /= (1.0 - cr01.dot(cr12)*cr01.dot(cr12));
+
 						var ps = p01.clone();
 						cr01.mul(s);
 						ps.add(cr01);
 						drawDot(ps, 0x000000, 2);
-    Renderer.clear();
-    Renderer.render(ThreeScene, ThreeCamera);
+						drawTriangle(p01, p0, ps);
+						drawTriangle(p0, p20, ps);
+						drawTriangle(p1, p01, ps);
+						drawTriangle(p12, p1, ps);
+						drawTriangle(p2, p12, ps);
+						drawTriangle(p20, p2, ps);
 					}
 				}
            	}

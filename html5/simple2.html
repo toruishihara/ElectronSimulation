@@ -1,7 +1,7 @@
 <html>
 <body>
 <div id="ThreeCanvas" style="height:200px;width:200px;background-color:#eeeeee">
-<script type="text/javascript" src="http://www.nariuchi.com/3d/Three.js"></script>
+<script type="text/javascript" src="Three.js"></script>
 <script type="text/javascript">
 <!--
 var ThreeCanvas = document.getElementById("ThreeCanvas");
@@ -17,6 +17,9 @@ function onLoad() {
 	ThreeRenderer.setClearColorHex(0xFFFFFF, 1.0);
 
 	var light = new THREE.PointLight(0xFFFFFF, 1.0, 0);
+	light.position.set( -100, -100, 200 );
+	ThreeScene.add(light);
+	var light = new THREE.PointLight(0xFFFFFF, 1.0, 0);
 	light.position.set( 100, 100, 200 );
 	ThreeScene.add(light);
 	var ambientLight = new THREE.AmbientLight(0x888888);
@@ -30,13 +33,38 @@ function onLoad() {
  
 	var col = 0xff0000;
   	var mat = new THREE.MeshLambertMaterial({ color:col, ambient:col, opacity:1.0 });
-	var box = new THREE.Mesh(new THREE.CubeGeometry(100,100,100), mat);
+	var box = new THREE.Mesh(new THREE.CubeGeometry(20,20,20), mat);
 	ThreeScene.add(box);
 	box.position.set(0,0,0);	
+	var tri2 = createTriangle(-20,40,-20, 100,40,0, 0,40,100, 0xFF00FF);
+	var tri3 = createTriangle(-20,60,-20, 100,60,0, 0,60,100, 0xFFFF00);
+	var tri1 = createTriangle(-20,25,-20, 100,25,0, 0,25,100, 0x00FFFF);
+	ThreeScene.add(tri3);
+	ThreeScene.add(tri2);
+	ThreeScene.add(tri1);
+
 	window.requestAnimationFrame(loop);
 }
+function createTriangle(x0,y0,z0, x1,y1,z1, x2,y2,z2, col) {
+    var geometry = new THREE.Geometry();
+    var vect0 = new THREE.Vector3(x0, y0, z0);
+    var vect1 = new THREE.Vector3(x1, y1, z1);
+    var vect2 = new THREE.Vector3(x2, y2, z2);
+	var face = new THREE.Face3( 
+		geometry.vertices.push(vect0)-1,
+		geometry.vertices.push(vect1)-1,
+		geometry.vertices.push(vect2)-1);
+
+	geometry.faces.push(face);
+	geometry.computeFaceNormals();
+	var mat = new THREE.MeshLambertMaterial({color:col, ambient:col, 
+		opacity:0.5,
+		side:THREE.DoubleSide, transparent:true });
+	var tri = new THREE.Mesh( geometry, mat );
+    return tri;
+}
 function loop() {
-	Theta += 0.05;
+	Theta += 0.02;
 	ThreeCamera.position.x = 300*Math.sin(Theta);
 	ThreeCamera.position.y = 300*Math.cos(Theta);
 	ThreeCamera.lookAt( {x:0, y:0, z:0 } );

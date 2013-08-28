@@ -317,11 +317,18 @@ function drawTriangle(p0, p1, p2) {
 	h2.sub(p0);
 	var n = h1.cross(h2);
 	n.unify();
-	var col = Math.floor(Math.abs(n.x)*255) << 16;
-	col += Math.floor(Math.abs(n.y)*255) << 8;
-	col += Math.floor(Math.abs(n.z)*255);
+	var dot = n.dot(p0);
+	if (dot < 0.0) {
+		n.mul(-1.0);
+	}
+	//var col = Math.floor(Math.abs(n.x)*255) << 16;
+	//col += Math.floor(Math.abs(n.y)*255) << 8;
+	//col += Math.floor(Math.abs(n.z)*255);
+	var col = Math.floor((n.x+1.0)*127) << 16;
+	col += Math.floor((n.y+1.0)*127) << 8;
+	col += Math.floor((n.z+1.0)*127);
 	var tri;
-	if (n.dot(p0) > 0.0) {
+	if (dot > 0.0) {
 		tri = createTriangle(
 			100*p0.x, 100*p0.y, 100*p0.z,
 			100*p1.x, 100*p1.y, 100*p1.z,
@@ -333,12 +340,11 @@ function drawTriangle(p0, p1, p2) {
 			100*p1.x, 100*p1.y, 100*p1.z,
 			100*p0.x, 100*p0.y, 100*p0.z,
 			col);
-		n.mul(-1.0);
 	}
     ThreeScene.add(tri);
-
+	return;
 	// Add lines around triangle for debugging
-	var d = 0.01;
+	var d = 0.05;
 	var diff = new tuple3d(
 		d - Math.random()*2*d,
 		d - Math.random()*2*d,
@@ -457,7 +463,6 @@ function drawFaces() {
        	var p0 = Trons[i].point.clone();
 		//addLine(CenterPoint, p0, 0xFF0000);
        	for(var j=i+1; j < Trons.length; ++j ) {
-       	//for(var j=0; j < Trons.length; ++j ) {
        		var p1 = Trons[j].point.clone();
 			//addLine(CenterPoint, p1, 0xFFFF00);
        		var dis01 = p0.dis(p1);
@@ -493,13 +498,6 @@ function drawFaces() {
 							continue;
 						}
 
-						// test only
-						cnt = cnt + 1;
-						if (cnt > 999) {
-							continue;
-						}
-						// test only
-
 						p20.unify();
 						p20.setLength(1/p20.dot(p2));
 
@@ -507,6 +505,9 @@ function drawFaces() {
 						cr01.unify();
 						cr12 = p1.cross(p2);
 						cr12.unify();
+						if (cr01.dot(cr12) > 0.9999) {
+							continue; //parallel
+						}
 						var d0112 = p12.clone();
 						d0112.sub(p01);
 

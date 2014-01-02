@@ -260,8 +260,8 @@ function drawTrons() {
 	}
 }
 
-function drawEdges() {
-	drawFaces();
+function drawEdge() {
+	//drawFace();
     var shortest = 1000;
 	for(var i=0; i < Trons.length; ++i ) {
         for(var j=i+1; j < Trons.length; ++j ) {
@@ -321,12 +321,16 @@ function drawTriangle(p0, p1, p2) {
 	if (dot < 0.0) {
 		n.mul(-1.0);
 	}
+    var idx = findTronFromNormal(n);
+    var col = Trons[idx].color;
+    // Calculate color from normal
 	//var col = Math.floor(Math.abs(n.x)*255) << 16;
 	//col += Math.floor(Math.abs(n.y)*255) << 8;
 	//col += Math.floor(Math.abs(n.z)*255);
-	var col = Math.floor((n.x+1.0)*127) << 16;
-	col += Math.floor((n.y+1.0)*127) << 8;
-	col += Math.floor((n.z+1.0)*127);
+    //
+	//var col = Math.floor((n.x+1.0)*127) << 16;
+	//col += Math.floor((n.y+1.0)*127) << 8;
+	//col += Math.floor((n.z+1.0)*127);
 	var tri;
 	if (dot > 0.0) {
 		tri = createTriangle(
@@ -381,9 +385,16 @@ function createTriangle(x0,y0,z0, x1,y1,z1, x2,y2,z2, col) {
 
 	geometry.faces.push(face);
 	geometry.computeFaceNormals();
-	var mat = new THREE.MeshLambertMaterial({color:col, ambient:col, 
+	//var mat = new THREE.MeshLambertMaterial({color:col, ambient:col, 
+	//	opacity:0.5,
+	//	side:THREE.FrontSide, transparent:true });
+
+    var mat = new THREE.MeshLambertMaterial({color: 0xff0000,
 		opacity:0.5,
 		side:THREE.FrontSide, transparent:true });
+    mat.color.setHSL(col.p1/360.0, 1.0, .5);
+    mat.ambient.setHSL(col.p1/360.0, 1.0, .5);
+
 	var tri = new THREE.Mesh( geometry, mat );
     return tri;
 }
@@ -415,7 +426,7 @@ function createTriangleOld(x0,y0,z0, x1,y1,z1, x2,y2,z2, col) {
     return tri;
 }
 
-function drawFaces2() {
+function drawFace_old() {
 	var t;
 	t = createTriangle(-100,-100,-100, -100,100,100, -100,100,-100, 0x00FF00);
     ThreeScene.add(t);
@@ -445,13 +456,28 @@ function drawFaces2() {
     ThreeScene.add(t);
 }
 
-function drawFaces() {
+function testAdjustPoint(p) {
+if (p.x > 0.9999) { p.x = 1.0;}
+if (p.x < -0.9999) { p.x = -1.0;}
+if (p.y > 0.9999) { p.y = 1.0;}
+if (p.y < -0.9999) { p.y = -1.0;}
+if (p.z > 0.9999) { p.z = 1.0;}
+if (p.z < -0.9999) { p.z = -1.0;}
+if (Math.abs(p.x) < 0.0001) {p.x = 0.0;}
+if (Math.abs(p.y) < 0.0001) {p.y = 0.0;}
+if (Math.abs(p.z) < 0.0001) {p.z = 0.0;}
+}
+
+function drawFace() {
+    var facePoints = new Array(128*128*128);
 	// Find shortest pair
     var shortest = 1000;
 	for(var i=0; i < Trons.length; ++i ) {
        	for(var j=i+1; j < Trons.length; ++j ) {
        		var p0 = Trons[i].point.clone();
+testAdjustPoint(p0);
        		var p1 = Trons[j].point.clone();
+testAdjustPoint(p1);
        		var dis = p0.dis(p1);
        		if (dis < shortest) {
            		shortest = dis;
@@ -461,19 +487,20 @@ function drawFaces() {
 	var cnt = 0;
 	for(var i=0; i < Trons.length; ++i ) {
        	var p0 = Trons[i].point.clone();
-		//addLine(CenterPoint, p0, 0xFF0000);
+		addLine(CenterPoint, p0, 0xFF0000);
        	for(var j=i+1; j < Trons.length; ++j ) {
        		var p1 = Trons[j].point.clone();
-			//addLine(CenterPoint, p1, 0xFFFF00);
+			addLine(CenterPoint, p1, 0xFFFF00);
        		var dis01 = p0.dis(p1);
-       		if (dis01 < shortest*1.42 && dis01 > 0.00001) {
+       		if (dis01 < shortest*1.5 && dis01 > 0.00001) {
        			for(var k=j+1; k < Trons.length; ++k ) {
        			//for(var k=0; k < Trons.length; ++k ) {
        				var p2 = Trons[k].point.clone();
-					//addLine(CenterPoint, p2, 0x0000FF);
+testAdjustPoint(p2);
+					addLine(CenterPoint, p2, 0x0000FF);
        				var dis02 = p0.dis(p2);
        				var dis12 = p1.dis(p2);
-					if (dis02 < shortest*1.42 && dis12 < shortest*1.42) {
+					if (dis02 < shortest*1.5 && dis12 < shortest*1.5) {
 						var p01 = p0.clone();
 						p01.add(p1);
 						if (p01.length2() < 0.00001) {
@@ -508,17 +535,54 @@ function drawFaces() {
 						if (cr01.dot(cr12) > 0.9999) {
 							continue; //parallel
 						}
+
 						var d0112 = p12.clone();
 						d0112.sub(p01);
 
+        console.log("p0=[" + p0.x + "," + p0.y + "," + p0.z + "]");
+        console.log("p1=[" + p1.x + "," + p1.y + "," + p1.z + "]");
+        console.log("p2=[" + p2.x + "," + p2.y + "," + p2.z + "]");
+        console.log("d0112=[" + d0112.x + "," + d0112.y + "," + d0112.z + "]");
+        console.log("cr01=[" + cr01.x + "," + cr01.y + "," + cr01.z + "]");
+        console.log("cr12=[" + cr12.x + "," + cr12.y + "," + cr12.z + "]");
+						drawDot(p0, 0xFF0000, 4);
+						drawDot(p1, 0x00FF00, 4);
+						drawDot(p2, 0x0000FF, 4);
+
 						// http://d.hatena.ne.jp/obelisk2/20101228/1293521247
 						var s = d0112.dot(cr01) - d0112.dot(cr12)*cr01.dot(cr12);
+        console.log("s0=" + s);
 						s /= (1.0 - cr01.dot(cr12)*cr01.dot(cr12));
+        console.log("s1=" + s);
 
 						var ps = p01.clone();
 						cr01.mul(s);
 						ps.add(cr01);
-						drawDot(ps, 0x000000, 2);
+                        // if already has same point, skip it. Happens on square case 
+						var pn = ps.clone();
+                        pn.unify();
+                        var idx = Math.floor(pn.x*63) + 64;
+                        idx *= 128;
+                        idx += Math.floor(pn.y*63) + 64;
+                        idx *= 128;
+                        idx += Math.floor(pn.z*63) + 64;
+	                    console.log("x=" + ps.x + " y=" + ps.y + " z=" + ps.z + " i="+idx);
+                        if (facePoints[idx] == 1) {
+	                        console.log("SKIPP" + "i=" + idx);
+                            //continue;
+                        }
+                        facePoints[idx] = 1;
+                        // above is not perfect code for floating xyz values
+
+						// testing
+						var d = 0.05;
+						ps.x += Math.random()*d;
+						ps.y += Math.random()*d;
+						ps.z += Math.random()*d;
+						drawDot(ps, Math.random()*0xffffff, 4);
+						// end testing
+						drawDot(ps, 0x000000, 4);
+
 						drawTriangle(p01, p0, ps);
 						drawTriangle(p0, p20, ps);
 						drawTriangle(p1, p01, ps);

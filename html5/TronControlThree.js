@@ -15,6 +15,8 @@ var ZoomValue = 180;
 var LoopNum = 960*2;
 var LoopDelta = 0.01;
 
+var Edge = false;
+var Face = false;
 var Timer1;
 var Times = 0;
 var Interval = 50;
@@ -44,6 +46,8 @@ function tronColor_toStringWithAlpha(alpha)
 }
 
 function init() {
+    Edge = document.getElementById('Edge').checked;
+    Face = document.getElementById('Face').checked;
 	ViewPole = new tuple3d(-0.3,-0.5,1);
 	ViewPoleX = new tuple3d(1,-0.2,0);
 	ViewPoleX.unify();
@@ -53,6 +57,7 @@ function init() {
 	ViewPole.unify();
 	ViewPoleX = ViewPoleY.cross(ViewPole);
 	ViewPoleX.unify();
+
 	for (var p=0;p<Math.PI;p+=Math.PI/6) {
 		for (var t=0;t<2*Math.PI;t+=Math.PI/6) {
 			var p0 = new tuple3d(1, t-Math.PI/6, p); 
@@ -179,6 +184,14 @@ function updateAll(){
 
 var tour_t = 0;
 function tour() {
+    Edge = document.getElementById('Edge').checked;
+    Face = document.getElementById('Face').checked;
+    if (Edge) {
+       drawEdge();
+    }
+    if (Face) {
+        drawFace();
+    }
     tour_t = 0;
     tourLoop();
 }
@@ -262,7 +275,12 @@ function movePole(){
 	ModelMovePole();
     Looping = false;
 	drawViews();
-    drawEdges();
+    if (Edge) {
+        drawEdge();
+    }
+    if (Face) {
+        drawFace();
+    }
     //var s = JSON.sringify(ThreeScene);
     //console.log(s);
 }
@@ -325,18 +343,23 @@ function setShadow(c, color, blur, offsetX, offsetY){
 
 function loop() {
 	hideEdges();
-    	ModelProgress();
-    	updateThree();
-	drawEdges();
-    	Renderer.clear();
-    	Renderer.render(ThreeScene, ThreeCamera);
+   	ModelProgress();
+   	updateThree();
+    if (Edge) {
+       drawEdge();
+    }
+    if (Face) {
+        drawFace();
+    }
+   	Renderer.clear();
+   	Renderer.render(ThreeScene, ThreeCamera);
     
-    	drawMapView();
-    	drawInfos();
+   	drawMapView();
+   	drawInfos();
 
-    	if (Looping) {
-        	window.requestAnimationFrame(loop);
-    	}
+   	if (Looping) {
+       	window.requestAnimationFrame(loop);
+   	}
 }
 
 function loadThree() {
@@ -365,10 +388,15 @@ function storyLoop()
     var wait = 0;
     if (phase == 0) {
         calc_cnt++;
-	hideEdges();
+	    hideEdges();
         ModelProgress();
         updateThree();
-	drawEdges();
+        if (Edge) {
+            drawEdge();
+        }
+        if (Face) {
+            drawFace();
+        }
         drawMapView();
         drawInfos();
         if (TotalMove() < Limit && calc_cnt > 100) {
@@ -380,7 +408,12 @@ function storyLoop()
 
             //ModelMovePole();
             drawTrons();
-            drawEdges();
+            if (Edge) {
+                drawEdge();
+            }
+            if (Face) {
+                drawFace();
+            }
         }
         story_tour_cnt ++;
         var x = 0;
@@ -451,23 +484,33 @@ function movieLoop()
         var str = "N=" + NumTrons;
         document.getElementById("underDesc").innerText = str;
         ModelProgress();
-	if (calc_cnt % 20 <= 20) {
+	    if (calc_cnt % 20 <= 20) {
             hideEdges();
             updateThree();
-            drawEdges();
+            if (Edge) {
+                drawEdge();
+            }
+            if (Face) {
+                drawFace();
+            }
             drawMapView();
             drawInfos();
-	}
+	    }
         if (TotalMove() < Limit && calc_cnt > 100) {
             phase = 1;
         }
 	if (calc_cnt > 1000) {
-            phase = 1;
-            hideEdges();
-            hideTrons();
+        phase = 1;
+        hideEdges();
+        hideTrons();
 	    readJsonAndMove(NumTrons);
-            drawTrons();
-            drawEdges();
+        drawTrons();
+        if (Edge) {
+            drawEdge();
+        }
+        if (Face) {
+            drawFace();
+        }
 	    _sleep(500);
 	}
     } else {
@@ -476,7 +519,12 @@ function movieLoop()
 
             //ModelMovePole();
             drawTrons();
-            drawEdges();
+            if (Edge) {
+                drawEdge();
+            }
+            if (Face) {
+                drawFace();
+            }
 	    _sleep(500);
         }
         story_tour_cnt ++;
@@ -657,7 +705,12 @@ function selItem(num) {
         	AddTron(0, 0, color);
 	}
 	readJsonAndMove(num);
-    	drawTrons();
-    	drawEdges();
+   	drawTrons();
+    if (Edge) {
+        drawEdge();
+    }
+    if (Face) {
+        drawFace();
+    }
 	tour();
 }

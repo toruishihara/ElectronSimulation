@@ -1,0 +1,212 @@
+<head>Simplest Three.js sample</head>
+<body onload="onLoad()">
+<input type="button" value="left" onclick="left()" />
+<input type="button" value="right" onclick="right()" />
+<input type="button" value="up" onclick="up()" />
+<input type="button" value="down" onclick="down()" />
+  <div id="ThreeCanvas" style="height:400px;width:400px"></div>
+</body>
+<script type="text/javascript" src="Three.js"></script>
+<script type="text/javascript">
+
+var X = 9;
+var Y = 1;
+var ThreeCamera;
+var ThreeRenderer;
+var ThreeScene;
+var ThreeCanvas;
+
+var PrevCameraPos;
+var TargetCameraPos;
+var PrevLookPos;
+var TargetLookPos;
+var TotalSteps = 100;
+var CurrentStep;
+
+var Arr=[[1,1,1,1,1,1,1,1,0],
+	[1,0,0,0,0,1,0,1,0],
+	[1,0,1,1,0,0,0,1,0],
+ 	[1,0,0,0,1,0,1,1,0],
+	[1,1,1,0,1,0,0,1,0],
+	[1,0,0,0,1,1,0,1,0],
+	[1,0,1,0,1,0,0,0,0],
+	[1,0,1,1,1,1,1,1,0],
+	[0,0,0,0,0,0,0,0,0]];
+
+function onLoad() {
+    	ThreeCanvas = document.getElementById("ThreeCanvas");
+	var width = ThreeCanvas.clientWidth;
+	var height = ThreeCanvas.clientHeight;  
+	ThreeRenderer = new THREE.WebGLRenderer({antialias: true});
+	ThreeRenderer.setSize(width, height );
+	ThreeCanvas.appendChild(ThreeRenderer.domElement);
+	ThreeRenderer.setClearColorHex(0xFFFFFF, 1.0);
+	ThreeScene = new THREE.Scene();
+
+	var light = new THREE.PointLight(0xFFFFFF, 1.0, 0);
+	light.position.set( 1000, 1000, 2000 );
+	ThreeScene.add(light);
+	var ambientLight = new THREE.AmbientLight(0x888888);
+	ThreeScene.add(ambientLight);
+
+	ThreeCamera = new THREE.PerspectiveCamera( 45 , width / height , 1 , 100000 );
+	ThreeScene.add(ThreeCamera);
+	ThreeCamera.up = new THREE.Vector3( 0, 0, 1 );
+
+	var tri1 = createTriangle(-100,-100,-50, 800,-100,-50, -100,800,-50, 0x888888);
+	ThreeScene.add(tri1);
+	var tri2 = createTriangle(800,800,-50, 800,-100,-50, -100,800,-50, 0x888888);
+	ThreeScene.add(tri2);
+	var t = createText("ABC", 100, 100,100,300, 0x0000FF);
+	ThreeScene.add(t);
+	for(var i=0; i<8; ++i) {
+		for(var j=0; j<8; ++j) {
+			console.log("i=" + i + " j=" + j);
+			var val = Arr[i][j];
+			console.log("val=" + val);
+			if (val == 1) {
+				var cube = createCube(i*100, j*100, 0, 100, 0xFF0000);
+				ThreeScene.add(cube);
+			}			
+		}		
+	}
+	PrevCameraPos = new THREE.Vector3(100,100,3000);
+        PrevLookPos =  new THREE.Vector3(250,250,50);
+	up();
+}
+function loop() {
+	CurrentStep += 1;
+	pos = new THREE.Vector3( 
+		PrevCameraPos.x + (TargetCameraPos.x - PrevCameraPos.x)*CurrentStep/TotalSteps,
+		PrevCameraPos.y + (TargetCameraPos.y - PrevCameraPos.y)*CurrentStep/TotalSteps,
+		PrevCameraPos.z + (TargetCameraPos.z - PrevCameraPos.z)*CurrentStep/TotalSteps);
+	ThreeCamera.position = pos;
+	look = new THREE.Vector3( 
+		PrevLookPos.x + (TargetLookPos.x - PrevLookPos.x)*CurrentStep/TotalSteps,
+		PrevLookPos.y + (TargetLookPos.y - PrevLookPos.y)*CurrentStep/TotalSteps,
+		PrevLookPos.z + (TargetLookPos.z - PrevLookPos.z)*CurrentStep/TotalSteps);
+
+        ThreeCamera.lookAt( look );
+
+	ThreeRenderer.clear();
+	ThreeRenderer.render(ThreeScene, ThreeCamera);
+	if (CurrentStep < TotalSteps) {
+		window.requestAnimationFrame(loop);
+	} else {
+		PrevCameraPos = TargetCameraPos;
+		PrevLookPos = TargetLookPos;
+	}
+}
+
+function left() {
+	if (Arr[X][Y-1] == 1) {
+		return;
+	}
+	Y = Y -1;
+	TargetCameraPos = new THREE.Vector3( 100*X, 100*Y, 90 );
+	TargetLookPos = new THREE.Vector3( 100*X, 100*(Y-1), 80);
+	CurrentStep = 0;
+	window.requestAnimationFrame(loop);
+}
+function right() {
+	if (Arr[X][Y+1] == 1) {
+		return;
+	}
+	Y = Y +1;
+	TargetCameraPos = new THREE.Vector3( 100*X, 100*Y, 90 );
+	TargetLookPos = new THREE.Vector3( 100*X, 100*(Y+1), 80);
+	CurrentStep = 0;
+	window.requestAnimationFrame(loop);
+}
+function up() {
+        if (Arr[X-1][Y] == 1) {
+		return;
+	}
+	X = X - 1;
+	TargetCameraPos = new THREE.Vector3( 100*X, 100*Y, 90 );
+	TargetLookPos = new THREE.Vector3( 100*(X-1), 100*Y, 80);
+	CurrentStep = 0;
+	window.requestAnimationFrame(loop);
+}
+function down() {
+	if (Arr[X+1][Y] == 1) {
+		return;
+	}
+	X = X +1;
+	TargetCameraPos = new THREE.Vector3( 100*X, 100*Y, 90 );
+	TargetLookPos = new THREE.Vector3( 100*(X+1), 100*Y, 80);
+	CurrentStep = 0;
+	window.requestAnimationFrame(loop);
+}
+
+function createSphere(x,y,z,r, col)
+{
+	var material = new THREE.MeshLambertMaterial({ color:col, ambient:col, opacity:0.7, transparent:true });
+     	var sphere = new THREE.Mesh(new THREE.SphereGeometry(r, 16, 16), material);
+	sphere.position.x = x;
+	sphere.position.y = y;
+	sphere.position.z = z;
+
+      	sphere.overdraw = true;
+	return sphere;
+}
+
+function createCube(x,y,z,w, col)
+{
+	var material = new THREE.MeshLambertMaterial({ color:col, ambient:col, opacity:1.0 });
+	var cube = new THREE.Mesh(new THREE.CubeGeometry(w, w, w), material);
+	cube.overdraw = true;
+    
+	cube.position.x = x;
+	cube.position.y = y;
+	cube.position.z = z;
+    
+	return cube;
+}
+
+function createTriangle(x0,y0,z0, x1,y1,z1, x2,y2,z2, col) {
+    	var geometry = new THREE.Geometry();
+    	var vect0 = new THREE.Vector3(x0, y0, z0);
+	geometry.vertices.push(vect0);
+    	var vect1 = new THREE.Vector3(x1, y1, z1);
+	geometry.vertices.push(vect1);
+    	var vect2 = new THREE.Vector3(x2, y2, z2);
+	geometry.vertices.push(vect2);
+	var d01 = vect1.clone();
+	d01.subSelf(vect0);
+	var d12 = vect2.clone();
+	d12.subSelf(vect1);
+    	var n = new THREE.Vector3(0,0,0);
+	n = n.cross(d01, d12);
+	var face;
+	face = new THREE.Face3( 0, 1, 2);
+	face.normal = new THREE.Vector3(n.x, n.y, n.z);
+	geometry.faces.push(face);
+	face2 = new THREE.Face3( 2, 1, 0);
+	face2.normal = new THREE.Vector3(-1*n.x, -1*n.y, -1*n.z);
+	geometry.faces.push(face2);
+	var material = new THREE.MeshBasicMaterial({color:col, ambient:col, opacity:1.0 });
+	var tri = new THREE.Mesh( geometry, material );
+	tri.overdraw = true;
+    	return tri;
+}
+
+function createText(text, size, x,y,z, col) {
+    var geo=new THREE.TextGeometry(
+      text,
+      {size:size, height:size/5, curveSegments:5, font:"helvetiker", weight:"bold", style:"normal"}
+    );
+	var material = new THREE.MeshLambertMaterial({ color:col, ambient:col, opacity:1.0 });
+	var obj = new THREE.Mesh(geo, material);
+	obj.overdraw = true;
+    
+	obj.position.x = x;
+	obj.position.y = y;
+	obj.position.z = z;
+    
+	return obj;
+}
+
+
+</script>
+</html>

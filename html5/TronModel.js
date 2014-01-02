@@ -319,8 +319,8 @@ function progressOne(idx)
 {
 	var oldTron = Trons[idx].point.clone();
 	var tron = Trons[idx];
-    	var len;
-    	var shakeV;
+    var len;
+    var shakeV;
 
 	tron.point.add(tron.velo);
 
@@ -341,4 +341,23 @@ function _sleep(millisec){
         d2=new Date().getTime();
     }
     return;
+}
+
+// find closest normal
+function findTronFromNormal(n) {
+    var dot = -1.0;
+    var idx = 0;
+	for(var i=0;i<Trons.length;++i) {
+        var d = Trons[i].point.dot(n);
+        if (d > 0.99999) {
+            console.log("findTron return i=" + i);
+            return i;
+        }
+        if (d > dot) {
+            dot = d;
+            idx = i;
+        }
+    }
+    console.log("findTron return i=" + i + " dot=" + dot);
+    return idx;
 }

@@ -1,5 +1,6 @@
 var ThreeTrons = new Array();
 var ThreeEdges = new Array();
+var ThreeTriangles = new Array();
 var ThreeScene;
 var ThreeCamera;
 var width, height;
@@ -43,8 +44,7 @@ function initCamera() {
 
 function updateCamera() {
     var pole = ViewPole.clone();
-    //pole.mul(330);
-    pole.mul(500);
+    pole.mul(ZoomDistance);
     ThreeCamera.position.x = pole.x;
     ThreeCamera.position.y = pole.y;
     ThreeCamera.position.z = pole.z;
@@ -261,7 +261,6 @@ function drawTrons() {
 }
 
 function drawEdge() {
-	//drawFace();
     var shortest = 1000;
 	for(var i=0; i < Trons.length; ++i ) {
         for(var j=i+1; j < Trons.length; ++j ) {
@@ -295,14 +294,21 @@ function drawEdge() {
 	}
 } 
 
-function hideEdges() {
+function hideEdge() {
     for (var i=0;i<ThreeEdges.length;++i) {
         ThreeScene.remove(ThreeEdges[i]);
     }
     ThreeEdges = new Array();
 }
 
-function hideTrons() {
+function hideFace() {
+    for (var i=0;i<ThreeTriangles.length;++i) {
+        ThreeScene.remove(ThreeTriangles[i]);
+    }
+    ThreeTriangles = new Array();
+}
+
+function hideTron() {
     for (var i=0;i<ThreeTrons.length;++i) {
         ThreeScene.remove(ThreeTrons[i]);
     }
@@ -346,6 +352,7 @@ function drawTriangle(p0, p1, p2) {
 			col);
 	}
     ThreeScene.add(tri);
+    ThreeTriangles.push(tri);
 	return;
 	// Add lines around triangle for debugging
 	var d = 0.05;

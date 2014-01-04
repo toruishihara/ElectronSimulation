@@ -12,6 +12,7 @@ var ViewPoleX;
 var ViewPoleY;
 var CenterPoint = new tuple3d(0,0,0);
 var ZoomValue = 180;
+var ZoomDistance = 500;
 var LoopNum = 960*2;
 var LoopDelta = 0.01;
 
@@ -79,27 +80,7 @@ function init() {
 		}
 	}
 	ModelInit();
-    	addTronsOnModel();
-	//testCylinder();
-}
-function testCylinder() {
-	var col = 0xff00ff;
-	var c = createCylinder(0,0,0,0, 50,0,0,5, col, false);
-	ThreeScene.add(c);
-	c = createCylinder(50,0,0,5, 50,50,0,5, col, false);
-	ThreeScene.add(c);
-	c = createCylinder(50,50,0,5, 50,50,50,15, col, false);
-	ThreeScene.add(c);
-	c = createCylinder(50,0,50,5, 50,50,50,15, col, false);
-	ThreeScene.add(c);
-	c = createCylinder(0,50,50,5, 50,50,50,15, col, false);
-	ThreeScene.add(c);
-	c = createCylinder(50,0,0,5, 50,0,50,5, col, false);
-	ThreeScene.add(c);
-	c = createCylinder(0,0,0,0, 0,50,0,5, col, false);
-	ThreeScene.add(c);
-	c = createCylinder(0,0,0,0, 0,0,50,5, col, false);
-	ThreeScene.add(c);
+    addTronsOnModel();
 }
 
 function addTronsOnModel() {
@@ -112,6 +93,9 @@ function addTronsOnModel() {
 
 function drawViews() {
     updateThree();
+    if (Edge) { drawEdge(); } else { hideEdge(); }
+    if (Face) { drawFace(); } else { hideFace(); }
+    updateCamera();
     Renderer.clear();
     Renderer.render(ThreeScene, ThreeCamera);
 
@@ -191,7 +175,7 @@ function start(){
 	Times = 0;
 	init();
     
-	hideTrons();
+	hideTron();
 	ModelInit();
 	addTronsOnModel();
     
@@ -205,25 +189,21 @@ function stop(){
     Looping = false;
 }
 function reset() {
-    	Looping = false;
-    	init();
-    	initThree();
-    	drawTrons();
-    	updateCamera();
-    	Renderer.clear();
-    	Renderer.render(ThreeScene, ThreeCamera);
+    Looping = false;
+    init();
+    initThree();
+    drawTrons();
+    updateCamera();
+    Renderer.clear();
+    Renderer.render(ThreeScene, ThreeCamera);
 	drawViews();
 }
 function movePole(){
 	ModelMovePole();
     Looping = false;
 	drawViews();
-    if (Edge) {
-        drawEdge();
-    }
-    if (Face) {
-        drawFace();
-    }
+    if (Edge) { drawEdge(); }
+    if (Face) { drawFace(); }
     //var s = JSON.sringify(ThreeScene);
     //console.log(s);
 }
@@ -285,15 +265,11 @@ function setShadow(c, color, blur, offsetX, offsetY){
 }
 
 function loop() {
-	hideEdges();
+	hideEdge();
    	ModelProgress();
    	updateThree();
-    if (Edge) {
-       drawEdge();
-    }
-    if (Face) {
-        drawFace();
-    }
+    if (Edge) { drawEdge(); }
+    if (Face) { drawFace(); }
    	Renderer.clear();
    	Renderer.render(ThreeScene, ThreeCamera);
     
@@ -306,13 +282,13 @@ function loop() {
 }
 
 function loadThree() {
-    	init();
-    	initThree();
+    init();
+    initThree();
 	ThreeViewLoad();
-    	drawTrons();
-    	updateCamera();
-    	Renderer.clear();
-    	Renderer.render(ThreeScene, ThreeCamera);
+    drawTrons();
+    updateCamera();
+    Renderer.clear();
+    Renderer.render(ThreeScene, ThreeCamera);
 	drawViews();
 }
 function loadIndexThree() {
@@ -330,7 +306,7 @@ function readJson() {
 }
 
 function readJsonImpl(num) {
-    hideTrons();
+    hideTron();
     ModelInit();
     var jsonObj = JSON.parse(results[num]);
     for(var i=0;i<jsonObj.num;++i) {
@@ -360,8 +336,8 @@ function readJsonAndMove(num) {
 
 function selItem(num) {
     	console.log("num=" + num);
-    	hideTrons();
-    	hideEdges();
+    	hideTron();
+    	hideEdge();
     	ModelInit();
     	for(var i=0;i<num;++i) {
         	var color = new tronColor("hsl", (i*47)%360, "100%", "50%");
@@ -369,11 +345,16 @@ function selItem(num) {
 	}
 	readJsonAndMove(num);
    	drawTrons();
-    if (Edge) {
-        drawEdge();
-    }
-    if (Face) {
-        drawFace();
-    }
+    if (Edge) { drawEdge(); }
+    if (Face) { drawFace(); }
 	TourStart();
+}
+
+function OnViewValueChange() {
+    ZoomDistance = document.getElementById("Zoom").value;
+    Edge = document.getElementById('Edge').checked;
+    Face = document.getElementById('Face').checked;
+	//ZoomValue = Math.exp((value-20)/10);
+	console.log(" zoom=" + ZoomDistance);
+	drawViews();
 }

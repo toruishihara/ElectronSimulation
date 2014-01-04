@@ -8,7 +8,7 @@ function storyLoop()
     var wait = 0;
     if (phase == 0) {
         calc_cnt++;
-	    hideEdges();
+	    hideEdge();
         ModelProgress();
         updateThree();
         if (Edge) {
@@ -24,7 +24,7 @@ function storyLoop()
         }
     } else {
         if (story_tour_cnt == 0) {
-            hideTrons();
+            hideTron();
 
             //ModelMovePole();
             drawTrons();
@@ -71,11 +71,11 @@ function storyLoop()
         updateCamera();
         if (story_tour_cnt > LoopNum) {
             logJson();
-            hideEdges();
+            hideEdge();
             calc_cnt = 0;
             story_tour_cnt = 0;
             phase = 0;
-            hideTrons();
+            hideTron();
             //clearMapView();
             //ModelInit();
             NumTrons ++;
@@ -105,7 +105,7 @@ function quickLoop()
         document.getElementById("underDesc").innerText = str;
         ModelProgress();
 	    if (calc_cnt % 20 <= 20) {
-            hideEdges();
+            hideEdge();
             updateThree();
             if (Edge) {
                 drawEdge();
@@ -121,8 +121,8 @@ function quickLoop()
         }
 	if (calc_cnt > 1000) {
         phase = 1;
-        hideEdges();
-        hideTrons();
+        hideEdge();
+        hideTron();
 	    readJsonAndMove(NumTrons);
         drawTrons();
         if (Edge) {
@@ -135,7 +135,7 @@ function quickLoop()
 	}
     } else {
         if (story_tour_cnt == 0) {
-            hideTrons();
+            hideTron();
 
             //ModelMovePole();
             drawTrons();
@@ -184,11 +184,11 @@ function quickLoop()
 	}
         if (story_tour_cnt > LoopNum) {
             logJson();
-            hideEdges();
+            hideEdge();
             calc_cnt = 0;
             story_tour_cnt = 0;
             phase = 0;
-            hideTrons();
+            hideTron();
             //clearMapView();
             //ModelInit();
             NumTrons ++;
@@ -227,7 +227,7 @@ function storyCleanStart() {
     NumTrons = 2;
     init();
     
-    hideTrons();
+    hideTron();
     ModelInit();
     //addTronsOnModel();
 
@@ -248,7 +248,7 @@ function StoryQuickStart() {
     NumTrons = 2;
     init();
     
-    hideTrons();
+    hideTron();
     ModelInit();
 
     var color = new tronColor("hsl", (0*47)%360, "100%", "50%");

@@ -92,10 +92,18 @@ function addTronsOnModel() {
     }
 }
 
+var lastEdge = false;
+var lastFace = false;
 function drawViews() {
     updateThree();
-    if (Edge) { drawEdge(); } else { hideEdge(); }
-    if (Face) { drawFace(); } else { hideFace(); }
+    if (Edge != lastEdge) {
+        if (Edge) { drawEdge(); } else { hideEdge(); }
+        lastEdge = Edge;
+    }
+    if (Face != lastFace) {
+        if (Face) { drawFace(); } else { hideFace(); }
+        lastFace = Face;
+    }
     updateCamera();
     Renderer.clear();
     Renderer.render(ThreeScene, ThreeCamera);

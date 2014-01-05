@@ -201,7 +201,7 @@ var	DownY = 0;
 var	DownPole;
 var	DownPoleX;
 var	DownPoleY;
-function mouseDownShpere(e) {
+function mouseDownSphere(e) {
 	IsMouseDown = 1;
 	var canvas = document.getElementById("sphereCanvas");
 　	canvasOffsetX = canvas.offsetLeft;
@@ -212,10 +212,10 @@ function mouseDownShpere(e) {
 	DownPoleX = ViewPoleX.clone();
 	DownPoleY = ViewPoleY.clone();
 }
-function mouseUpShpere(e) {
+function mouseUpSphere(e) {
 	IsMouseDown = 0;
 }
-function mouseMoveShpere(e) {
+function mouseMoveSphere(e) {
 	if (IsMouseDown == 0)	return;
 	var canvas = document.getElementById("sphereCanvas");
 　	canvasOffsetX = canvas.offsetLeft;
@@ -258,9 +258,9 @@ function mouseMoveShpere(e) {
 
 function load(){
 	var canvas = document.getElementById("sphereCanvas");
-	canvas.onmousedown = mouseDownShpere;
-	canvas.onmousemove = mouseMoveShpere;
-	canvas.onmouseup = mouseUpShpere;
+	canvas.onmousedown = mouseDownSphere;
+	canvas.onmousemove = mouseMoveSphere;
+	canvas.onmouseup = mouseUpSphere;
 	init();
 	clear();
 	drawViews();

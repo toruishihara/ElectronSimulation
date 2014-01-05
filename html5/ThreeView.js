@@ -15,9 +15,10 @@ var	DownPoleY;
 
 function ThreeViewLoad() {
 	var canvas = document.getElementById("sphereCanvas");
-	canvas.onmousedown = mouseDownShpere;
-	canvas.onmousemove = mouseMoveShpere;
-	canvas.onmouseup = mouseUpShpere;
+	canvas.onmousedown = mouseDownSphere;
+	canvas.onmousemove = mouseMoveSphere;
+	canvas.onmouseup = mouseUpSphere;
+	canvas.ondblclick = mouseDblClickSphere;
 
 	canvas.addEventListener("webglcontextlost", function(event) { event.preventDefault(); }, false);
 }
@@ -51,7 +52,7 @@ function updateCamera() {
     ThreeCamera.up.x = ViewPoleY.x;
     ThreeCamera.up.y = ViewPoleY.y;
     ThreeCamera.up.z = ViewPoleY.z;
-    ThreeCamera.lookAt( {x:0, y:0, z:0 } );
+    ThreeCamera.lookAt( {x:ViewCenter.x*100, y:ViewCenter.y*100, z:ViewCenter.z*100 } );
 }
 function initScene() {    
     ThreeScene = new THREE.Scene();
@@ -77,7 +78,7 @@ function updateThree() {
     }
 }
 
-function mouseDownShpere(e) {
+function mouseDownSphere(e) {
 	IsMouseDown = 1;
 	var canvas = document.getElementById("sphereCanvas");
 　	canvasOffsetX = canvas.offsetLeft;
@@ -88,10 +89,10 @@ function mouseDownShpere(e) {
 	DownPoleX = ViewPoleX.clone();
 	DownPoleY = ViewPoleY.clone();
 }
-function mouseUpShpere(e) {
+function mouseUpSphere(e) {
 	IsMouseDown = 0;
 }
-function mouseMoveShpere(e) {
+function mouseMoveSphere(e) {
 	if (IsMouseDown == 0)	return;
 	var canvas = document.getElementById("sphereCanvas");
 　	canvasOffsetX = canvas.offsetLeft;
@@ -129,7 +130,48 @@ function mouseMoveShpere(e) {
 	ViewPoleY.unify();
 
     updateCamera();
+    Renderer.clear();
+    Renderer.render(ThreeScene, ThreeCamera);
+}
+function mouseDblClickSphere(e) {
+	var canvas = document.getElementById("sphereCanvas");
+　	canvasOffsetX = canvas.offsetLeft;
+　	canvasOffsetY = canvas.offsetTop;
+    var x = e.pageX - canvasOffsetX - 0.5*width;
+    var y = e.pageY - canvasOffsetY - 0.5*height;
+	console.log("dblclick x=" + x + " y=" + y);
+    x /= 100.0;
+    y /= 100.0;
 
+	var X1 = DownPoleX.clone();
+	var Y1 = DownPoleY.clone();
+	var Z1 = DownPole.clone();
+	var Z2 = DownPole.clone();
+
+    console.log("X1=[" + X1.x + "," + X1.y + "," + X1.z + "]");
+    console.log("Y1=[" + Y1.x + "," + Y1.y + "," + Y1.z + "]");
+    console.log("Z1=[" + Z1.x + "," + Z1.y + "," + Z1.z + "]");
+
+    console.log("C0=[" + ViewCenter.x + "," + ViewCenter.y + "," + ViewCenter.z + "]");
+    var dx = X1.clone();
+    var dx2 = X1.clone();
+    dx2.mul(0.8);
+    addLine(CenterPoint, dx2, 0xFF0000);
+    dx.mul(x);
+    ViewCenter.add(dx);
+
+    var dy = Y1.clone();
+    var dy2 = Y1.clone();
+    dy2.mul(0.8);
+    addLine(CenterPoint, dy2, 0x00FF00);
+
+    dy.mul(y);
+    ViewCenter.add(dy);
+    console.log("C=[" + ViewCenter.x + "," + ViewCenter.y + "," + ViewCenter.z + "]");
+    console.log("CP=[" + CenterPoint.x + "," + CenterPoint.y + "," + CenterPoint.z + "]");
+    addLine(CenterPoint, ViewCenter, 0xFFFF00);
+
+    updateCamera();
     Renderer.clear();
     Renderer.render(ThreeScene, ThreeCamera);
 }

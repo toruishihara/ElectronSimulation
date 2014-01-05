@@ -11,6 +11,7 @@ var ViewPole;
 var ViewPoleX;
 var ViewPoleY;
 var CenterPoint = new tuple3d(0,0,0);
+var ViewCenter = new tuple3d(0,0,0);
 var ZoomValue = 180;
 var ZoomDistance = 500;
 var LoopNum = 960*2;

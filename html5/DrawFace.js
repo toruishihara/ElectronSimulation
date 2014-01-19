@@ -1,4 +1,3 @@
-
 function drawFace_old() {
 	var t;
 	t = createTriangle(-100,-100,-100, -100,100,100, -100,100,-100, 0x00FF00);
@@ -47,14 +46,13 @@ return p;
 
 function drawFace() {
     var facePoints = new Array(128*128*128);
+    var realFacePoints = new Array();       // Used for drawing line
 	// Find shortest pair
     var shortest = 1000;
 	for(var i=0; i < Trons.length; ++i ) {
        	for(var j=i+1; j < Trons.length; ++j ) {
        		var p0 = Trons[i].point.clone();
-//p0 = testAdjustPoint(p0);
        		var p1 = Trons[j].point.clone();
-//p1 = testAdjustPoint(p1);
        		var dis = p0.dis(p1);
        		if (dis < shortest) {
            		shortest = dis;
@@ -64,17 +62,14 @@ function drawFace() {
 	var cnt = 0;
 	for(var i=0; i < Trons.length; ++i ) {
        	var p0 = Trons[i].point.clone();
-//p0 = testAdjustPoint(p0);
 		//addLine(CenterPoint, p0, 0xFF0000);
        	for(var j=i+1; j < Trons.length; ++j ) {
        		var p1 = Trons[j].point.clone();
-//p1 = testAdjustPoint(p1);
 			//addLine(CenterPoint, p1, 0xFFFF00);
        		var dis01 = p0.dis(p1);
        		if (dis01 < shortest*1.5 && dis01 > 0.00001) {
        			for(var k=j+1; k < Trons.length; ++k ) {
        				var p2 = Trons[k].point.clone();
-//p2 = testAdjustPoint(p2);
 					//addLine(CenterPoint, p2, 0x0000FF);
        				var dis02 = p0.dis(p2);
        				var dis12 = p1.dis(p2);
@@ -94,11 +89,8 @@ function drawFace() {
 						if (p12.length2() < 0.00001) {
 							continue;
 						}
-testLogPoint(p12, "A p12");
 						p12.unify();
-testLogPoint(p12, "B p12");
 						p12.setLength(1/p12.dot(p1));
-testLogPoint(p12, "C p12");
 
 						var p20 = p2.clone();
 						p20.add(p0);
@@ -117,24 +109,12 @@ testLogPoint(p12, "C p12");
 							continue; //parallel
 						}
 
-testLogPoint(p0, "before p0");
-testLogPoint(p1, "before p1");
-testLogPoint(p2, "before p2");
 						var d0112 = p12.clone();
 						d0112.sub(p01);
 
-        console.log("d0112=[" + d0112.x + "," + d0112.y + "," + d0112.z + "]");
-        console.log("cr01=[" + cr01.x + "," + cr01.y + "," + cr01.z + "]");
-        console.log("cr12=[" + cr12.x + "," + cr12.y + "," + cr12.z + "]");
-						//drawDot(p0, 0xFF0000, 4);
-						//drawDot(p1, 0x00FF00, 4);
-						//drawDot(p2, 0x0000FF, 4);
-
 						// http://d.hatena.ne.jp/obelisk2/20101228/1293521247
 						var s = d0112.dot(cr01) - d0112.dot(cr12)*cr01.dot(cr12);
-        console.log("s0=" + s);
 						s /= (1.0 - cr01.dot(cr12)*cr01.dot(cr12));
-        console.log("s1=" + s);
 
 						var ps = p01.clone();
 						cr01.mul(s);
@@ -155,18 +135,8 @@ testLogPoint(p2, "before p2");
                         facePoints[idx] = 1;
                         // above is not perfect code for floating xyz values
 
-						// testing
-						//var d = 0.05;
-						//ps.x += Math.random()*d;
-						//ps.y += Math.random()*d;
-						//ps.z += Math.random()*d;
-						//drawDot(ps, Math.random()*0xffffff, 4);
-						// end testing
-
+                        realFacePoints.push(ps);
 						drawDot(ps, 0x000000, 2);
-testLogPoint(p01, "p01");
-testLogPoint(p12, "p12");
-testLogPoint(p20, "p20");
 						drawTriangle(p01, p0, ps);
 						drawTriangle(p0, p20, ps);
 						drawTriangle(p1, p01, ps);
@@ -179,4 +149,30 @@ testLogPoint(p20, "p20");
            	}
        	}
 	}
+    if (ShowFaceEdge == 1) {
+        var shortest = 999999.9;
+        for(i=0;i<realFacePoints.length;++i) {
+            var p0 = realFacePoints[i].clone();
+            for(j=i+1;j<realFacePoints.length;++j) {
+                var p1 = realFacePoints[j].clone();
+                var dis = p0.dis(p1);
+                if (dis < shortest) {
+                    shortest = dis;
+                }
+            }
+        }
+        for(i=0;i<realFacePoints.length;++i) {
+            var p0 = realFacePoints[i].clone();
+            for(j=i+1;j<realFacePoints.length;++j) {
+                var p1 = realFacePoints[j].clone();
+                var dis = p0.dis(p1);
+                if (dis > shortest*2.0 && dis > 0.25) {
+                    continue;
+                }
+			    addLine(p0, p1, 0x000000);
+                var cyl = createCylinder(p0, p1, 2, 0x000000);
+                ThreeScene.add(cyl);
+            }
+        }
+    }
 } 

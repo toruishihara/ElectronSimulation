@@ -16,16 +16,24 @@ var ZoomValue = 180;
 var ZoomDistance = 500;
 var LoopNum = 960*2;
 var LoopDelta = 0.01;
-
+var Width = 800;
+var Height = 800;
 var Edge = false;
 var Face = false;
 var Timer1;
 var Times = 0;
 var Interval = 50;
 var NumTrons = 8;
+var ShowFaceEdge = 1;
+var AllLight = 1;
 
 var Limit = 0.0000001;
 var Looping = false;
+
+var ThreeRadius = 100.5;
+var WhiteFace = 1;
+var WireSphere = 0;
+var PoleXYZ = 0;
 
 function tronColor(type,p1,p2,p3)
 {
@@ -103,6 +111,9 @@ function drawViews() {
     if (Face != lastFace) {
         if (Face) { drawFace(); } else { hideFace(); }
         lastFace = Face;
+        if (WhiteFace == 1) {
+            hideTron();
+        }
     }
     updateCamera();
     Renderer.clear();

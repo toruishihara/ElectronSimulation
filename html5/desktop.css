@@ -60,8 +60,8 @@ div {
 	position: absolute;
 	top: 20px;
 	left: 10px;
-	width: 400px;
-	height: 400px;
+	width: 800px;
+	height: 800px;
 }
 #underDesc {
 	position: absolute;
@@ -76,7 +76,7 @@ div {
 #mapCanvas {
 	position: absolute;
 	top: 50px;
-	left: 450px;
+	left: 850px;
 	background-color: #FFFFFF;
 }
 #bottom {

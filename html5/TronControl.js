@@ -11,14 +11,9 @@ var ViewPole;
 var ViewPoleX;
 var ViewPoleY;
 var CenterPoint = new tuple3d(0,0,0);
-var ZoomValue = 180;
 
-var Timer1;
 var Width = 400;
 var Height = 400;
-var Times = 0;
-var Interval = 50;
-var numTrons = 8;
 
 function tronColor(type,p1,p2,p3)
 {
@@ -87,7 +82,8 @@ function drawSphereView() {
 	ctx.lineWidth = 1;
 	var w2 = canvas.width/2;
 	var h2 = canvas.height/2;
-	for(var i=0; i < Lines.length; ++i ) {
+    if (WireSphere == 1) {
+	  for(var i=0; i < Lines.length; ++i ) {
 		var p0 = Lines[i].p0.clone();
 		p0.sub(CenterPoint);
 		var p1 = Lines[i].p1.clone();
@@ -99,15 +95,16 @@ function drawSphereView() {
 		var depth = 0.8*(ViewPole.dot(p0)+1)/2 + 0.2;
 		var color = "rgba(0,0,0," + depth.toFixed(1) + ")";
 		drawLine(ctx, x0, y0, x1, y1, color);
-	}
-	for(var i=0; i < Trons.length; ++i ) {
+	  }
+	  for(var i=0; i < Trons.length; ++i ) {
 		var p0 = Trons[i].point.clone();
 		p0.sub(CenterPoint);
 		var x0 = w2 + ZoomValue*p0.dot(ViewPoleX);
 		var y0 = h2 + -1*ZoomValue*p0.dot(ViewPoleY);
 		var depth = (ViewPole.dot(p0) + 1)/2;
 		drawSmallRect(ctx, x0, y0, Trons[i].color.toStringWithAlpha(depth));
-	}
+	  }
+    }
 	drawInfos();
 }
 

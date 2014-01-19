@@ -6,8 +6,6 @@ var ThreeCamera;
 var width, height;
 var Renderer;
 
-var ThreeRadius = 100.5;
-
 var	IsMouseDown = 0;
 var	DownX = 0;
 var	DownY = 0;
@@ -60,18 +58,25 @@ function initScene() {
     ThreeScene = new THREE.Scene();
 }
 function initLight() {  
-    var light = new THREE.PointLight(0xFFFFFF, 1.0, 0);
-    light.position.set( 100, 100, 200 );
-    ThreeScene.add(light);
-    //var light2 = new THREE.PointlLight(0x888888, 1.0, 0);
-    //light2.position.set( -1000, -1000, -2000 );
-    //ThreeScene.add(light2);
+    if (AllLight == 1) {
+        var x,y,z;
+        for(x=-1;x<2;++x) { for(y=-1;y<2;++y) { for(z=-1;z<2;++z) {
+         var light = new THREE.PointLight(0xFFFFFF, 1.0, 0);
+         light.position.set( 300*x, 300*y, 300*z );
+         ThreeScene.add(light);
+        } } } 
+    } else {
+         var light = new THREE.PointLight(0xFFFFFF, 1.0, 0);
+         light.position.set( 300, 300, 300 );
+         ThreeScene.add(light);
+    }
+
     var ambientLight = new THREE.AmbientLight(0x888888);
     ThreeScene.add(ambientLight);
 }
 
 function updateThree() {
-    for(var i=0; i < Trons.length; ++i ) {
+    for(var i=0; i < Trons.length && i < ThreeTrons.length; ++i ) {
 		var p0 = Trons[i].point.clone();
         p0.mul(ThreeRadius);
         ThreeTrons[i].position.x = p0.x;
@@ -178,7 +183,7 @@ function mouseDblClickSphere(e) {
     Renderer.render(ThreeScene, ThreeCamera);
 }
 
-function createCylinder(x0,y0,z0,r0, x1,y1,z1,r1, col, open)
+function createCylinder_old(x0,y0,z0,r0, x1,y1,z1,r1, col, open)
 {
 	var v = new THREE.Vector3(x0-x1, y0-y1, z0-z1);
 	var len = v.length();
@@ -199,8 +204,12 @@ function createCylinder(x0,y0,z0,r0, x1,y1,z1,r1, col, open)
 	return cylinder;
 }
 
-function create_cylinder(p0, p1, r, col)
+function createCylinder(inP0, inP1, r, col)
 {
+    var p0 = inP0.clone();
+    var p1 = inP1.clone();
+    p0.mul(ThreeRadius);
+    p1.mul(ThreeRadius);
     var material = new THREE.MeshLambertMaterial({ color:col, ambient:col, opacity:1.0 });
     var cylinder = new THREE.Mesh(new THREE.CylinderGeometry(r, r, p0.dis(p1), 0, 0, false), material);
     //cylinder.overdraw = true;
@@ -238,24 +247,30 @@ function initObjectThree() {
     geometry.vertices.push(vect0);
     vect1 = new THREE.Vector3(250, 0, 0);
     geometry.vertices.push(vect1);
-    var line = new THREE.Line(geometry, new THREE.LineBasicMaterial( { color:0xFF0000, opacity: 1.0, lineWidth:5} ));
-    ThreeScene.add( line );
+    if (PoleXYZ == 1) {
+        var line = new THREE.Line(geometry, new THREE.LineBasicMaterial( { color:0xFF0000, opacity: 1.0, lineWidth:5} ));
+        ThreeScene.add( line );
+    }
 
     var geometry = new THREE.Geometry();
     vect0 = new THREE.Vector3(0, 0, 0);
     geometry.vertices.push(vect0);
     vect1 = new THREE.Vector3(0, 250, 0);
     geometry.vertices.push(vect1);
-    var line = new THREE.Line(geometry, new THREE.LineBasicMaterial( { color:0x00FF00, opacity: 1.0, lineWidth:5} ));
-    ThreeScene.add( line );
+    if (PoleXYZ == 1) {
+        var line = new THREE.Line(geometry, new THREE.LineBasicMaterial( { color:0x00FF00, opacity: 1.0, lineWidth:5} ));
+        ThreeScene.add( line );
+    }
 
     var geometry = new THREE.Geometry();
     vect0 = new THREE.Vector3(0, 0, 0);
     geometry.vertices.push(vect0);
     vect1 = new THREE.Vector3(0, 0, 250);
     geometry.vertices.push(vect1);
-    var line = new THREE.Line(geometry, new THREE.LineBasicMaterial( { color:0x0000FF, opacity: 1.0, lineWidth:5} ));
-    ThreeScene.add( line );
+    if (PoleXYZ == 1) {
+        var line = new THREE.Line(geometry, new THREE.LineBasicMaterial( { color:0x0000FF, opacity: 1.0, lineWidth:5} ));
+        ThreeScene.add( line );
+    }
 
 	for(var i=0; i < Lines.length; ++i ) {
         var geometry = new THREE.Geometry();
@@ -324,13 +339,13 @@ function drawEdge() {
             if (dis < shortest*1.01) {
                 p0.mul(ThreeRadius);
                 p1.mul(ThreeRadius);
-                var cyl = create_cylinder(p0, p1, 2, 0x00ff00);
+                var cyl = createCylinder(p0, p1, 2, 0x00ff00);
                 ThreeScene.add(cyl);
                 ThreeEdges.push(cyl);
             } else if (dis < shortest*1.42) {
                 p0.mul(ThreeRadius);
                 p1.mul(ThreeRadius);
-                var cyl = create_cylinder(p0, p1, 1.5, 0x0000ff);
+                var cyl = createCylinder(p0, p1, 1.5, 0x0000ff);
                 ThreeScene.add(cyl);
                 ThreeEdges.push(cyl);
             }
@@ -440,11 +455,17 @@ function createTriangle(x0,y0,z0, x1,y1,z1, x2,y2,z2, col) {
 	//	opacity:0.5,
 	//	side:THREE.FrontSide, transparent:true });
 
-    var mat = new THREE.MeshLambertMaterial({color: 0xff0000,
-		opacity:0.5,
-		side:THREE.FrontSide, transparent:true });
-    mat.color.setHSL(col.p1/360.0, 1.0, .5);
-    mat.ambient.setHSL(col.p1/360.0, 1.0, .5);
+    var mat;
+    if (WhiteFace) {
+        mat = new THREE.MeshLambertMaterial({color: 0xffffff,
+		    opacity:1.0 });
+    } else {
+        mat = new THREE.MeshLambertMaterial({color: 0xff0000,
+		    opacity:0.5,
+		    side:THREE.FrontSide, transparent:true });
+        mat.color.setHSL(col.p1/360.0, 1.0, .5);
+        mat.ambient.setHSL(col.p1/360.0, 1.0, .5);
+    }
 
 	var tri = new THREE.Mesh( geometry, mat );
     return tri;

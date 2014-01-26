@@ -376,6 +376,7 @@ function hideTron() {
 
 var cnt2 = 0;
 function drawTriangle(p0, p1, p2) {
+
 	var h1 = p1.clone(); 
 	h1.sub(p0);
 	var h2 = p2.clone(); 
@@ -383,9 +384,9 @@ function drawTriangle(p0, p1, p2) {
 	var n = h1.cross(h2);
 	n.unify();
 	var dot = n.dot(p0);
-	if (dot < 0.0) {
-		n.mul(-1.0);
-	}
+	//if (dot < 0.0) {
+	//	n.mul(-1.0);
+	//}
     var idx = findTronFromNormal(n);
     var col = Trons[idx].color;
     // Calculate color from normal

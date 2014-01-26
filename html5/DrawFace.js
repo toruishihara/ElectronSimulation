@@ -151,6 +151,30 @@ function drawFace() {
            	}
        	}
 	}
+	/*
+	var nears;
+	for(var i=0; i < FacePoints.length; ++i ) {
+		var nears = new Array();
+       	var p0 = FacePoints[i].clone();
+		var near = FindNearestFacePointIndexFromIndex(i);
+		nears.push(near);
+		var dis = FacePoints[near].dis2(p0);
+		for(var j=0; j < FacePoints.length; ++j ) {
+			if (j == i || j == near)
+				continue;
+			if (FacePoints[j].dis2(p0) < dis*1.1) {
+				nears.push(j);
+			}
+		}
+		for(var j=0;j<nears.length;++j) {
+			for(var k=j+1;k<nears.length;++k) {
+				addTriangle(p0, FacePoints[nears[j]], FacePoints[nears[k]]);
+			}
+		}
+		//return;
+	}
+	*/
+
     if (ShowFaceEdge == 1) {
         var shortest = 999999.9;
         for(i=0;i<FacePoints.length;++i) {
@@ -228,39 +252,59 @@ function drawFace() {
         //document.getElementById("result").innerText += str + "\n";
     }
 }
+function FindNearestFacePointIndexFromIndex(idx)
+{
+    var nearest = huge;
+    var ret = -1;
+	for(var i=0;i<FacePoints.length;++i) {
+        if (i == idx)   continue;
+        var dis = FacePoints[idx].dis2(FacePoints[i]);
+        if (nearest > dis) {
+            nearest = dis;
+            ret = i;
+        }
+    }
+    return ret;
+}
+
 function addTriangle(p0, p1, p2)
 {
-	drawTriangle(p0, p1, p2);
-	FaceTris.push(new tri3d(p0, p1, p2));
+	var h1 = p1.clone(); 
+	h1.sub(p0);
+	var h2 = p2.clone(); 
+	h2.sub(p0);
+	var n = h1.cross(h2);
+	n.unify();
+	var dot = n.dot(p0);
+	if (dot > 0.0) {
+		drawTriangle(p0, p1, p2);
+		FaceTris.push(new tri3d(p0, p1, p2));
+	} else {
+		drawTriangle(p2, p1, p0);
+		FaceTris.push(new tri3d(p2, p1, p0));
+		
+	}
 }
 function writeFaceSTL()
 {
 	var i;
 	var n;
 	var str = "soild face" + FaceTris.length + "\n";
+	document.getElementById("result").innerText += str;
 	for(i=0;i<FaceTris.length;++i) {
 		str = "";
 		var revese;
-		n = FaceTris[i].p0.cross(FaceTris[i].p1);
+		var h1 = FaceTris[i].p1.clone(); 
+		h1.sub(FaceTris[i].p0);
+		var h2 = FaceTris[i].p2.clone(); 
+		h2.sub(FaceTris[i].p0);
+		var n = h1.cross(h2);
 		n.unify();
-		if (n.dot(FaceTris[i].p0) < 0.0) {
-			n.mul(-1.0);
-			reverse = 1;
-		} else {
-			reverse = 0;
-		}
 		
 		str += "facet normal " + n.x  + " " + n.y + " " + n.z + "\n";
 		str += "  outer loop\n";
-		if (reverse == 0) {
-			str += "    vertex " + FaceTris[i].p0.x + " " + FaceTris[i].p0.y + " " + FaceTris[i].p0.z + "\n";
-			str += "    vertex " + FaceTris[i].p1.x + " " + FaceTris[i].p1.y + " " + FaceTris[i].p1.z + "\n";
-			str += "    vertex " + FaceTris[i].p2.x + " " + FaceTris[i].p2.y + " " + FaceTris[i].p2.z + "\n";
-		} else {
-			str += "    vertex " + FaceTris[i].p2.x + " " + FaceTris[i].p2.y + " " + FaceTris[i].p2.z + "\n";
-			str += "    vertex " + FaceTris[i].p1.x + " " + FaceTris[i].p1.y + " " + FaceTris[i].p1.z + "\n";
-			str += "    vertex " + FaceTris[i].p0.x + " " + FaceTris[i].p0.y + " " + FaceTris[i].p0.z + "\n";
-		}
+		str += "    vertex " + FaceTris[i].p0.x + " " + FaceTris[i].p0.y + " " + FaceTris[i].p0.z + "\n";
+		str += "    vertex " + FaceTris[i].p1.x + " " + FaceTris[i].p1.y + " " + FaceTris[i].p1.z + "\n";			str += "    vertex " + FaceTris[i].p2.x + " " + FaceTris[i].p2.y + " " + FaceTris[i].p2.z + "\n";
 		str += "  endloop\n";
 		str += "endfacet\n";
 		document.getElementById("result").innerText += str;

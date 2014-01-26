@@ -11,7 +11,7 @@
 <div>
 	<canvas id="mapCanvas" onload="drawMapView()"></canvas>
 </div>
-<div style="top:900px;left:20px;width:100%;">	
+<div style="top:500px;left:20px;width:100%;">	
 <div>
 	<input type="button" value="Start" onclick="start()"/>
 	<input type="button" value="Stop" onclick="stop()"/>
@@ -25,8 +25,10 @@
 	<input type="button" value="Clear" onclick="clear()"/>
 	<input type="button" value="Continue" onclick="StoryContinue()"/>
 	<input type="button" value="Movie" onclick="StoryQuickStart()" style="background-color:#FF0000"/><br>
-	<input name="num" type="text" value="6" maxlength=4>
-	<input type="button" value="ReadJson" onclick="readJson()"/><br>
+	<input name="num" type="text" value="72" maxlength=4>
+	<input type="button" value="ReadJson" onclick="readJson()"/>
+	<input type="button" value="WriteSVG" onclick="writeSVG()"/>
+	<input type="button" value="WriteSTL" onclick="writeFaceSTL()"/><br>
 progress=<span id="progress"></span><br>
 Total Movement in this step=<span id="totalMove"></span><br>
 Closest pair=<span id="closestPair"></span><br>

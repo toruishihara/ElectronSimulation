@@ -247,7 +247,7 @@ function initObjectThree() {
     geometry.vertices.push(vect0);
     vect1 = new THREE.Vector3(250, 0, 0);
     geometry.vertices.push(vect1);
-    if (PoleXYZ == 1) {
+    if (ShowPoleXYZ == 1) {
         var line = new THREE.Line(geometry, new THREE.LineBasicMaterial( { color:0xFF0000, opacity: 1.0, lineWidth:5} ));
         ThreeScene.add( line );
     }
@@ -257,7 +257,7 @@ function initObjectThree() {
     geometry.vertices.push(vect0);
     vect1 = new THREE.Vector3(0, 250, 0);
     geometry.vertices.push(vect1);
-    if (PoleXYZ == 1) {
+    if (ShowPoleXYZ == 1) {
         var line = new THREE.Line(geometry, new THREE.LineBasicMaterial( { color:0x00FF00, opacity: 1.0, lineWidth:5} ));
         ThreeScene.add( line );
     }
@@ -267,7 +267,7 @@ function initObjectThree() {
     geometry.vertices.push(vect0);
     vect1 = new THREE.Vector3(0, 0, 250);
     geometry.vertices.push(vect1);
-    if (PoleXYZ == 1) {
+    if (ShowPoleXYZ == 1) {
         var line = new THREE.Line(geometry, new THREE.LineBasicMaterial( { color:0x0000FF, opacity: 1.0, lineWidth:5} ));
         ThreeScene.add( line );
     }

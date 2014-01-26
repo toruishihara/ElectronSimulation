@@ -1,5 +1,5 @@
 
-var StoryLimit = 0.0000001;
+var StoryLimit = 0.000001;
 var story_tour_cnt = 0;
 
 function storyLoop()
@@ -19,8 +19,14 @@ function storyLoop()
         }
         drawMapView();
         drawInfos();
-        if (TotalMove() < Limit && calc_cnt > 100) {
-            phase = 1;
+        if ((NumTrons-12)%60 == 0) {
+            if (TotalMove() < CriticalLimit && calc_cnt > 100) {
+                phase = 1;
+            }
+        } else {
+            if (TotalMove() < Limit && calc_cnt > 100) {
+                phase = 1;
+            }
         }
     } else {
         if (story_tour_cnt == 0) {

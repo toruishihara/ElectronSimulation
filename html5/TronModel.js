@@ -130,6 +130,21 @@ function FindFreePoint() {
 	return freePoint;
 }
 
+function FindNearestTronIndexFromIndex(idx)
+{
+    var maxDot = -1*huge;
+    var ret = -1;
+	for(var i=0;i<Trons.length;++i) {
+        if (i == idx)   continue;
+        var dot = Trons[idx].point.dot(Trons[i].point);
+        if (maxDot < dot) {
+            maxDot = dot;
+            ret = i;
+        }
+    }
+    return ret;
+}
+
 function updateLoneliest() {
 	// find loneliest
 	var lonelyDot = -1*huge;
@@ -169,7 +184,31 @@ function LoneliestAngle() {
 	return loneliestAngle;
 }
 function ModelMovePole() {
-        updateLoneliest();
+    return ModelMovePoleIndex();
+}
+var poleIndex = -1;
+function ModelMovePoleIndex() {
+    poleIndex = poleIndex + 1;
+    var nearIdx = FindNearestTronIndexFromIndex(poleIndex);
+        
+	var newPoleZ = Trons[poleIndex].point.clone();	
+	var newPoleY = newPoleZ.cross(Trons[nearIdx].point);
+	newPoleY.unify();
+	var newPoleX = newPoleY.cross(newPoleZ);
+	
+	for(var i=0;i<Trons.length;++i) {
+		var p = Trons[i].point.clone();
+		Trons[i].point.x = p.dot(newPoleX);
+		Trons[i].point.y = p.dot(newPoleY);
+		Trons[i].point.z = p.dot(newPoleZ);
+		var v = Trons[i].velo.clone();
+		Trons[i].velo.x = v.dot(newPoleX);
+		Trons[i].velo.y = v.dot(newPoleY);
+		Trons[i].velo.z = v.dot(newPoleZ);
+	}
+}
+function ModelMovePoleLoneliest() {
+    updateLoneliest();
 	var ls = loneliestPair.split(',');
 	var newPoleZ = Trons[ls[0]].point.clone();	
 	var newPoleY = newPoleZ.cross(Trons[ls[1]].point);
@@ -191,12 +230,16 @@ function logJson() {
     var a1 = ClosestAngle().toFixed(6);
     var a2 = LoneliestAngle().toFixed(6);
     var ps = Array(Trons.length*3);
+    var pv = Array(Trons.length*3);
     for(var i=0;i<Trons.length;++i) {
         ps[3*i+0] = Trons[i].point.x;
         ps[3*i+1] = Trons[i].point.y;
         ps[3*i+2] = Trons[i].point.z;
+        pv[3*i+0] = Trons[i].velo.x;
+        pv[3*i+1] = Trons[i].velo.y;
+        pv[3*i+2] = Trons[i].velo.z;
     }
-    var jsonObj = {num:Trons.length, vertex:ps, angle1:a1, angle2:a2};
+    var jsonObj = {num:Trons.length, vertex:ps, velocity:pv, angle1:a1, angle2:a2};
     var str = JSON.stringify(jsonObj);
     console.log(str);
     document.getElementById("result").innerText += str + "\n";
@@ -222,6 +265,7 @@ function logPoints() {
     str += "Ninfo" + Trons.length + "=" + a1 + "," + a2 + "\n";
     document.getElementById("result").innerText += str;
 }
+
 function save() {
 	var text = outputSTL();
 	location.href = 'data:application/octet-stream,'+encodeURIComponent(text);

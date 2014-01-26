@@ -1,10 +1,23 @@
 /* 3D framework class */
 // Triangle data
 function tri3d(in_x0, in_y0, in_z0, in_x1, in_y1, in_z1, in_x2, in_y2, in_z2){
-	this.p0 = new tuple3d(in_x0, in_y0, in_z0);
-	this.p1 = new tuple3d(in_x1, in_y1, in_z1);
-	this.p2 = new tuple3d(in_x2, in_y2, in_z2);
+	switch (arguments.length) {
+		case 3:
+			// overload, passed 3 points
+			this.p0 = in_x0.clone();
+			this.p1 = in_y0.clone();
+			this.p2 = in_z0.clone();
+		break;
+		case 6:
+		default :
+			// overload, passed 9 xyz values
+			this.p0 = new tuple3d(in_x0, in_y0, in_z0);
+			this.p1 = new tuple3d(in_x1, in_y1, in_z1);
+			this.p2 = new tuple3d(in_x2, in_y2, in_z2);
+		break;
+	}
 }
+
 // Line data
 function line3d(in_x0, in_y0, in_z0, in_x1, in_y1, in_z1){
 	this.p0 = new tuple3d(in_x0, in_y0, in_z0);
@@ -26,8 +39,8 @@ function tuple3d(in_x, in_y, in_z){
 	this.sub = tuple3d_sub;
 	this.length = tuple3d_length;
 	this.length2 = tuple3d_length2;
-    	this.dis = tuple3d_dis;
-    	this.dis2 = tuple3d_dis2;
+    this.dis = tuple3d_dis;
+    this.dis2 = tuple3d_dis2;
 	this.xy2sp = tuple3d_xy2sp;
 	this.sp2xy = tuple3d_sp2xy;
 	this.xy2spy = tuple3d_xy2spy;

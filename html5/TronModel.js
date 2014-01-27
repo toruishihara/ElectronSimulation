@@ -186,6 +186,41 @@ function LoneliestAngle() {
 function ModelMovePole() {
     return ModelMovePoleIndex();
 }
+function MovePointByBase(p, basePoint) {
+	var tmpPoleZ = basePoint.clone();
+	var tmpPoleY;
+	var tmpPoleX;
+	if (Math.abs(basePoint.z) > Math.abs(basePoint.x) && Math.abs(basePoint.z) > Math.abs(basePoint.y)) {
+		if (basePoint.z > 0.0) {
+			tmpPoleY = new tuple3d(0,1,0);
+		} else {
+			tmpPoleY = new tuple3d(0,-1,0);
+		}
+	} else if (Math.abs(basePoint.y) > Math.abs(basePoint.x) && Math.abs(basePoint.y) > Math.abs(basePoint.z)) {
+		if (basePoint.y > 0.0) {
+			tmpPoleY = new tuple3d(1,0,0);
+		} else {
+			tmpPoleY = new tuple3d(-1,0,0);
+		}
+	} else {
+		if (basePoint.x > 0.0) {
+			tmpPoleY = new tuple3d(0,0,1);
+		} else {
+			tmpPoleY = new tuple3d(0,0,-1);
+		}
+	}
+	tmpPoleZ.unify();
+	tmpPoleX = tmpPoleY.cross(tmpPoleZ);
+	tmpPoleX.unify();
+	tmpPoleY = tmpPoleZ.cross(tmpPoleX);
+	
+	var ret = new tuple3d(0,0,0);
+	ret.x = p.dot(tmpPoleX);
+	ret.y = p.dot(tmpPoleY);
+	ret.z = p.dot(tmpPoleZ);
+	return ret;
+}
+
 var poleIndex = -1;
 function ModelMovePoleIndex() {
     poleIndex = poleIndex + 1;

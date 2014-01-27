@@ -266,6 +266,19 @@ function FindNearestFacePointIndexFromIndex(idx)
     }
     return ret;
 }
+function FindNearestFacePointIndexFromPoint(p0)
+{
+    var nearest = huge;
+    var ret = -1;
+	for(var i=0;i<FacePoints.length;++i) {
+        var dis = p0.dis2(FacePoints[i]);
+        if (nearest > dis) {
+            nearest = dis;
+            ret = i;
+        }
+    }
+    return ret;
+}
 
 function addTriangle(p0, p1, p2)
 {
@@ -312,23 +325,53 @@ function writeFaceSTL()
 	document.getElementById("result").innerText += "endsolid face" + FaceTris.length + "\n";
 }
 
-function writeSVG() {
+function writeSVG()
+{
+	var str = "<svg height=\"500\" width=\"500\">\n";
+	document.getElementById("result").innerText += str;
 	var north = new tuple3d(0,0,1);
-	var i;
-	var str = "<svg height=\"500\" width=\"500\">\n  <polygon points=\"";
-	var prev = 0;
-	for(i=0;i<FacePoints.length;++i) {
-		var dis = north.dis(FacePoints[i]);
-		if (dis < 0.3) {
-			if (prev) {
-				str += " ";
-			}
-			str += (250 + FacePoints[i].x*200).toString();
-			str += ",";
-			str += (250 + FacePoints[i].y*200).toString();
-			prev = 1;
+	for(var i=0;i<Trons.length;++i) {
+		if (Trons[i].point.dis2(north) < 1.0) {
+			writeOneSVG(Trons[i].point, Trons[i].point.x, Trons[i].point.y);
 		}
 	}
-	str += "\" style=\"stroke:black;stroke-width:1\" />\n</svg>";
-    document.getElementById("result").innerText += str + "\n";
+	str = "</svg>\n";
+	document.getElementById("result").innerText += str;
+}
+
+function writeOneSVG(p0/* base Tron point*/, baseSVGx, baseSVGy) {
+	var points = new Array();
+	var i;
+	var str = "  <polygon points=\"";
+	var prev = 0;
+	var nearestIdx = FindNearestFacePointIndexFromPoint(p0);
+	var dis = p0.dis2(FacePoints[nearestIdx]);
+	for(i=0;i<FacePoints.length;++i) {
+		var d = p0.dis2(FacePoints[i]);
+		if (d < dis*1.1) {
+			points.push(MovePointByBase(FacePoints[i], p0));
+		}
+	}
+	for(i=0;i<points.length-1;++i) {
+		for(j=i+2;j<points.length;++j) {
+			var d1 = points[i].dis2(points[i+1]);
+			var d2 = points[i].dis2(points[j]);
+			if (d2 < d1) {
+				var swap = points[i+1].clone();
+				points[i+1] = points[j];
+				points[j] = swap;
+			}
+		}
+	}
+	for(i=0;i<points.length;++i) {
+		if (prev) {
+			str += " ";
+		}
+		str += (250 + (baseSVGx+points[i].x)*200).toString();
+		str += ",";			
+		str += (250 + (baseSVGy+points[i].y)*200).toString();
+		prev = 1;
+	}
+	str += "\" style=\"stroke:black;stroke-width:1;fill:none;\" />\n";
+    document.getElementById("result").innerText += str;
 }

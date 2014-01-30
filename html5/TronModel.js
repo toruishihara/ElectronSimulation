@@ -22,7 +22,7 @@ var ColombK = -0.00001;
 // defines
 var huge = 9999999999;
 
-// construct
+// constructer
 function tron(th, sp, color)
 {
 	this.point = new tuple3d(1, th, sp);

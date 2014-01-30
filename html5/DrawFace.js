@@ -1,34 +1,27 @@
 var FacePoints = new Array();       // Used for drawing line
 var FaceTris = new Array();
+var sortedTrons = new Array();
 
-function drawFace_old() {
-	var t;
-	t = createTriangle(-100,-100,-100, -100,100,100, -100,100,-100, 0x00FF00);
-    ThreeScene.add(t);
-	t = createTriangle(-100,-100,-100, -100,100,100, -100,-100,100, 0x00FF00);
-    ThreeScene.add(t);
-	t = createTriangle(100,-100,-100, 100,100,100, 100,100,-100, 0x00FF00);
-    ThreeScene.add(t);
-	t = createTriangle(100,-100,-100, 100,100,100, 100,-100,100, 0x00FF00);
-    ThreeScene.add(t);
+var facePointCnt = 0;
 
-	t = createTriangle(-100,100,-100, 100,100,100, 100,100,-100, 0xFFFF00);
-    ThreeScene.add(t);
-	t = createTriangle(-100,100,-100, 100,100,100, -100,100,100, 0xFFFF00);
-    ThreeScene.add(t);
-	t = createTriangle(-100,-100,-100, 100,-100,100, 100,-100,-100, 0xFFFF00);
-    ThreeScene.add(t);
-	t = createTriangle(-100,-100,-100, 100,-100,100, -100,-100,100, 0xFFFF00);
-    ThreeScene.add(t);
-
-	t = createTriangle(-100,-100,100, 100,100,100, 100,-100,100, 0xFF00FF);
-    ThreeScene.add(t);
-	t = createTriangle(-100,-100,100, 100,100,100, -100,100,100, 0xFF00FF);
-    ThreeScene.add(t);
-	t = createTriangle(-100,-100,-100, 100,100,-100, 100,-100,-100, 0xFF00FF);
-    ThreeScene.add(t);
-	t = createTriangle(-100,-100,-100, 100,100,-100, -100,100,-100, 0xFF00FF);
-    ThreeScene.add(t);
+function facePoint(id, p)
+{
+	if (id == -1) {
+		this.index = facePointCnt;
+		facePointCnt = facePointCnt + 1;
+	}
+	this.point = p.clone();
+}
+function facePointSort(a, b)
+{
+	var sp1 = a.point.clone();
+	var sp2 = b.point.clone();
+	sp1.xy2sp();
+	sp2.xy2sp();
+	if (Math.abs(sp1.z - sp2.z) > 0.0001) {
+		return (sp1.z - sp2.z);
+	}
+	return (sp1.y - sp2.y);
 }
 
 function testLogPoint(p,str) {
@@ -47,8 +40,24 @@ if (Math.abs(p.z) < 0.0001) {p.z = 0.0;}
 return p;
 }
 
+function TronSort(a, b)
+{
+	var sp1 = a.point.clone();
+	var sp2 = b.point.clone();
+	sp1.xy2sp();
+	sp2.xy2sp();
+	if (Math.abs(sp1.z - sp2.z) > 0.0001) {
+		return (sp1.z - sp2.z);
+	}
+	return (sp1.y - sp2.y);
+}
+
 function drawFace() {
     var dupCheck = new Array(128*128*128);
+	// sort Trons
+	sortedTrons = Trons.concat();
+	sortedTrons.sort(TronSort);
+	
 	// Find shortest pair
     var shortest = 1000;
 	for(var i=0; i < Trons.length; ++i ) {
@@ -137,7 +146,7 @@ function drawFace() {
                         dupCheck[idx] = 1;
                         // above is not perfect code for floating xyz values
 
-                        FacePoints.push(ps);
+                        FacePoints.push(new facePoint(-1,ps));
 						drawDot(ps, 0x000000, 2);
 						addTriangle(p01, p0, ps);
 						addTriangle(p0, p20, ps);
@@ -151,6 +160,7 @@ function drawFace() {
            	}
        	}
 	}
+	FacePoints.sort(facePointSort);
 	/*
 	var nears;
 	for(var i=0; i < FacePoints.length; ++i ) {
@@ -178,9 +188,9 @@ function drawFace() {
     if (ShowFaceEdge == 1) {
         var shortest = 999999.9;
         for(i=0;i<FacePoints.length;++i) {
-            var p0 = FacePoints[i].clone();
+            var p0 = FacePoints[i].point.clone();
             for(j=i+1;j<FacePoints.length;++j) {
-                var p1 = FacePoints[j].clone();
+                var p1 = FacePoints[j].point.clone();
                 var dis = p0.dis(p1);
                 if (dis < shortest) {
                     shortest = dis;
@@ -188,9 +198,9 @@ function drawFace() {
             }
         }
         for(i=0;i<FacePoints.length;++i) {
-            var p0 = FacePoints[i].clone();
+            var p0 = FacePoints[i].point.clone();
             for(j=i+1;j<FacePoints.length;++j) {
-                var p1 = FacePoints[j].clone();
+                var p1 = FacePoints[j].point.clone();
                 var dis = p0.dis(p1);
                 if (dis > shortest*2.0 && dis > 0.25) {
                     continue;
@@ -210,9 +220,9 @@ function drawFace() {
             fp[3*i+2] = Trons[i].point.z;
         }
         for(var i=0;i<FacePoints.length;++i) {
-            vp[3*i+0] = FacePoints[i].x;
-            vp[3*i+1] = FacePoints[i].y;
-            vp[3*i+2] = FacePoints[i].z;
+            vp[3*i+0] = FacePoints[i].point.x;
+            vp[3*i+1] = FacePoints[i].point.y;
+            vp[3*i+2] = FacePoints[i].point.z;
         }
         // sort by z
         var sw;
@@ -252,13 +262,14 @@ function drawFace() {
         //document.getElementById("result").innerText += str + "\n";
     }
 }
+
 function FindNearestFacePointIndexFromIndex(idx)
 {
     var nearest = huge;
     var ret = -1;
 	for(var i=0;i<FacePoints.length;++i) {
         if (i == idx)   continue;
-        var dis = FacePoints[idx].dis2(FacePoints[i]);
+        var dis = FacePoints[idx].point.dis2(FacePoints[i].point);
         if (nearest > dis) {
             nearest = dis;
             ret = i;
@@ -266,12 +277,13 @@ function FindNearestFacePointIndexFromIndex(idx)
     }
     return ret;
 }
+
 function FindNearestFacePointIndexFromPoint(p0)
 {
     var nearest = huge;
     var ret = -1;
 	for(var i=0;i<FacePoints.length;++i) {
-        var dis = p0.dis2(FacePoints[i]);
+        var dis = p0.dis2(FacePoints[i].point);
         if (nearest > dis) {
             nearest = dis;
             ret = i;
@@ -327,11 +339,81 @@ function writeFaceSTL()
 
 function writeSVG()
 {
-	var str = "<svg height=\"500\" width=\"500\">\n";
+	writeSVGplot();	
+}
+
+function writeSVGplot()
+{
+	var str = "<svg height=\"1000\" width=\"1000\">\n";
+	document.getElementById("result").innerText += str;
+	for(i=0;i<sortedTrons.length/2;++i) {
+		str = "  <text x=\"";
+		var p = sortedTrons[i].point;
+		str += (500 + (p.x)*400).toString();
+		str += "\" y=\"";			
+		str += (500 + (p.y)*400).toString();
+		str += "\" fill=\"red\">" + i.toString() + "</text>\n";
+    	document.getElementById("result").innerText += str;
+	}
+	for(i=0;i<FacePoints.length/2;++i) {
+		str = "  <text x=\"";
+		var p = FacePoints[i].point;
+		str += (500 + (p.x)*400).toString();
+		str += "\" y=\"";			
+		str += (500 + (p.y)*400).toString();
+		str += "\" fill=\"blue\">" + i.toString() + "</text>\n";
+    	document.getElementById("result").innerText += str;
+	}
+	var shortest = 9999999;
+	for(i=0;i<FacePoints.length;++i) {
+		for(j=i+1;j<FacePoints.length;++j) {
+			var dis = FacePoints[i].point.dis2(FacePoints[j].point);
+			if (shortest > dis) {
+				shortest = dis;
+			}
+		}	
+	}
+	for(i=0;i<FacePoints.length/2;++i) {
+		for(j=i+1;j<FacePoints.length/2;++j) {
+			var dis2 = FacePoints[i].point.dis2(FacePoints[j].point);
+			if (dis2 < 4*shortest) {
+				str = "  <line x1=\"";
+				var p = FacePoints[i].point.clone();
+				str += (500 + (p.x)*400).toString();
+				str += "\" y1=\"";			
+				str += (500 + (p.y)*400).toString();
+				p = FacePoints[j].point.clone();
+				str += "\" x2=\"";			
+				str += (500 + (p.x)*400).toString();
+				str += "\" y2=\"";			
+				str += (500 + (p.y)*400).toString();
+				str += "\" style=\"stroke:black;stroke-width:1\">" + i.toString() + "</line>\n";
+    			document.getElementById("result").innerText += str;
+				
+				var dis = FacePoints[i].point.dis(FacePoints[j].point);
+				str = "  <text x=\"";
+				p = FacePoints[i].point.clone();
+				p.add(FacePoints[j].point);
+				p.mul(0.5);
+				str += (500 + (p.x)*400).toString();
+				str += "\" y=\"";			
+				str += (500 + (p.y)*400).toString();
+				str += "\" fill=\"green\">" + dis.toFixed(5) + "</text>\n";
+    			document.getElementById("result").innerText += str;
+			}
+		}	
+	}
+	str = "</svg>\n";
+	document.getElementById("result").innerText += str;
+}
+
+function writeSVGopened()
+{
+	var str = "<svg height=\"1000\" width=\"1000\">\n";
 	document.getElementById("result").innerText += str;
 	var north = new tuple3d(0,0,1);
 	for(var i=0;i<Trons.length;++i) {
-		if (Trons[i].point.dis2(north) < 1.0) {
+		if (Trons[i].point.dis2(north) < 0.5) {
 			writeOneSVG(Trons[i].point, Trons[i].point.x, Trons[i].point.y);
 		}
 	}
@@ -339,17 +421,43 @@ function writeSVG()
 	document.getElementById("result").innerText += str;
 }
 
+var SVGPoints = new Array();
+
 function writeOneSVG(p0/* base Tron point*/, baseSVGx, baseSVGy) {
 	var points = new Array();
+	var indexes = new Array();
 	var i;
-	var str = "  <polygon points=\"";
 	var prev = 0;
 	var nearestIdx = FindNearestFacePointIndexFromPoint(p0);
 	var dis = p0.dis2(FacePoints[nearestIdx]);
+	var numExist = 0;
+	var moveVect = new tuple3d(0,0,0);
+	var	turnCos = 1.0;
+	var turnSin = 0.0;
+	var baseIdx;
 	for(i=0;i<FacePoints.length;++i) {
-		var d = p0.dis2(FacePoints[i]);
+		var d = p0.dis2(FacePoints[i].point);
 		if (d < dis*1.1) {
-			points.push(MovePointByBase(FacePoints[i], p0));
+			var np = MovePointByBase(FacePoints[i].point, p0);
+			points.push(np);
+			indexes.push(i);
+			if (SVGPoints[i]){
+				if (numExist == 0) {
+					moveVect = new tuple3d(SVGPoints[i].x - np.x, SVGPoints[i].y - np.y, 0);
+					baseIdx = i;
+				} else if (numExist == 1) {
+					np.add(moveVect);
+					var v1 = SVGPoints[i];
+					v1.sub(SVGPoints[baseIdx]);
+					v1.unify();
+					var v2 = np.clone();
+					v2.sub(SVGPoints[baseIdx]);
+					v2.unify();
+					//turnCos = v1.dot(v2);
+					//trunSin = Math.sqrt(1.0 - turnCos*turnCos);
+				}
+				numExist = numExist + 1;
+			}
 		}
 	}
 	for(i=0;i<points.length-1;++i) {
@@ -360,16 +468,54 @@ function writeOneSVG(p0/* base Tron point*/, baseSVGx, baseSVGy) {
 				var swap = points[i+1].clone();
 				points[i+1] = points[j];
 				points[j] = swap;
+				var swapi = indexes[i+1];
+				indexes[i+1] = indexes[j];
+				indexes[j] = swapi;
 			}
 		}
 	}
+	var str;
+	
+	// debug before move
+	str = "  <polygon points=\"";
 	for(i=0;i<points.length;++i) {
+		var p = points[i];
 		if (prev) {
 			str += " ";
 		}
-		str += (250 + (baseSVGx+points[i].x)*200).toString();
+		str += (250 + (baseSVGx + p.x)*200).toString();
 		str += ",";			
-		str += (250 + (baseSVGy+points[i].y)*200).toString();
+		str += (250 + (baseSVGy + p.y)*200).toString();
+		prev = 1;
+	}
+	str += "\" style=\"stroke:blue;stroke-width:1;fill:none;\" />\n";
+    document.getElementById("result").innerText += str;
+	// debug before move
+	
+	// debug point index
+	for(i=0;i<points.length;++i) {
+		str = "  <text x=\"";
+		var p = points[i];
+		str += (500 + (baseSVGx + p.x)*400).toString();
+		str += "\" y=\"";			
+		str += (500 + (baseSVGy + p.y)*400).toString();
+		str += "\" fill=\"red\">" + indexes[i].toString() + "</text>\n";
+    	document.getElementById("result").innerText += str;
+	}
+	// debug point index
+
+	str = "  <polygon points=\"";
+	for(i=0;i<points.length;++i) {
+		var p = points[i];
+		p.add(moveVect);
+		var p2 = new tuple3d(turnCos*p.x - turnSin*p.y, turnSin*p.x + turnCos*p.y, 0);
+		SVGPoints[indexes[i]] = p2;
+		if (prev) {
+			str += " ";
+		}
+		str += (500 + (baseSVGx + p2.x)*400).toString();
+		str += ",";			
+		str += (500 + (baseSVGy + p2.y)*400).toString();
 		prev = 1;
 	}
 	str += "\" style=\"stroke:black;stroke-width:1;fill:none;\" />\n";

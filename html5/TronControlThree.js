@@ -29,8 +29,8 @@ var ShowFaceEdge = 0;
 var AllLight = 0;
 var LogFaceToJson = 1;
 
-var Limit = 0.0001;
-var CriticalLimit = 0.000000000001;
+var Limit = 0.0000001;
+var CriticalLimit = 0.000000001;
 var Looping = false;
 
 var ThreeRadius = 100.5;
@@ -178,11 +178,13 @@ function clearMapView() {
 }
 function drawInfos() {
 	document.getElementById("progress").innerText = NumTrons.toFixed(0);
-	document.getElementById("totalMove").innerText = TotalMove().toFixed(12);
+	document.getElementById("aveMove").innerText = getAveMove().toFixed(12);
 	document.getElementById("closestPair").innerText = ClosestPair();
 	document.getElementById("closestAngle").innerText = ClosestAngle().toFixed(6);
 	document.getElementById("loneliestPair").innerText = LoneliestPair();
 	document.getElementById("loneliestAngle").innerText = LoneliestAngle().toFixed(6);
+	document.getElementById("Angle21").innerText = getAngle21().toFixed(6);
+	document.getElementById("Angle31").innerText = getAngle31().toFixed(6);
 }
 
 function updateAll(){

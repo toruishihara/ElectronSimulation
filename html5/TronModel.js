@@ -10,10 +10,13 @@ var Shake = 0.0;
 
 // static variables
 var totalMove = 0;
+var aveMove = 0;
 var closestPair = "";
 var closestAngle = 360;
 var loneliestPair = "";
 var loneliestAngle = 360;
+var Angle21 = 360;
+var Angle31 = 360;
 var outputDone = 0;
 var times = 0;
 var initVelo = 0.01;
@@ -64,37 +67,90 @@ function ModelProgress() {
 	for(var i=0;i<Trons.length;++i) {
 		calcNewVelocityOne(i);
 	}
-    	totalMove = 0;
-    	for(var i=0;i<Trons.length;++i) {
-        	totalMove += progressOne(i);
-    	}
-    	if (times % 20 == 0) {
-        	updateClosest();
-        	updateLoneliest();
-    	}
+    totalMove = 0;
+    for(var i=0;i<Trons.length;++i) {
+        totalMove += progressOne(i);
+    }
+	aveMove = totalMove/Trons.length;
+    if (times % 50 == 0) {
+        updateClosest();
+        updateLoneliest();
+    }
+    if (times % 100 == 0) {
+        updateAngles();
+    }
 	times ++;
+}
+
+function updateAngles() {
+	var diffDot12 = 0;
+	var diffDot13 = 0;
+	console.log("updateAngle");
+	for(var i=0;i<Trons.length;++i) {
+		var maxDot = -1*huge;
+		var maxDot2 = -1*huge;
+		var maxDot3 = -1*huge;
+		var maxJ = 0;
+		var maxJ2 = 0;
+		var maxJ3 = 0;
+		var t0 = Trons[i].point;
+		for(var j=0;j<Trons.length;++j) {
+			if (i == j) continue;
+			var dot = Trons[j].point.dot(t0);
+			if (maxDot < dot) {
+				maxDot = dot;
+				maxJ = j;
+				console.log("angle1[" + i + "," + j + "]=" + 180*Math.acos(maxDot)/Math.PI);
+			}
+		}
+		for(var j=0;j<Trons.length;++j) {
+			if (i == j || j == maxJ) continue;
+			var dot = Trons[j].point.dot(t0);
+			if (maxDot2 < dot) {
+				maxDot2 = dot;
+				maxJ2 = j;
+				console.log("angle2[" + i + "," + j + "]=" + 180*Math.acos(maxDot2)/Math.PI);
+			}
+		}
+		for(var j=0;j<Trons.length;++j) {
+			if (i == j || j == maxJ || j == maxJ2) continue;
+			var dot = Trons[j].point.dot(t0);
+			if (maxDot3 < dot) {
+				maxDot3 = dot;
+				maxJ3 = j;
+				console.log("angle3[" + i + "," + j + "]=" + 180*Math.acos(maxDot3)/Math.PI);
+			}
+		}
+		if (maxDot - maxDot2 > diffDot12) {
+			diffDot12 = maxDot - maxDot2;
+			Angle21 = 180*(Math.acos(maxDot2) - Math.acos(maxDot))/Math.PI;
+		}
+		if (maxDot - maxDot3 > diffDot13) {
+			diffDot13 = maxDot - maxDot3;
+			Angle31 = 180*(Math.acos(maxDot3) - Math.acos(maxDot))/Math.PI;
+		}
+	}
 }
 
 function updateClosest() {
 	// find closest pair
-	var minDot = huge;
+	var maxDot = -1*huge;
 	for(var i=0;i<Trons.length;++i) {
 		var ti = Trons[i].point;
 		for(var j=0;j<Trons.length;++j) {
 			if (i == j) continue;
-			var tj = Trons[j].point;
-			var dot = Math.acos(ti.dot(tj));
-			if (minDot > dot) {
-				minDot = dot;
+			var dot = ti.dot(Trons[j].point);
+			if (maxDot < dot) {
+				maxDot = dot;
 				closestPair = i.toFixed(0) + " and " + j.toFixed(0);
 			}
 		}
 	}
-	closestAngle = 180*minDot/Math.PI;
+	closestAngle = 180*Math.acos(maxDot)/Math.PI;
 }
 
 function FindFreePoint() {
-    var fine = 1024.0;
+    var fine = 512.0; //1024.0;
 	var minDot = 1.0;
     var size = 1;
 	var freePoint = new tuple3d(0,0,0);
@@ -168,8 +224,8 @@ function updateLoneliest() {
 		}
 	}
 }
-function TotalMove() {
-	return totalMove;
+function getAveMove() {
+	return aveMove;
 }
 function ClosestPair() {
 	return closestPair;
@@ -182,6 +238,12 @@ function LoneliestPair() {
 }
 function LoneliestAngle() {
 	return loneliestAngle;
+}
+function getAngle21() {
+	return Angle21;
+}
+function getAngle31() {
+	return Angle31;
 }
 function ModelMovePole() {
     return ModelMovePoleIndex();
@@ -264,6 +326,8 @@ function ModelMovePoleLoneliest() {
 function logJson() {
     var a1 = ClosestAngle().toFixed(6);
     var a2 = LoneliestAngle().toFixed(6);
+	var a21 = Angle21.toFixed(6);
+	var a31 = Angle31.toFixed(6);
     var ps = Array(Trons.length*3);
     var pv = Array(Trons.length*3);
     for(var i=0;i<Trons.length;++i) {
@@ -274,7 +338,7 @@ function logJson() {
         pv[3*i+1] = Trons[i].velo.y;
         pv[3*i+2] = Trons[i].velo.z;
     }
-    var jsonObj = {num:Trons.length, vertex:ps, velocity:pv, angle1:a1, angle2:a2};
+    var jsonObj = {num:Trons.length, vertex:ps, velocity:pv, angle1:a1, angle2:a2, angle21:a21, angle31:a31};
     var str = JSON.stringify(jsonObj);
     console.log(str);
     document.getElementById("result").innerText += str + "\n";

@@ -1,5 +1,5 @@
-
-var StoryLimit = 0.000001;
+var Is60 = 0;
+var StoryLimit = 0.0000001;
 var story_tour_cnt = 0;
 
 function storyLoop()
@@ -19,12 +19,12 @@ function storyLoop()
         }
         drawMapView();
         drawInfos();
-        if ((NumTrons-12)%60 == 0) {
-            if (TotalMove() < CriticalLimit && calc_cnt > 100) {
+        if ((NumTrons-12)%60 == 0 || NumTrons <= 12) {
+            if (getAveMove() < CriticalLimit && calc_cnt > 300) {
                 phase = 1;
             }
         } else {
-            if (TotalMove() < Limit && calc_cnt > 100) {
+            if (getAveMove() < Limit && calc_cnt > 300) {
                 phase = 1;
             }
         }
@@ -84,10 +84,17 @@ function storyLoop()
             hideTron();
             //clearMapView();
             //ModelInit();
-            NumTrons ++;
-            //addTronsOnModel();
-            var color = new tronColor("hsl", (NumTrons*47)%360, "100%", "50%");
-            launchTron(color);
+			if (Is60) {
+				for (var i=0;i<60;++i) {
+            		NumTrons ++;
+            		var color = new tronColor("hsl", (NumTrons*47)%360, "100%", "50%");
+            		launchTron(color);
+				}
+			} else {
+            	NumTrons ++;
+            	var color = new tronColor("hsl", (NumTrons*47)%360, "100%", "50%");
+            	launchTron(color);
+			}
 
             drawTrons();
         }
@@ -215,6 +222,15 @@ function quickLoop()
 }
 
 function story() {
+	var fs = require('fs');
+fs.writeFile("/tmp/test", "Hey there!", function(err) {
+    if(err) {
+        console.log(err);
+    } else {
+        console.log("The file was saved!");
+    }
+}); 
+
     return storyCleanStart();
 }
 
@@ -227,6 +243,11 @@ function StoryContinue() {
     Looping = true;
     Limit = StoryLimit;
     storyLoop();
+}
+
+function StoryContinue60() {
+	Is60 = 1;
+	StoryContinue();
 }
 
 function storyCleanStart() {

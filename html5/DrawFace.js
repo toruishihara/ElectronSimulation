@@ -10,8 +10,16 @@ function facePoint(id, p)
 		this.index = facePointCnt;
 		facePointCnt = facePointCnt + 1;
 	}
+	this.index = id;
 	this.point = p.clone();
+	this.clone = facePoint_clone;
 }
+function facePoint_clone() {
+	var ret = new facePoint(this.index, this.point);
+	return ret;
+}
+
+
 function facePointSort(a, b)
 {
 	var sp1 = a.point.clone();
@@ -339,10 +347,10 @@ function writeFaceSTL()
 
 function writeSVG()
 {
-	writeSVGplot();	
+	writeSVGopened();
 }
 
-function writeSVGplot()
+function writePlotSVG()
 {
 	var str = "<svg height=\"1000\" width=\"1000\">\n";
 	document.getElementById("result").innerText += str;
@@ -403,6 +411,47 @@ function writeSVGplot()
 			}
 		}	
 	}
+	document.getElementById("result").innerText += str;
+	// Draw Trons
+	var shortest = 9999999;
+	for(i=0;i<sortedTrons.length;++i) {
+		for(j=i+1;j<sortedTrons.length;++j) {
+			var dis = sortedTrons[i].point.dis2(sortedTrons[j].point);
+			if (shortest > dis) {
+				shortest = dis;
+			}
+		}	
+	}
+	for(i=0;i<sortedTrons.length/2;++i) {
+		for(j=i+1;j<sortedTrons.length/2;++j) {
+			var dis2 = sortedTrons[i].point.dis2(sortedTrons[j].point);
+			if (dis2 < 1.5*shortest) {
+				str = "  <line x1=\"";
+				var p = sortedTrons[i].point.clone();
+				str += (500 + (p.x)*400).toString();
+				str += "\" y1=\"";			
+				str += (500 + (p.y)*400).toString();
+				p = sortedTrons[j].point.clone();
+				str += "\" x2=\"";			
+				str += (500 + (p.x)*400).toString();
+				str += "\" y2=\"";			
+				str += (500 + (p.y)*400).toString();
+				str += "\" style=\"stroke:red;stroke-width:1\">" + i.toString() + "</line>\n";
+    			document.getElementById("result").innerText += str;
+				
+				var dis = sortedTrons[i].point.dis(sortedTrons[j].point);
+				str = "  <text x=\"";
+				p = sortedTrons[i].point.clone();
+				p.add(sortedTrons[j].point);
+				p.mul(0.5);
+				str += (500 + (p.x)*400).toString();
+				str += "\" y=\"";			
+				str += (500 + (p.y)*400).toString();
+				str += "\" fill=\"red\">" + dis.toFixed(5) + "</text>\n";
+    			document.getElementById("result").innerText += str;
+			}
+		}	
+	}
 	str = "</svg>\n";
 	document.getElementById("result").innerText += str;
 }
@@ -413,7 +462,7 @@ function writeSVGopened()
 	document.getElementById("result").innerText += str;
 	var north = new tuple3d(0,0,1);
 	for(var i=0;i<Trons.length;++i) {
-		if (Trons[i].point.dis2(north) < 0.5) {
+		if (Trons[i].point.dis2(north) < 0.3) {
 			writeOneSVG(Trons[i].point, Trons[i].point.x, Trons[i].point.y);
 		}
 	}
@@ -425,11 +474,10 @@ var SVGPoints = new Array();
 
 function writeOneSVG(p0/* base Tron point*/, baseSVGx, baseSVGy) {
 	var points = new Array();
-	var indexes = new Array();
 	var i;
 	var prev = 0;
 	var nearestIdx = FindNearestFacePointIndexFromPoint(p0);
-	var dis = p0.dis2(FacePoints[nearestIdx]);
+	var dis = p0.dis2(FacePoints[nearestIdx].point);
 	var numExist = 0;
 	var moveVect = new tuple3d(0,0,0);
 	var	turnCos = 1.0;
@@ -439,8 +487,7 @@ function writeOneSVG(p0/* base Tron point*/, baseSVGx, baseSVGy) {
 		var d = p0.dis2(FacePoints[i].point);
 		if (d < dis*1.1) {
 			var np = MovePointByBase(FacePoints[i].point, p0);
-			points.push(np);
-			indexes.push(i);
+			points.push(new facePoint(i,np));
 			if (SVGPoints[i]){
 				if (numExist == 0) {
 					moveVect = new tuple3d(SVGPoints[i].x - np.x, SVGPoints[i].y - np.y, 0);
@@ -462,15 +509,12 @@ function writeOneSVG(p0/* base Tron point*/, baseSVGx, baseSVGy) {
 	}
 	for(i=0;i<points.length-1;++i) {
 		for(j=i+2;j<points.length;++j) {
-			var d1 = points[i].dis2(points[i+1]);
-			var d2 = points[i].dis2(points[j]);
-			if (d2 < d1) {
-				var swap = points[i+1].clone();
-				points[i+1] = points[j];
+			var d1 = points[i].point.dis2(points[j-1]);
+			var d2 = points[i].point.dis2(points[j]);
+			if (d2 > d1) {
+				var swap = points[j+1];
+				points[j+1] = points[j];
 				points[j] = swap;
-				var swapi = indexes[i+1];
-				indexes[i+1] = indexes[j];
-				indexes[j] = swapi;
 			}
 		}
 	}
@@ -479,13 +523,13 @@ function writeOneSVG(p0/* base Tron point*/, baseSVGx, baseSVGy) {
 	// debug before move
 	str = "  <polygon points=\"";
 	for(i=0;i<points.length;++i) {
-		var p = points[i];
+		var p = points[i].point.clone();
 		if (prev) {
 			str += " ";
 		}
-		str += (250 + (baseSVGx + p.x)*200).toString();
+		str += (500 + (baseSVGx + p.x)*400).toString();
 		str += ",";			
-		str += (250 + (baseSVGy + p.y)*200).toString();
+		str += (500 + (baseSVGy + p.y)*400).toString();
 		prev = 1;
 	}
 	str += "\" style=\"stroke:blue;stroke-width:1;fill:none;\" />\n";
@@ -495,21 +539,21 @@ function writeOneSVG(p0/* base Tron point*/, baseSVGx, baseSVGy) {
 	// debug point index
 	for(i=0;i<points.length;++i) {
 		str = "  <text x=\"";
-		var p = points[i];
+		var p = points[i].point.clone();
 		str += (500 + (baseSVGx + p.x)*400).toString();
 		str += "\" y=\"";			
 		str += (500 + (baseSVGy + p.y)*400).toString();
-		str += "\" fill=\"red\">" + indexes[i].toString() + "</text>\n";
+		str += "\" fill=\"red\">" + points[i].index.toString() + "</text>\n";
     	document.getElementById("result").innerText += str;
 	}
 	// debug point index
 
 	str = "  <polygon points=\"";
 	for(i=0;i<points.length;++i) {
-		var p = points[i];
+		var p = points[i].point.clone();
 		p.add(moveVect);
 		var p2 = new tuple3d(turnCos*p.x - turnSin*p.y, turnSin*p.x + turnCos*p.y, 0);
-		SVGPoints[indexes[i]] = p2;
+		SVGPoints[points[i].index] = p2;
 		if (prev) {
 			str += " ";
 		}

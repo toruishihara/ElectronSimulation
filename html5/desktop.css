@@ -79,6 +79,12 @@ div {
 	left: 450px;
 	background-color: #FFFFFF;
 }
+#GoldBurgCanvas {
+	position: absolute;
+	top: 225px;
+	left: 450px;
+	background-color: #FFFFFF;
+}
 #bottom {
 	position: absolute;
 	top: 610px;

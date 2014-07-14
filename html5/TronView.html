@@ -11,6 +11,9 @@
 <div>
 	<canvas id="mapCanvas" onload="drawMapView()"></canvas>
 </div>
+<div>
+	<canvas id="GoldBurgCanvas" onload="drawGoldBurgView()" width=110 height=110></canvas>
+</div>
 <div style="top:500px;left:20px;width:100%;">	
 <div>
 	<input type="button" value="Start" onclick="start()"/>
@@ -30,7 +33,8 @@
 	<input type="button" value="ReadJson" onclick="readJson()"/>
 	<input type="button" value="WriteSVG" onclick="writeSVG()"/>
 	<input type="button" value="WritePlotSVG" onclick="writePlotSVG()"/>
-	<input type="button" value="WriteSTL" onclick="writeFaceSTL()"/><br>
+	<input type="button" value="WriteSTL" onclick="writeFaceSTL()"/>
+	<input type="button" value="CalcGoldBurg" onclick="calcGoldBurg()"/><br>
 progress=<span id="progress"></span><br>
 Ave movement in this step=<span id="aveMove"></span><br>
 Closest pair=<span id="closestPair"></span><br>
@@ -52,5 +56,6 @@ distance3-1(digree)=<span id="Angle31"></span><br>
 		<script type="text/javascript" src="DrawFace.js"></script>
 		<script type="text/javascript" src="jsutil.js"></script>
 		<script type="text/javascript" src="results.js"></script>
+		<script type="text/javascript" src="GoldBurg.js"></script>
 </body>
 </html>

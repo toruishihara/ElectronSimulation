@@ -60,6 +60,33 @@ function TronSort(a, b)
 	return (sp1.y - sp2.y);
 }
 
+function getVertialCrossPointOfTwoTron(p0, p1) {
+    var p01 = p0.clone();
+    p01.add(p1);
+    if (p01.length2() < 0.00001) {
+        return null;
+    }
+    p01.unify();
+    p01.setLength(1 / p01.dot(p0));
+    return p01;
+}
+
+// find minimum distance point of two lines, 
+// p0 : one point of line0
+// v0 : vector of line0
+// p1 : one point of line1
+// v1 : vector of line1
+// return S: p0 + S*v0
+function minimumDistancePointOfTwoLines(p0, v0, p1, v1) {
+    var d01 = p1.clone();
+    d01.sub(p0);
+
+    // http://d.hatena.ne.jp/obelisk2/20101228/1293521247
+    var s = d01.dot(v0) - d01.dot(v1) * v0.dot(v1);
+    s /= (1.0 - v0.dot(v1) * v0.dot(v1));
+    return s;
+}
+
 function drawFace() {
     var dupCheck = new Array(128*128*128);
 	// sort Trons
@@ -92,48 +119,26 @@ function drawFace() {
 					//addLine(CenterPoint, p2, 0x0000FF);
        				var dis02 = p0.dis(p2);
        				var dis12 = p1.dis(p2);
-					if (dis02 < shortest*1.5 && dis12 < shortest*1.5) {
-						var p01 = p0.clone();
-						p01.add(p1);
-						if (p01.length2() < 0.00001) {
-							continue;
-						}
-						p01.unify();
-						p01.setLength(1/p01.dot(p0));
+       				if (dis02 < shortest * 1.5 && dis12 < shortest * 1.5) {
+       				    var p01 = getVertialCrossPointOfTwoTron(p0, p1);
+       				    var p12 = getVertialCrossPointOfTwoTron(p1, p2);
+       				    var p20 = getVertialCrossPointOfTwoTron(p2, p0);
+       				    if (p01 == null || p12 == null || p20 == null)
+       				        continue;
 						var cr01 = p0.cross(p1);
-						var cr12 = p1.cross(p2);
-
-						var p12 = p1.clone();
-						p12.add(p2);
-						if (p12.length2() < 0.00001) {
-							continue;
-						}
-						p12.unify();
-						p12.setLength(1/p12.dot(p1));
-
-						var p20 = p2.clone();
-						p20.add(p0);
-						if (p20.length2() < 0.00001) {
-							continue;
-						}
-
-						p20.unify();
-						p20.setLength(1/p20.dot(p2));
-
-						cr01 = p0.cross(p1);
 						cr01.unify();
-						cr12 = p1.cross(p2);
+						var cr12 = p1.cross(p2);
 						cr12.unify();
 						if (cr01.dot(cr12) > 0.9999) {
 							continue; //parallel
 						}
 
-						var d0112 = p12.clone();
-						d0112.sub(p01);
-
+						var s = minimumDistancePointOfTwoLines(p01, cr01, p12, cr12)
+						//var d0112 = p12.clone();
+						//d0112.sub(p01);
 						// http://d.hatena.ne.jp/obelisk2/20101228/1293521247
-						var s = d0112.dot(cr01) - d0112.dot(cr12)*cr01.dot(cr12);
-						s /= (1.0 - cr01.dot(cr12)*cr01.dot(cr12));
+						//var s = d0112.dot(cr01) - d0112.dot(cr12)*cr01.dot(cr12);
+						//s /= (1.0 - cr01.dot(cr12)*cr01.dot(cr12));
 
 						var ps = p01.clone();
 						cr01.mul(s);
@@ -155,7 +160,7 @@ function drawFace() {
                         // above is not perfect code for floating xyz values
 
                         FacePoints.push(new facePoint(-1,ps));
-						drawDot(ps, 0x000000, 2);
+       				    //drawDot(ps, 0x000000, 2);
 						addTriangle(p01, p0, ps);
 						addTriangle(p0, p20, ps);
 						addTriangle(p1, p01, ps);
@@ -302,6 +307,7 @@ function FindNearestFacePointIndexFromPoint(p0)
 
 function addTriangle(p0, p1, p2)
 {
+    var p0, p1, p2;
 	var h1 = p1.clone(); 
 	h1.sub(p0);
 	var h2 = p2.clone(); 
@@ -310,12 +316,12 @@ function addTriangle(p0, p1, p2)
 	n.unify();
 	var dot = n.dot(p0);
 	if (dot > 0.0) {
-		drawTriangle(p0, p1, p2);
+		drawTriangle(p0, p1, p2, n);
 		FaceTris.push(new tri3d(p0, p1, p2));
 	} else {
-		drawTriangle(p2, p1, p0);
-		FaceTris.push(new tri3d(p2, p1, p0));
-		
+	    n.mul(-1.0);
+		drawTriangle(p2, p1, p0, n);
+		FaceTris.push(new tri3d(p2, p1, p0));		
 	}
 }
 function writeFaceSTL()

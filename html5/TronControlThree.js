@@ -27,7 +27,7 @@ var Interval = 50;
 var NumTrons = 8;
 var ShowFaceEdge = 0;
 var AllLight = 0;
-var LogFaceToJson = 1;
+var LogFaceToJson = 0;
 
 var Limit = 0.0000001;
 var CriticalLimit = 0.000000001;
@@ -36,7 +36,8 @@ var Looping = false;
 var ThreeRadius = 100.5;
 var WhiteFace = 0;
 var WireSphere = 0;
-var ShowPoleXYZ = 1;
+var ShowPoleXYZ = 0;
+var OffsetPoint = new tuple3d(0,0,0);
 
 function tronColor(type,p1,p2,p3)
 {
@@ -59,8 +60,8 @@ function tronColor_toStringWithAlpha(alpha)
 }
 
 function init() {
-    Edge = document.getElementById('Edge').checked;
-    Face = document.getElementById('Face').checked;
+    //Edge = document.getElementById('Edge').checked;
+    //Face = document.getElementById('Face').checked;
 	ViewPole = new tuple3d(-0.3,-0.5,1);
 	ViewPoleX = new tuple3d(1,-0.2,0);
 	ViewPoleX.unify();
@@ -114,7 +115,7 @@ function drawViews() {
     if (Face != lastFace) {
         if (Face) { drawFace(); } else { hideFace(); }
         lastFace = Face;
-        if (WhiteFace == 1) {
+        if (WhiteFace > 0) {
             hideTron();
         }
     }
@@ -155,7 +156,9 @@ function calcMapXEdge(tuple) {
 }
 
 function drawMapView() {
-	var canvas = document.getElementById("mapCanvas");
+    var canvas = document.getElementById("mapCanvas");
+    if (canvas == null)
+        return;
 	var ctx = canvas.getContext("2d");
 	ctx.lineWidth = 1;
 	for(var i=0; i < Lines.length; ++i ) {
@@ -320,6 +323,55 @@ function loadIndexThree() {
 	loadThree();
 	var n = Math.floor( 4 + Math.random() * 16 );
 	selItem(n);
+}
+
+function loadResultView() {
+    //init();
+    ViewPole = new tuple3d(0, 0, 1);
+    ViewPoleX = new tuple3d(1, 0, 0);
+    ViewPoleX.unify();
+    ViewPoleY = ViewPole.cross(ViewPoleX);
+    ViewPoleY.unify();
+    ViewPole = ViewPoleX.cross(ViewPoleY);
+    ViewPole.unify();
+    ViewPoleX = ViewPoleY.cross(ViewPole);
+    ViewPoleX.unify();
+
+    width = document.getElementById('sphereCanvas').clientWidth;
+    height = document.getElementById('sphereCanvas').clientHeight;
+    Renderer = new THREE.WebGLRenderer({ antialias: true });
+    Renderer.setSize(width, height);
+    document.getElementById('sphereCanvas').appendChild(Renderer.domElement);
+    Renderer.setClearColorHex(0xFFFFFF, 1.0);
+
+    ZoomDistance = 2000;
+    initScene();
+    initLight();
+    initCamera();
+    initObjectThree();
+    for (var j = 0; j < 30; ++j) {
+        ModelInit();
+        var jsonObj = JSON.parse(results[4+j]);
+        for (var i = 0; i < jsonObj.num; ++i) {
+            var p = new tuple3d(jsonObj.vertex[3 * i], jsonObj.vertex[3 * i + 1], jsonObj.vertex[3 * i + 2]);
+            p.xy2sp();
+            var color = new tronColor("hsl", (i * 47) % 360, "100%", "50%");
+            AddTron(p.y, p.z, color);
+        }
+        hideTron();
+        OffsetPoint = new tuple3d(-7 + 3 * (j % 6), 6.5 - 3 * Math.floor(j / 6), 0);
+        if (j < 2) {
+            ThreeRadius = 100.5 * 0.5;
+            OffsetPoint.mul(2.0);
+        } else {
+            ThreeRadius = 100.5;
+        }
+        drawFace();
+    }
+
+    updateCamera();
+    Renderer.clear();
+    Renderer.render(ThreeScene, ThreeCamera);
 }
 
 var phase = 0;

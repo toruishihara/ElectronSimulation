@@ -375,14 +375,16 @@ function hideTron() {
 }
 
 var cnt2 = 0;
-function drawTriangle(p0, p1, p2) {
+function drawTriangle(p0, p1, p2, n) {
 
-	var h1 = p1.clone(); 
-	h1.sub(p0);
-	var h2 = p2.clone(); 
-	h2.sub(p0);
-	var n = h1.cross(h2);
-	n.unify();
+    if (n == null) {
+        var h1 = p1.clone();
+        h1.sub(p0);
+        var h2 = p2.clone();
+        h2.sub(p0);
+        n = h1.cross(h2);
+        n.unify();
+    }
 	var dot = n.dot(p0);
 	//if (dot < 0.0) {
 	//	n.mul(-1.0);
@@ -397,18 +399,24 @@ function drawTriangle(p0, p1, p2) {
 	//var col = Math.floor((n.x+1.0)*127) << 16;
 	//col += Math.floor((n.y+1.0)*127) << 8;
 	//col += Math.floor((n.z+1.0)*127);
-	var tri;
-	if (dot > 0.0) {
+    var tri;
+    var p0t = p0.clone();
+    p0t.add(OffsetPoint);
+    var p1t = p1.clone();
+    p1t.add(OffsetPoint);
+    var p2t = p2.clone();
+    p2t.add(OffsetPoint);
+    if (dot > 0.0) {
 		tri = createTriangle(
-			ThreeRadius*p0.x, ThreeRadius*p0.y, ThreeRadius*p0.z,
-			ThreeRadius*p1.x, ThreeRadius*p1.y, ThreeRadius*p1.z,
-			ThreeRadius*p2.x, ThreeRadius*p2.y, ThreeRadius*p2.z,
+			ThreeRadius*p0t.x, ThreeRadius*p0t.y, ThreeRadius * p0t.z,
+			ThreeRadius*p1t.x, ThreeRadius*p1t.y, ThreeRadius*p1t.z,
+			ThreeRadius*p2t.x, ThreeRadius*p2t.y, ThreeRadius*p2t.z,
 			col);
 	} else {
 		tri = createTriangle(
-			ThreeRadius*p2.x, ThreeRadius*p2.y, ThreeRadius*p2.z,
-			ThreeRadius*p1.x, ThreeRadius*p1.y, ThreeRadius*p1.z,
-			ThreeRadius*p0.x, ThreeRadius*p0.y, ThreeRadius*p0.z,
+			ThreeRadius*p2t.x, ThreeRadius*p2t.y, ThreeRadius*p2t.z,
+			ThreeRadius*p1t.x, ThreeRadius*p1t.y, ThreeRadius*p1t.z,
+			ThreeRadius*p0t.x, ThreeRadius*p0t.y, ThreeRadius*p0t.z,
 			col);
 	}
     ThreeScene.add(tri);
@@ -426,9 +434,9 @@ function drawTriangle(p0, p1, p2) {
 	p0d.add(diff);
 	p1d.add(diff);
 	p2d.add(diff);
-	addLine(p0d, p1d, col);
-	addLine(p1d, p2d, col);
-	addLine(p2d, p0d, col);
+	//addLine(p0d, p1d, col);
+	//addLine(p1d, p2d, col);
+	//addLine(p2d, p0d, col);
 
 	// Add noamrl line around triangle for debugging
 	n.mul(0.2);
@@ -437,7 +445,7 @@ function drawTriangle(p0, p1, p2) {
 	c.add(p2);
 	c.mul(1/3.0);
 	n.add(c);
-	addLine(c, n, col);
+	//addLine(c, n, col);
 }
  
 function createTriangle(x0,y0,z0, x1,y1,z1, x2,y2,z2, col) {
@@ -457,9 +465,13 @@ function createTriangle(x0,y0,z0, x1,y1,z1, x2,y2,z2, col) {
 	//	side:THREE.FrontSide, transparent:true });
 
     var mat;
-    if (WhiteFace) {
-        mat = new THREE.MeshLambertMaterial({color: 0xffffff,
-		    opacity:1.0 });
+    if (WhiteFace > 0.0) {
+        if (WhiteFace == 1.0) {
+            mat = new THREE.MeshLambertMaterial({color: 0xffffff, opacity: 1.0});
+        }
+        if (WhiteFace == 0.5) {
+            mat = new THREE.MeshLambertMaterial({ color: 0x808080, opacity: 1.0 });
+        }
     } else {
         mat = new THREE.MeshLambertMaterial({color: 0xff0000,
 		    opacity:0.5,

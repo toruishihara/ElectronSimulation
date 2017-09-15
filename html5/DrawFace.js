@@ -276,6 +276,39 @@ function drawFace() {
     }
 }
 
+function drawInnerFace()
+{
+    var shortest = 1000;
+    for (var i = 0; i < Trons.length; ++i) {
+        for (var j = i + 1; j < Trons.length; ++j) {
+            var p0 = Trons[i].point.clone();
+            var p1 = Trons[j].point.clone();
+            var dis = p0.dis(p1);
+            if (dis < shortest) {
+                shortest = dis;
+            }
+        }
+    }
+    for (var i = 0; i < Trons.length; ++i) {
+        for (var j = i + 1; j < Trons.length; ++j) {
+            var p0 = Trons[i].point.clone();
+            var p1 = Trons[j].point.clone();
+            var dis01 = p0.dis(p1);
+            if (dis01 < shortest * 1.5) {
+                for (var k = j + 1; k < Trons.length; ++k) {
+                    var p2 = Trons[k].point.clone();
+                    var dis02 = p0.dis(p2);
+                    var dis12 = p1.dis(p2);
+                    if (dis02 < shortest * 1.5 && dis12 < shortest * 1.5) {
+                        addTriangle(p0, p1, p2);
+                    }
+                }
+            }
+        }
+    }
+
+}
+
 function FindNearestFacePointIndexFromIndex(idx)
 {
     var nearest = huge;

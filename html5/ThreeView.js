@@ -6,6 +6,7 @@ var ThreeCamera;
 var width, height;
 var Renderer;
 
+var TriangleOpacity = 0.5;
 var	IsMouseDown = 0;
 var	DownX = 0;
 var	DownY = 0;
@@ -375,6 +376,7 @@ function hideTron() {
 }
 
 var cnt2 = 0;
+var ColorCount = 0;
 function drawTriangle(p0, p1, p2, n) {
 
     if (n == null) {
@@ -390,15 +392,12 @@ function drawTriangle(p0, p1, p2, n) {
 	//	n.mul(-1.0);
 	//}
     var idx = findTronFromNormal(n);
-    var col = Trons[idx].color;
-    // Calculate color from normal
-	//var col = Math.floor(Math.abs(n.x)*255) << 16;
-	//col += Math.floor(Math.abs(n.y)*255) << 8;
-	//col += Math.floor(Math.abs(n.z)*255);
-    //
-	//var col = Math.floor((n.x+1.0)*127) << 16;
-	//col += Math.floor((n.y+1.0)*127) << 8;
-	//col += Math.floor((n.z+1.0)*127);
+    var col;
+    col = Trons[idx].color;
+    if (GlobalFaceColor != null) {
+        col = GlobalFaceColor;
+    }
+
     var tri;
     var p0t = p0.clone();
     p0t.add(OffsetPoint);
@@ -447,7 +446,9 @@ function drawTriangle(p0, p1, p2, n) {
 	n.add(c);
 	//addLine(c, n, col);
 }
- 
+
+var GlobalFaceColor = null;
+
 function createTriangle(x0,y0,z0, x1,y1,z1, x2,y2,z2, col) {
     var geometry = new THREE.Geometry();
     var vect0 = new THREE.Vector3(x0, y0, z0);
@@ -465,16 +466,15 @@ function createTriangle(x0,y0,z0, x1,y1,z1, x2,y2,z2, col) {
 	//	side:THREE.FrontSide, transparent:true });
 
     var mat;
-    if (WhiteFace > 0.0) {
-        if (WhiteFace == 1.0) {
-            mat = new THREE.MeshLambertMaterial({color: 0xffffff, opacity: 1.0});
-        }
-        if (WhiteFace == 0.5) {
-            mat = new THREE.MeshLambertMaterial({ color: 0x808080, opacity: 1.0 });
-        }
+    if (GlobalFaceColor != null) {
+        mat = new THREE.MeshLambertMaterial({color: 0xff0000,
+            opacity:TriangleOpacity,
+            side:THREE.FrontSide, transparent:true });
+        mat.color.set(GlobalFaceColor);
+        mat.ambient.set(GlobalFaceColor);
     } else {
         mat = new THREE.MeshLambertMaterial({color: 0xff0000,
-		    opacity:0.5,
+		    opacity:TriangleOpacity,
 		    side:THREE.FrontSide, transparent:true });
         mat.color.setHSL(col.p1/360.0, 1.0, .5);
         mat.ambient.setHSL(col.p1/360.0, 1.0, .5);

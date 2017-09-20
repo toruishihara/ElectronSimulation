@@ -209,9 +209,11 @@ function createCylinder(inP0, inP1, r, col)
 {
     var p0 = inP0.clone();
     var p1 = inP1.clone();
+    p0.add(OffsetPoint);
     p0.mul(ThreeRadius);
+    p1.add(OffsetPoint);
     p1.mul(ThreeRadius);
-    var material = new THREE.MeshLambertMaterial({ color:col, ambient:col, opacity:1.0 });
+    var material = new THREE.MeshLambertMaterial({ color: col, ambient: col, opacity: 1.0 });
     var cylinder = new THREE.Mesh(new THREE.CylinderGeometry(r, r, p0.dis(p1), 0, 0, false), material);
     //cylinder.overdraw = true;
 

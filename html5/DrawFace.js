@@ -276,8 +276,9 @@ function drawFace() {
     }
 }
 
-function drawInnerFace()
+function drawInnerFaceOne(offsetP)
 {
+    OffsetPoint = offsetP;
     var shortest = 1000;
     for (var i = 0; i < Trons.length; ++i) {
         for (var j = i + 1; j < Trons.length; ++j) {
@@ -294,6 +295,10 @@ function drawInnerFace()
             var p0 = Trons[i].point.clone();
             var p1 = Trons[j].point.clone();
             var dis01 = p0.dis(p1);
+            if (dis01 < shortest * 1.4) {
+                var cyl = createCylinder(p0, p1, 2, 0x000000);
+                ThreeScene.add(cyl);
+            }
             if (dis01 < shortest * 1.5) {
                 for (var k = j + 1; k < Trons.length; ++k) {
                     var p2 = Trons[k].point.clone();

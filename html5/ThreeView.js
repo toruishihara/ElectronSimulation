@@ -30,7 +30,7 @@ function initThree() {
     	Renderer = new THREE.WebGLRenderer({antialias: true});
     	Renderer.setSize(width, height );
     	document.getElementById('sphereCanvas').appendChild(Renderer.domElement);
-    	Renderer.setClearColorHex(0xFFFFFF, 1.0);
+    	Renderer.setClearColor(new THREE.Color(0xFFFFFF));
 
     	initScene();    
     	initLight();
@@ -209,10 +209,6 @@ function createCylinder(inP0, inP1, r, col)
 {
     var p0 = inP0.clone();
     var p1 = inP1.clone();
-    p0.add(OffsetPoint);
-    p0.mul(ThreeRadius);
-    p1.add(OffsetPoint);
-    p1.mul(ThreeRadius);
     var material = new THREE.MeshLambertMaterial({ color: col, ambient: col, opacity: 1.0 });
     var cylinder = new THREE.Mesh(new THREE.CylinderGeometry(r, r, p0.dis(p1), 0, 0, false), material);
     //cylinder.overdraw = true;
@@ -314,7 +310,7 @@ function drawTrons() {
         
         mat = new THREE.MeshLambertMaterial({color: 0xff0000});
         mat.color.setHSL(Trons[i].color.p1/360.0, 1.0, .5);
-        mat.ambient.setHSL(Trons[i].color.p1/360.0, 1.0, .5);
+        //mat.ambient.setHSL(Trons[i].color.p1/360.0, 1.0, .5);
         
         ThreeTrons[i] = new THREE.Mesh(new THREE.CubeGeometry(5,5,5), mat);
         ThreeScene.add(ThreeTrons[i]);
@@ -380,7 +376,6 @@ function hideTron() {
 var cnt2 = 0;
 var ColorCount = 0;
 function drawTriangle(p0, p1, p2, n) {
-
     if (n == null) {
         var h1 = p1.clone();
         h1.sub(p0);
@@ -401,25 +396,19 @@ function drawTriangle(p0, p1, p2, n) {
     }
 
     var tri;
-    var p0t = p0.clone();
-    p0t.add(OffsetPoint);
-    var p1t = p1.clone();
-    p1t.add(OffsetPoint);
-    var p2t = p2.clone();
-    p2t.add(OffsetPoint);
-    if (dot > 0.0) {
-		tri = createTriangle(
-			ThreeRadius*p0t.x, ThreeRadius*p0t.y, ThreeRadius * p0t.z,
-			ThreeRadius*p1t.x, ThreeRadius*p1t.y, ThreeRadius*p1t.z,
-			ThreeRadius*p2t.x, ThreeRadius*p2t.y, ThreeRadius*p2t.z,
+    //if (dot > 0.0) {
+        tri = createTriangle(
+            p0.x, p0.y, p0.z,
+            p1.x, p1.y, p1.z,
+            p2.x, p2.y, p2.z,
 			col);
-	} else {
-		tri = createTriangle(
-			ThreeRadius*p2t.x, ThreeRadius*p2t.y, ThreeRadius*p2t.z,
-			ThreeRadius*p1t.x, ThreeRadius*p1t.y, ThreeRadius*p1t.z,
-			ThreeRadius*p0t.x, ThreeRadius*p0t.y, ThreeRadius*p0t.z,
-			col);
-	}
+	//} else {
+	//	tri = createTriangle(
+    //        p2.x, p2.y, p2.z,
+    //        p1.x, p1.y, p1.z,
+    //        p0.x, p0.y, p0.z,
+	//		col);
+	//}
     ThreeScene.add(tri);
     ThreeTriangles.push(tri);
 	return;
@@ -473,13 +462,13 @@ function createTriangle(x0,y0,z0, x1,y1,z1, x2,y2,z2, col) {
             opacity:TriangleOpacity,
             side:THREE.FrontSide, transparent:true });
         mat.color.set(GlobalFaceColor);
-        mat.ambient.set(GlobalFaceColor);
+        //mat.ambient.set(GlobalFaceColor);
     } else {
         mat = new THREE.MeshLambertMaterial({color: 0xff0000,
 		    opacity:TriangleOpacity,
 		    side:THREE.FrontSide, transparent:true });
         mat.color.setHSL(col.p1/360.0, 1.0, .5);
-        mat.ambient.setHSL(col.p1/360.0, 1.0, .5);
+        //mat.ambient.setHSL(col.p1/360.0, 1.0, .5);
     }
 
 	var tri = new THREE.Mesh( geometry, mat );

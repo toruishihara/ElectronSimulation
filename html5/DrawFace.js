@@ -161,12 +161,12 @@ function drawFace() {
 
                         FacePoints.push(new facePoint(-1,ps));
        				    //drawDot(ps, 0x000000, 2);
-						addTriangle(p01, p0, ps);
-						addTriangle(p0, p20, ps);
-						addTriangle(p1, p01, ps);
-						addTriangle(p12, p1, ps);
-						addTriangle(p2, p12, ps);
-						addTriangle(p20, p2, ps);
+						addTriangleFace(p01, p0, ps);
+						addTriangleFace(p0, p20, ps);
+						addTriangleFace(p1, p01, ps);
+						addTriangleFace(p12, p1, ps);
+						addTriangleFace(p2, p12, ps);
+						addTriangleFace(p20, p2, ps);
 //return;
 					}
 				}
@@ -191,7 +191,7 @@ function drawFace() {
 		}
 		for(var j=0;j<nears.length;++j) {
 			for(var k=j+1;k<nears.length;++k) {
-				addTriangle(p0, FacePoints[nears[j]], FacePoints[nears[k]]);
+				addTriangleFace(p0, FacePoints[nears[j]], FacePoints[nears[k]]);
 			}
 		}
 		//return;
@@ -296,7 +296,13 @@ function drawInnerFaceOne(offsetP)
             var p1 = Trons[j].point.clone();
             var dis01 = p0.dis(p1);
             if (dis01 < shortest * 1.4) {
-                var cyl = createCylinder(p0, p1, 2, 0x000000);
+                var p0t = p0.clone();
+                p0t.add(OffsetPoint);
+                p0t.mul(ThreeRadius);
+                var p1t = p1.clone();
+                p1t.add(OffsetPoint);
+                p1t.mul(ThreeRadius);
+                var cyl = createCylinder(p0t, p1t, 2, 0x000000);
                 ThreeScene.add(cyl);
             }
             if (dis01 < shortest * 1.5) {
@@ -305,7 +311,7 @@ function drawInnerFaceOne(offsetP)
                     var dis02 = p0.dis(p2);
                     var dis12 = p1.dis(p2);
                     if (dis02 < shortest * 1.5 && dis12 < shortest * 1.5) {
-                        addTriangle(p0, p1, p2);
+                        addTriangleFace(p0, p1, p2);
                     }
                 }
             }
@@ -343,25 +349,38 @@ function FindNearestFacePointIndexFromPoint(p0)
     return ret;
 }
 
-function addTriangle(p0, p1, p2)
+function addTriangleFace(p0, p1, p2)
 {
     var p0, p1, p2;
-	var h1 = p1.clone(); 
-	h1.sub(p0);
-	var h2 = p2.clone(); 
-	h2.sub(p0);
-	var n = h1.cross(h2);
+	var d01 = p1.clone(); 
+	d01.sub(p0);
+	var d02 = p2.clone(); 
+	d02.sub(p0);
+	var n = d01.cross(d02);
 	n.unify();
 	var dot = n.dot(p0);
 	if (dot > 0.0) {
-		drawTriangle(p0, p1, p2, n);
 		FaceTris.push(new tri3d(p0, p1, p2));
 	} else {
 	    n.mul(-1.0);
-		drawTriangle(p2, p1, p0, n);
 		FaceTris.push(new tri3d(p2, p1, p0));		
 	}
+	var p0t = p0.clone();
+	var p1t = p1.clone();
+	var p2t = p2.clone();
+	p0t.add(OffsetPoint);
+	p1t.add(OffsetPoint);
+	p2t.add(OffsetPoint);
+	p0t.mul(ThreeRadius);
+	p1t.mul(ThreeRadius);
+	p2t.mul(ThreeRadius);
+	if (dot > 0.0) {
+	    drawTriangle(p0t, p1t, p2t, n);
+	} else {
+	    drawTriangle(p2t, p1t, p0t, n);
+	}
 }
+
 function writeFaceSTL()
 {
 	var i;

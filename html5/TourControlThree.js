@@ -1,9 +1,14 @@
 var tour_t = 0;
 function TourStart() {
-    Edge = document.getElementById('Edge').checked;
-    Face = document.getElementById('Face').checked;
+    Edge = true;
+    if (document.getElementById('Edge') != null) {
+        Edge = document.getElementById('Edge').checked;
+    }
+    if (document.getElementById('Face') != null) {
+        Face = document.getElementById('Face').checked;
+    }
     if (Edge) {
-       drawEdge();
+        drawEdge();
     }
     if (Face) {
         drawFace();

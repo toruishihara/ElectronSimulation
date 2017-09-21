@@ -1,20 +1,23 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<meta charset="utf-8"/>
-<title>球面上の電子の動きのシミュレーション</title>
-<link rel="stylesheet" href="desktop.css" />
+  <meta charset="utf-8"/>
+  <title>球面上の古典電子の動きのシミュレーション</title>
+  <link rel="stylesheet" href="desktop.css" />
+  <script type="text/javascript" async
+    src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML">
+  </script>
 </head>
 <body onload="loadIndexThree()">
-<div id="titleDesc">電子を球面上に、次々に置いて、クローン力による動きをWebGLでのシミュレーション</div>
+<div id="titleDesc">電子を球面上に、次々に置いて、クローン力による反発する動きのシミュレーション</div>
 <div id="leftBox">
   <div id="sphereTitle">WebGLによる３D表示、ドラッグで回転します。</div>
   <div id="sphereCanvas"></div>
   <div id="underDesc"></div>
 </div>
 <div id="rightBox">
-  <div id="resultsDesc">シミュレーションの結果、生成された立体<br><small>クリックで３次元アニメーション表示されます。（要Chrome26）</small></div>
-  <div id="imageList">
+  <div id="resultsDesc">シミュレーションの結果、生成された立体<br><small>クリックで３次元アニメーション表示されます。</small></div>
+  <div id="imageListItem">
   <table id="imageTable">
     <tr onclick="selItem(4)"><td>N=4</td><td><img class="tableItem" src="img/n4.png"></td><td>正四面体<br>Tetrahedron</td></tr>
     <tr onclick="selItem(5)"><td>N=5</td><td><img class="tableItem" src="img/n5.png"></td><td>双三角錐<br>Bipyramid(3)</td></tr>
@@ -33,27 +36,52 @@
   </div>
 </div>
 <div id="detailDesc">
+$$F=\frac{q_1 q_2}{4\pi \epsilon_0 {\left| \bf{r}_1-\bf{r}_2 \right|}^2}$$
+計算を簡単にするために、\(q_n=1, 4\pi=1, \epsilon_0=1\)とする。\(\bf{r}_{12}=\bf{r}_1-\bf{r}_2\)とする。ベクトルでは、
+$$\bf{F}=\frac{\hat{r}_{12}}{{
+\left| \bf{r}_{12} \right|}^2}$$
+i 番目の出電子が他の電子から受ける力の和は、
+$$\bf{F_i}=\sum_{n=0}^{n \neq i}\frac{\hat{r}_{i n
+}}                        {{
+\left| \bf{r}_{i n} \right|}^2}$$
 シミュレート条件<br>
 <li>電子は球面上しか移動できない。
-<li>働く力は、クローン力のみ。
+<li>働く力は、クローン力のみ(古典電子)
 シミュレート方法<br>
-<li>最初の電子二つを、両極に配置する。
-<li>クローン力は、それぞれの電子間に働き、距離の二乗に反比例する。
-<li>ステップでの移動量は、前ステップまでの力のXYZ座標系での積算を元に計算する。
-<li>ステップでの電子に働く力は、XYZ座標系で計算し、極座標系に変換しr成分を０にした後、XYZ系で保存する。
-<li>合計移動量が充分に小さくなれば、計算を中止して、電子を追加する。
-<li>電子を追加する場所は、球面上をスキャンして、一番電子から離れているポイントに決定する。
+<li>最初の電子二つを、北極と南極の位置に配置する。
+<li>１ステップでの移動量は、前ステップまでの力と現時点でのクーロン力の和を元に計算する。
+<li>移動後には、球の外部に移動しているので、\( \bf{r} = 1 \)になるようにx,y,z成分を長さで割る
+<li>全電子の合計移動量が充分に小さくなれば、計算を終了。
+<li>電子を追加する場所は、球面上を1024 x 1024で分割スキャンして、近接電子から一番距離のある点に決定する。
 電子間角度<br>
-<li>一番近接した電子同士の距離角度を、角度 a とする。
-<li>再孤立電子と、それの再近接電子戸の角度を、角度 b とする。
-<li>a = b ならば、電子らの配置は、調和が取れた多面体であると推定できる。
-<li>辺を表示する時に、角度 a x 1.01以下の辺は、緑色で表示、角度 a x 1.5 以下の辺は青色で表示している。 
+<li>一番近接した電子同士の距離角度を、角度 \( a \) とする。
+<li>各電子の中で、一番近い電子からの距離が最大の電子を最孤立電子とする。（イースター島のような電子）
+<li>最孤立電子と、それの再近接電子戸の距離角度を、角度 \( b \) とする。
+<li>\(a \approx b\)ならば、電子らの配置は、調和が取れた多面体であると推定できる。
+<li>上の図では、辺を表示する時に、角度 \(1.01a\)以下の辺は、緑色で表示、角度\(1.5a\)以下の辺は青色で表示している。<br>
+各電子を線で結び３角形を表示した結果図<br>
+電子４個から３４個まで<br>
+<img src="../png/ResultInner30.png"><br>
+電子３５個から６４個まで<br>
+<img src="../png/ResultInner60.png"><br>
+電子６５個から９４個まで<br>
+<img src="../png/ResultInner90.png"><br>
+各電子で球に接する面を作成し、それらの面作成される多角形を表示した結果図<br>
+電子４個から３４個まで<br>
+<img src="../png/ResultOuter30.png"><br>
+電子３５個から６４個まで<br>
+<img src="../png/ResultOuter60.png"><br>
+電子６５個から９４個まで<br>
+<img src="../png/ResultOuter90.png"><br>
+参考<link href="http://v.rentalserver.jp/morigon.jp/Repository/SUBI0/tok.html">
+Last updated 9/21/2017
 </div>
 </body>
 	<script type="text/javascript" src="Three.js"></script>
 	<script type="text/javascript" src="ThreeView.js"></script>
 	<script type="text/javascript" src="Tuple.js"></script>
 	<script type="text/javascript" src="TronControlThree.js"></script>
+    <script type="text/javascript" src="TourControlThree.js"></script>
 	<script type="text/javascript" src="TronModel.js"></script>
 	<script type="text/javascript" src="jsutil.js"></script>
 	<script type="text/javascript" src="results.js"></script>

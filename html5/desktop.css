@@ -106,6 +106,13 @@ div {
 	overflow-y: scroll;
 	background-color: #DDDDFF;
 }
+#imageListItem {
+	position: absolute;
+	width: 400px;
+	height: 420px;
+	overflow-y: scroll;
+	background-color: #DDDDFF;
+}
 #detailDesc {
 	position: absolute;
 	top: 540px;

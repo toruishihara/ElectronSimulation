@@ -41,7 +41,8 @@ $$F=\frac{q_1 q_2}{4\pi \epsilon_0 {\left| \bf{r}_1-\bf{r}_2 \right|}^2}$$
 $$\bf{F}=\frac{\hat{r}_{12}}{{
 \left| \bf{r}_{12} \right|}^2}$$
 i 番目の出電子が他の電子から受ける力の和は、
-$$\bf{F_i}=\sum_{j=0}^{n\,j \neq i}\frac{\hat{r}_{i j}}{{\left| \bf{r}_{i j} \right|}^2}$$
+$$\bf{F_i}=\sum_{j=0}^{n\,j \neq i}\frac{\hat{r}_{i j}}            {{
+\left| \bf{r}_{i j} \right|}^2}$$
 シミュレート条件<br>
 <li>電子は球面上しか移動できない。
 <li>働く力は、クローン力のみ(古典電子)
@@ -57,21 +58,22 @@ $$\bf{F_i}=\sum_{j=0}^{n\,j \neq i}\frac{\hat{r}_{i j}}{{\left| \bf{r}_{i j} \ri
 <li>最孤立電子と、それの再近接電子戸の距離角度を、角度 \( b \) とする。
 <li>\(a \approx b\)ならば、電子らの配置は、調和が取れた多面体であると推定できる。
 <li>上の図では、辺を表示する時に、角度 \(1.01a\)以下の辺は、緑色で表示、角度\(1.5a\)以下の辺は青色で表示している。<br>
-各電子を線で結び３角形を表示した結果図<br>
+質問は<a href="mailto:torui@nariuchi.com">torui@nariuchi.comまで</a><br>
+参考文献<a href="http://v.rentalserver.jp/morigon.jp/Repository/SUBI0/tok.html">電子の安定配置の３次元への拡張と最急降下法の考察</a><br>
+<h2>各電子を線で結び３角形を表示した結果図</h2>
 電子４個から３４個まで<br>
 <img src="png/ResultInner30.png"><br>
 電子３５個から６４個まで<br>
 <img src="png/ResultInner60.png"><br>
 電子６５個から９４個まで<br>
 <img src="png/ResultInner90.png"><br>
-各電子で球に接する面を作成し、それらの面作成される多角形を表示した結果図<br>
+<h2>各電子で球に接する面を作成し、それらの面作成される多角形を表示した結果図</h2>
 電子４個から３４個まで<br>
 <img src="png/ResultOuter30.png"><br>
 電子３５個から６４個まで<br>
 <img src="png/ResultOuter60.png"><br>
 電子６５個から９４個まで<br>
 <img src="png/ResultOuter90.png"><br>
-参考<link href="http://v.rentalserver.jp/morigon.jp/Repository/SUBI0/tok.html">
 Last updated 9/21/2017
 </div>
 </body>
@@ -81,6 +83,8 @@ Last updated 9/21/2017
 	<script type="text/javascript" src="TronControlThree.js"></script>
     <script type="text/javascript" src="TourControlThree.js"></script>
 	<script type="text/javascript" src="TronModel.js"></script>
+	<script type="text/javascript" src="TronDraw.js"></script>
 	<script type="text/javascript" src="jsutil.js"></script>
 	<script type="text/javascript" src="results.js"></script>
 </html>
+    

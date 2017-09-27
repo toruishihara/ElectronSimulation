@@ -1,9 +1,8 @@
 <html>
 <body>
 <div id="ThreeCanvas" style="height:200px;width:200px;background-color:#eeeeee">
-<script type="text/javascript" src="Three.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r83/three.min.js"></script>
 <script type="text/javascript">
-<!--
 var ThreeCanvas = document.getElementById("ThreeCanvas");
 var Width = ThreeCanvas.clientWidth;
 var Height = ThreeCanvas.clientHeight;  
@@ -14,7 +13,7 @@ var Theta = 0;
 function onLoad() {
 	ThreeRenderer.setSize(Width, Height );
 	ThreeCanvas.appendChild(ThreeRenderer.domElement);
-	ThreeRenderer.setClearColorHex(0xFFFFFF, 1.0);
+	ThreeRenderer.setClearColor(0xFFFFFF);
 
 	var light = new THREE.PointLight(0xFFFFFF, 1.0, 0);
 	light.position.set( -100, -100, 200 );
@@ -74,7 +73,6 @@ function loop() {
 	window.requestAnimationFrame(loop);
 }
 onLoad();
-//->
 </script>
 </div>
 </body>

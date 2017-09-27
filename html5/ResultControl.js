@@ -27,7 +27,7 @@
     //drawOuterFaceResults();
     drawInnerFaceResults();
 
-    updateCamera();
+    updateCamera(new tuple3d(0, 0, 0));
     Renderer.clear();
     Renderer.render(ThreeScene, ThreeCamera);
 }
@@ -35,10 +35,10 @@
 function drawInnerFaceResults() {
     GlobalFaceColor = new THREE.Color('skyblue');
     //TriangleOpacity = 0.0;
-    for (var j = 0; j < 30; ++j) {
+    for (var j = 0; j < 1/*30*/; ++j) {
         ColorCount = 0;
         ModelInit();
-        var jsonObj = JSON.parse(results[4 + j]);
+        var jsonObj = JSON.parse(results[72 + j]);
         for (var i = 0; i < jsonObj.num; ++i) {
             var p = new tuple3d(jsonObj.vertex[3 * i], jsonObj.vertex[3 * i + 1], jsonObj.vertex[3 * i + 2]);
             p.xy2sp();
@@ -56,7 +56,7 @@ function drawOuterFaceResults()
     GlobalFaceColor = new THREE.Color('skyblue');
     for (var j = 0; j < 30; ++j) {
         ModelInit();
-        var jsonObj = JSON.parse(results[34 + j]);
+        var jsonObj = JSON.parse(results[64 + j]);
         for (var i = 0; i < jsonObj.num; ++i) {
             var p = new tuple3d(jsonObj.vertex[3 * i], jsonObj.vertex[3 * i + 1], jsonObj.vertex[3 * i + 2]);
             p.xy2sp();
@@ -65,12 +65,12 @@ function drawOuterFaceResults()
         }
         hideTron();
         OffsetPoint = new tuple3d(-7 + 3 * (j % 6), 6.5 - 3 * Math.floor(j / 6), 0);
-        if (j < -2)
+        if (j < -3)
         {
-            ThreeRadius = 100.5 * 0.5;
+            TronThreeRadius = 100.5 * 0.5;
             OffsetPoint.mul(2.0);
         } else {
-            ThreeRadius = 100.5;
+            TronThreeRadius = 100.5;
         }
         drawFace();
     }

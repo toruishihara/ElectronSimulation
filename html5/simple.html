@@ -1,18 +1,17 @@
 <html>
 <head>Simplest Three.js sample</head>
 <body onload="onLoad()">
-  <div id="ThreeCanvas" style="height:400px;width:400px"></div>
-</body>
-<script type="text/javascript" src="Three.js"></script>
+<div id="ThreeCanvas" style="height:400px;width:400px">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r83/three.min.js"></script>
 <script type="text/javascript">
 function onLoad() {
 	var ThreeCanvas = document.getElementById("ThreeCanvas");
 	var width = ThreeCanvas.clientWidth;
-	var height = ThreeCanvas.clientHeight;  
+	var height = ThreeCanvas.clientHeight;
 	var ThreeRenderer = new THREE.WebGLRenderer({antialias: true});
 	ThreeRenderer.setSize(width, height );
 	ThreeCanvas.appendChild(ThreeRenderer.domElement);
-	ThreeRenderer.setClearColorHex(0xFFFFFF, 1.0);
+	ThreeRenderer.setClearColor(0xFFFFFF);
 
 	var ThreeScene = new THREE.Scene();
 
@@ -32,10 +31,12 @@ function onLoad() {
   	var mat = new THREE.MeshLambertMaterial({ color:col, ambient:col, opacity:1.0 });
 	var box = new THREE.Mesh(new THREE.CubeGeometry(100,100,100), mat);
 	ThreeScene.add(box);
-	box.position.set(0,0,0);	
-	
+	box.position.set(0,0,0);
+
 	ThreeRenderer.clear();
 	ThreeRenderer.render(ThreeScene, ThreeCamera);
 }
-</script>	
+</script>
+</div>	
+</body>
 </html>

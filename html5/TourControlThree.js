@@ -50,7 +50,7 @@ function tourLoop() {
 	ViewPoleY = ViewPole.cross(ViewPoleX);
 	ViewPoleY.unify();
 
-    updateCamera();
+	updateCamera(new tuple3d(ViewCenter.x * TronThreeRadius, ViewCenter.y * TronThreeRadius, ViewCenter.z * TronThreeRadius));
     Renderer.clear();
     Renderer.render(ThreeScene, ThreeCamera);
     

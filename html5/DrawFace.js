@@ -218,9 +218,9 @@ function drawFace() {
                 if (dis > shortest*2.0 && dis > 0.25) {
                     continue;
                 }
-			    addLine(p0, p1, 0x000000);
-                var cyl = createCylinder(p0, p1, 2, 0x000000);
-                ThreeScene.add(cyl);
+			    //addLine(p0, p1, 0x000000);
+                //var cyl = createCylinder(p0, p1, 2, 0x000000);
+                //ThreeScene.add(cyl);
             }
         }
     }
@@ -280,6 +280,7 @@ function drawInnerFaceOne(offsetP)
 {
     OffsetPoint = offsetP;
     var shortest = 1000;
+    var triangleCnt = 0;
     for (var i = 0; i < Trons.length; ++i) {
         for (var j = i + 1; j < Trons.length; ++j) {
             var p0 = Trons[i].point.clone();
@@ -298,12 +299,12 @@ function drawInnerFaceOne(offsetP)
             if (dis01 < shortest * 1.4) {
                 var p0t = p0.clone();
                 p0t.add(OffsetPoint);
-                p0t.mul(ThreeRadius);
+                p0t.mul(TronThreeRadius);
                 var p1t = p1.clone();
                 p1t.add(OffsetPoint);
-                p1t.mul(ThreeRadius);
-                var cyl = createCylinder(p0t, p1t, 2, 0x000000);
-                ThreeScene.add(cyl);
+                p1t.mul(TronThreeRadius);
+                //var cyl = createCylinder(p0t, p1t, 2, 0x000000);
+                //ThreeScene.add(cyl);
             }
             if (dis01 < shortest * 1.5) {
                 for (var k = j + 1; k < Trons.length; ++k) {
@@ -312,12 +313,13 @@ function drawInnerFaceOne(offsetP)
                     var dis12 = p1.dis(p2);
                     if (dis02 < shortest * 1.5 && dis12 < shortest * 1.5) {
                         addTriangleFace(p0, p1, p2);
+                        triangleCnt++;
                     }
                 }
             }
         }
     }
-
+    console.log("triangleCnt=" + triangleCnt);
 }
 
 function FindNearestFacePointIndexFromIndex(idx)
@@ -371,9 +373,9 @@ function addTriangleFace(p0, p1, p2)
 	p0t.add(OffsetPoint);
 	p1t.add(OffsetPoint);
 	p2t.add(OffsetPoint);
-	p0t.mul(ThreeRadius);
-	p1t.mul(ThreeRadius);
-	p2t.mul(ThreeRadius);
+	p0t.mul(TronThreeRadius);
+	p1t.mul(TronThreeRadius);
+	p2t.mul(TronThreeRadius);
 	if (dot > 0.0) {
 	    drawTriangle(p0t, p1t, p2t, n);
 	} else {

@@ -6,7 +6,7 @@
 //	ctx : context
 
 // Global variables
-var Lines = new Array(); // Lines for sphere
+var SphereLines = new Array(); // Lines for sphere
 var ViewPole;
 var ViewPoleX;
 var ViewPoleY;
@@ -28,16 +28,14 @@ var NumTrons = 8;
 var ShowFaceEdge = 0;
 var AllLight = 0;
 var LogFaceToJson = 0;
-
+var TronThreeRadius = 100.5;
 var Limit = 0.0000001;
 var CriticalLimit = 0.000000001;
 var Looping = false;
 
-var ThreeRadius = 100.5;
 var WhiteFace = 0;
 var WireSphere = 0;
 var ShowPoleXYZ = 0;
-var OffsetPoint = new tuple3d(0,0,0);
 
 function tronColor(type,p1,p2,p3)
 {
@@ -79,7 +77,7 @@ function init() {
 			var p1 = new tuple3d(1, t, p); 
 			p1.sp2xy();
 			var l = new line3d(p0.x, p0.y, p0.z, p1.x, p1.y, p1.z);
-			Lines.push(l);
+			SphereLines.push(l);
 		}
 	}
 	for (var t=0;t<2*Math.PI;t+=Math.PI/6) {
@@ -89,7 +87,7 @@ function init() {
 			var p1 = new tuple3d(1, t, p); 
 			p1.sp2xy();
 			var l = new line3d(p0.x, p0.y, p0.z, p1.x, p1.y, p1.z);
-			Lines.push(l);
+			SphereLines.push(l);
 		}
 	}
 	ModelInit();
@@ -107,7 +105,7 @@ function addTronsOnModel() {
 var lastEdge = false;
 var lastFace = false;
 function drawViews() {
-    updateThree();
+    updateThree(TronThreeRadius);
     if (Edge != lastEdge) {
         if (Edge) { drawEdge(); } else { hideEdge(); }
         lastEdge = Edge;
@@ -119,7 +117,7 @@ function drawViews() {
             hideTron();
         }
     }
-    updateCamera();
+    updateCamera(new tuple3d(ViewCenter.x * TronThreeRadius, ViewCenter.y * TronThreeRadius, ViewCenter.z * TronThreeRadius));
     Renderer.clear();
     Renderer.render(ThreeScene, ThreeCamera);
 
@@ -161,12 +159,12 @@ function drawMapView() {
         return;
 	var ctx = canvas.getContext("2d");
 	ctx.lineWidth = 1;
-	for(var i=0; i < Lines.length; ++i ) {
+	for (var i = 0; i < SphereLines.length; ++i) {
 		var color = "rgb(128,128,128)";
-		drawLine(ctx, calcMapX(Lines[i].p0), calcMapY(Lines[i].p0), 
-			calcMapX(Lines[i].p1), calcMapY(Lines[i].p1), color);
-		drawLine(ctx, calcMapXEdge(Lines[i].p0), calcMapY(Lines[i].p0), 
-			calcMapXEdge(Lines[i].p1), calcMapY(Lines[i].p1), color);
+		drawLine(ctx, calcMapX(SphereLines[i].p0), calcMapY(SphereLines[i].p0),
+			calcMapX(SphereLines[i].p1), calcMapY(SphereLines[i].p1), color);
+		drawLine(ctx, calcMapXEdge(SphereLines[i].p0), calcMapY(SphereLines[i].p0),
+			calcMapXEdge(SphereLines[i].p1), calcMapY(SphereLines[i].p1), color);
 	}
 	for(var i=0; i < Trons.length; ++i ) {
 		var p0 = Trons[i].point.clone();
@@ -199,7 +197,7 @@ function load(){
 	drawViews();
 }
 
-function start(){
+function startSimulation(){
 	Times = 0;
 	init();
     
@@ -213,7 +211,7 @@ function start(){
 	Looping = true;
 	loop();
 }
-function stop(){
+function stopSimulation(){
     Looping = false;
 }
 function reset() {
@@ -221,7 +219,7 @@ function reset() {
     init();
     initThree();
     drawTrons();
-    updateCamera();
+    updateCamera(new tuple3d(ViewCenter.x * TronThreeRadius, ViewCenter.y * TronThreeRadius, ViewCenter.z * TronThreeRadius));
     Renderer.clear();
     Renderer.render(ThreeScene, ThreeCamera);
 	drawViews();
@@ -295,7 +293,7 @@ function setShadow(c, color, blur, offsetX, offsetY){
 function loop() {
 	hideEdge();
    	ModelProgress();
-   	updateThree();
+   	updateThree(TronThreeRadius);
     if (Edge) { drawEdge(); }
     if (Face) { drawFace(); }
    	Renderer.clear();
@@ -312,9 +310,10 @@ function loop() {
 function loadThree() {
     init();
     initThree();
+    drawSphereFrame(new tuple3d(0, 0, 0), 100.5);
 	ThreeViewLoad();
     drawTrons();
-    updateCamera();
+    updateCamera(new tuple3d(ViewCenter.x * TronThreeRadius, ViewCenter.y * TronThreeRadius, ViewCenter.z * TronThreeRadius));
     Renderer.clear();
     Renderer.render(ThreeScene, ThreeCamera);
 	drawViews();
@@ -385,4 +384,102 @@ function OnViewValueChange() {
 	//ZoomValue = Math.exp((value-20)/10);
 	console.log(" zoom=" + ZoomDistance);
 	drawViews();
+}
+
+function mouseDownSphere(e) {
+    IsMouseDown = 1;
+    var canvas = document.getElementById("sphereCanvas");
+    canvasOffsetX = canvas.offsetLeft;
+    canvasOffsetY = canvas.offsetTop;
+    DownX = e.pageX - canvasOffsetX;
+    DownY = e.pageY - canvasOffsetY;
+    DownPole = ViewPole.clone();
+    DownPoleX = ViewPoleX.clone();
+    DownPoleY = ViewPoleY.clone();
+}
+function mouseUpSphere(e) {
+    IsMouseDown = 0;
+}
+function mouseMoveSphere(e) {
+    if (IsMouseDown == 0) return;
+    var canvas = document.getElementById("sphereCanvas");
+    canvasOffsetX = canvas.offsetLeft;
+    canvasOffsetY = canvas.offsetTop;
+    var x = e.pageX - canvasOffsetX;
+    var y = e.pageY - canvasOffsetY;
+    var tmpX = x;
+    var tmpY = y;
+    x -= DownX;
+    y -= DownY;
+    //console.log("x=" + x + " y=" + y);
+    x *= -1;
+    x /= ZoomValue;
+    y /= ZoomValue;
+    var X1 = DownPoleX.clone();
+    var Y1 = DownPoleY.clone();
+    var Z1 = DownPole.clone();
+    var Z2 = DownPole.clone();
+
+    X1.mul(Math.cos(x));
+    Z1.mul(Math.sin(x));
+    ViewPoleX = X1;
+    ViewPoleX.sub(Z1);
+
+    Y1.mul(Math.cos(y));
+    Z2.mul(Math.sin(y));
+    ViewPoleY = Y1;
+    ViewPoleY.sub(Z2);
+
+    ViewPole = ViewPoleX.cross(ViewPoleY);
+    ViewPole.unify();
+    ViewPoleX = ViewPoleY.cross(ViewPole);
+    ViewPoleX.unify();
+    ViewPoleY = ViewPole.cross(ViewPoleX);
+    ViewPoleY.unify();
+
+    updateCamera(new tuple3d(ViewCenter.x * TronThreeRadius, ViewCenter.y * TronThreeRadius, ViewCenter.z * TronThreeRadius));
+    Renderer.clear();
+    Renderer.render(ThreeScene, ThreeCamera);
+}
+function mouseDblClickSphere(e) {
+    var canvas = document.getElementById("sphereCanvas");
+    canvasOffsetX = canvas.offsetLeft;
+    canvasOffsetY = canvas.offsetTop;
+    var x = e.pageX - canvasOffsetX - 0.5 * width;
+    var y = e.pageY - canvasOffsetY - 0.5 * height;
+    console.log("dblclick x=" + x + " y=" + y);
+    x /= TronThreeRadius;
+    y /= TronThreeRadius;
+
+    var X1 = DownPoleX.clone();
+    var Y1 = DownPoleY.clone();
+    var Z1 = DownPole.clone();
+    var Z2 = DownPole.clone();
+
+    console.log("X1=[" + X1.x + "," + X1.y + "," + X1.z + "]");
+    console.log("Y1=[" + Y1.x + "," + Y1.y + "," + Y1.z + "]");
+    console.log("Z1=[" + Z1.x + "," + Z1.y + "," + Z1.z + "]");
+
+    console.log("C0=[" + ViewCenter.x + "," + ViewCenter.y + "," + ViewCenter.z + "]");
+    var dx = X1.clone();
+    var dx2 = X1.clone();
+    dx2.mul(0.8);
+    addLine(CenterPoint, dx2, 0xFF0000);
+    dx.mul(x);
+    ViewCenter.add(dx);
+
+    var dy = Y1.clone();
+    var dy2 = Y1.clone();
+    dy2.mul(0.8);
+    addLine(CenterPoint, dy2, 0x00FF00);
+
+    dy.mul(y);
+    ViewCenter.add(dy);
+    console.log("C=[" + ViewCenter.x + "," + ViewCenter.y + "," + ViewCenter.z + "]");
+    console.log("CP=[" + CenterPoint.x + "," + CenterPoint.y + "," + CenterPoint.z + "]");
+    addLine(CenterPoint, ViewCenter, 0xFFFF00);
+
+    updateCamera(new tuple3d(ViewCenter.x * TronThreeRadius, ViewCenter.y * TronThreeRadius, ViewCenter.z * TronThreeRadius));
+    Renderer.clear();
+    Renderer.render(ThreeScene, ThreeCamera);
 }

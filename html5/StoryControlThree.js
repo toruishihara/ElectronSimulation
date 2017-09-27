@@ -10,7 +10,7 @@ function storyLoop()
         calc_cnt++;
 	    hideEdge();
         ModelProgress();
-        updateThree();
+        updateThree(TronThreeRadius);
         if (Edge) {
             drawEdge();
         }
@@ -74,7 +74,7 @@ function storyLoop()
         ViewPoleY = ViewPole.cross(ViewPoleX);
         ViewPoleY.unify();
         
-        updateCamera();
+        updateCamera(new tuple3d(ViewCenter.x * TronThreeRadius, ViewCenter.y * TronThreeRadius, ViewCenter.z * TronThreeRadius));
         if (story_tour_cnt > LoopNum) {
             logJson();
             hideEdge();
@@ -119,7 +119,7 @@ function quickLoop()
         ModelProgress();
 	    if (calc_cnt % 20 <= 20) {
             hideEdge();
-            updateThree();
+            updateThree(TronThreeRadius);
             if (Edge) {
                 drawEdge();
             }
@@ -193,7 +193,7 @@ function quickLoop()
         ViewPoleY.unify();
         
 	if (story_tour_cnt % 2 == 0 || NumTrons > 3) {
-        	updateCamera();
+	    updateCamera(new tuple3d(ViewCenter.x * TronThreeRadius, ViewCenter.y * TronThreeRadius, ViewCenter.z * TronThreeRadius));
 	}
         if (story_tour_cnt > LoopNum) {
             logJson();

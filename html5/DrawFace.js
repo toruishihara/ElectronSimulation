@@ -370,9 +370,9 @@ function addTriangleFace(p0, p1, p2)
 	var p0t = p0.clone();
 	var p1t = p1.clone();
 	var p2t = p2.clone();
-	p0t.add(OffsetPoint);
-	p1t.add(OffsetPoint);
-	p2t.add(OffsetPoint);
+	p0t.add(TronOffsetPoint);
+	p1t.add(TronOffsetPoint);
+	p2t.add(TronOffsetPoint);
 	p0t.mul(TronThreeRadius);
 	p1t.mul(TronThreeRadius);
 	p2t.mul(TronThreeRadius);
@@ -428,7 +428,7 @@ function writePlotSVG()
 		str += "\" fill=\"red\">" + i.toString() + "</text>\n";
     	document.getElementById("result").innerText += str;
 	}
-	for(i=0;i<FacePoints.length/2;++i) {
+	for (i = 0; i < FacePoints.length / 2; ++i) {
 		str = "  <text x=\"";
 		var p = FacePoints[i].point;
 		str += (500 + (p.x)*400).toString();
@@ -446,38 +446,70 @@ function writePlotSVG()
 			}
 		}	
 	}
-	for(i=0;i<FacePoints.length/2;++i) {
-		for(j=i+1;j<FacePoints.length/2;++j) {
-			var dis2 = FacePoints[i].point.dis2(FacePoints[j].point);
-			if (dis2 < 4*shortest) {
-				str = "  <line x1=\"";
-				var p = FacePoints[i].point.clone();
-				str += (500 + (p.x)*400).toString();
-				str += "\" y1=\"";			
-				str += (500 + (p.y)*400).toString();
-				p = FacePoints[j].point.clone();
-				str += "\" x2=\"";			
-				str += (500 + (p.x)*400).toString();
-				str += "\" y2=\"";			
-				str += (500 + (p.y)*400).toString();
-				str += "\" style=\"stroke:black;stroke-width:1\">" + i.toString() + "</line>\n";
-    			document.getElementById("result").innerText += str;
-				
-				var dis = FacePoints[i].point.dis(FacePoints[j].point);
-				str = "  <text x=\"";
-				p = FacePoints[i].point.clone();
-				p.add(FacePoints[j].point);
-				p.mul(0.5);
-				str += (500 + (p.x)*400).toString();
-				str += "\" y=\"";			
-				str += (500 + (p.y)*400).toString();
-				str += "\" fill=\"green\">" + dis.toFixed(5) + "</text>\n";
-    			document.getElementById("result").innerText += str;
-			}
-		}	
+	for (i = 0; i < FacePoints.length / 2; ++i) {
+	    for (j = i + 1; j < FacePoints.length / 2; ++j) {
+	        var dis2 = FacePoints[i].point.dis2(FacePoints[j].point);
+	        if (dis2 < 3 * shortest) {
+	            str = "  <line x1=\"";
+	            var p = FacePoints[i].point.clone();
+	            str += (500 + (p.x) * 400).toString();
+	            str += "\" y1=\"";
+	            str += (500 + (p.y) * 400).toString();
+	            p = FacePoints[j].point.clone();
+	            str += "\" x2=\"";
+	            str += (500 + (p.x) * 400).toString();
+	            str += "\" y2=\"";
+	            str += (500 + (p.y) * 400).toString();
+	            str += "\" style=\"stroke:black;stroke-width:1\">" + i.toString() + "</line>\n";
+	            document.getElementById("result").innerText += str;
+
+	            var dis = FacePoints[i].point.dis(FacePoints[j].point);
+	            str = "  <text x=\"";
+	            p = FacePoints[i].point.clone();
+	            p.add(FacePoints[j].point);
+	            p.mul(0.5);
+	            str += (500 + (p.x) * 400).toString();
+	            str += "\" y=\"";
+	            str += (500 + (p.y) * 400).toString();
+	            str += "\" fill=\"green\">" + dis.toFixed(5) + "</text>\n";
+	            document.getElementById("result").innerText += str;
+	        }
+	    }
 	}
-	document.getElementById("result").innerText += str;
-	// Draw Trons
+	// Draw tron and facepoint line
+	for (i = 0; i < sortedTrons.length / 2; ++i) {
+	    for (j = 0; j < FacePoints.length / 2; ++j) {
+	        var dis2 = sortedTrons[i].point.dis2(FacePoints[j].point);
+	        if (dis2 < 2 * shortest) {
+	            str = "  <line x1=\"";
+	            var p = sortedTrons[i].point.clone();
+	            str += (500 + (p.x) * 400).toString();
+	            str += "\" y1=\"";
+	            str += (500 + (p.y) * 400).toString();
+	            p = FacePoints[j].point.clone();
+	            str += "\" x2=\"";
+	            str += (500 + (p.x) * 400).toString();
+	            str += "\" y2=\"";
+	            str += (500 + (p.y) * 400).toString();
+	            str += "\" style=\"stroke:blue;stroke-width:1\">" + i.toString() + "</line>\n";
+	            document.getElementById("result").innerText += str;
+
+	            var dis = sortedTrons[i].point.dis(FacePoints[j].point);
+	            str = "  <text x=\"";
+	            p = sortedTrons[i].point.clone();
+	            p.add(FacePoints[j].point);
+	            p.mul(0.5);
+	            str += (500 + (p.x) * 400).toString();
+	            str += "\" y=\"";
+	            str += (500 + (p.y) * 400).toString();
+	            str += "\" fill=\"blue\">" + dis.toFixed(5) + "</text>\n";
+	            document.getElementById("result").innerText += str;
+	        }
+	    }
+	}
+	//document.getElementById("result").innerText += str;
+    // Draw Trons
+    /*
 	var shortest = 9999999;
 	for(i=0;i<sortedTrons.length;++i) {
 		for(j=i+1;j<sortedTrons.length;++j) {
@@ -517,6 +549,7 @@ function writePlotSVG()
 			}
 		}	
 	}
+    */
 	str = "</svg>\n";
 	document.getElementById("result").innerText += str;
 }

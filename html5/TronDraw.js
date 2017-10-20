@@ -69,3 +69,12 @@ function hideTron() {
     }
     ThreeTrons = new Array();
 }
+
+function addTronLine(p0, p1, col) {
+    var p0t = p0.clone();
+    p0t.mul(TronThreeRadius);
+    var p1t = p1.clone();
+    p1t.mul(TronThreeRadius);
+
+    addLine(p0t, p1t, col);
+}

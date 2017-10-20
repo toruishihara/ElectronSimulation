@@ -101,10 +101,10 @@ function calcGoldBurg() {
                         p.dis2(isoPoints[k]) < shortest*1.01 &&
                         isoPoints[j].dis2(isoPoints[k]) < shortest*1.01) {
                     var t1 = isoPoints[j].clone();
-addLine(p, t1, 0xFF0000);
+addTronLine(p, t1, 0xFF0000);
                     t1.sub(p);
                     var t2 = isoPoints[k].clone();
-addLine(p, t2, 0x00FF00);
+addTronLine(p, t2, 0x00FF00);
                     t2.sub(p);
                     addOneGoldBurgFace(p, t1, t2);
                 }

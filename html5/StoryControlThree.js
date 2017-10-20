@@ -222,14 +222,14 @@ function quickLoop()
 }
 
 function story() {
-	var fs = require('fs');
-fs.writeFile("/tmp/test", "Hey there!", function(err) {
-    if(err) {
-        console.log(err);
-    } else {
-        console.log("The file was saved!");
-    }
-}); 
+	//var fs = require('fs');
+//fs.writeFile("/tmp/test", "Hey there!", function(err) {
+    //if(err) {
+    //    console.log(err);
+    //} else {
+    //    console.log("The file was saved!");
+    //}
+//}); 
 
     return storyCleanStart();
 }
@@ -251,17 +251,19 @@ function StoryContinue60() {
 }
 
 function storyCleanStart() {
+    // tmp for 6 story
     NumTrons = 2;
     init();
     
     hideTron();
     ModelInit();
-    //addTronsOnModel();
+    addTronsOnModel();
 
-    var color = new tronColor("hsl", (0*47)%360, "100%", "50%");
-    AddTron(0.0, 0.0, color);
-    var color2 = new tronColor("hsl", (1*47)%360, "100%", "50%");
-    AddTron(0.0, Math.PI, color2);
+    // tmp for 6 story
+    //var color = new tronColor("hsl", (0*47)%360, "100%", "50%");
+    //AddTron(0.0, 0.0, color);
+    //var color2 = new tronColor("hsl", (1*47)%360, "100%", "50%");
+    //AddTron(0.0, Math.PI, color2);
 
     drawTrons();
     drawViews();

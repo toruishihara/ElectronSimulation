@@ -24,7 +24,7 @@ var Face = false;
 var Timer1;
 var Times = 0;
 var Interval = 50;
-var NumTrons = 8;
+var NumTrons = 6;
 var ShowFaceEdge = 0;
 var AllLight = 0;
 var LogFaceToJson = 0;
@@ -464,20 +464,20 @@ function mouseDblClickSphere(e) {
     var dx = X1.clone();
     var dx2 = X1.clone();
     dx2.mul(0.8);
-    addLine(CenterPoint, dx2, 0xFF0000);
+    addTronLine(CenterPoint, dx2, 0xFF0000);
     dx.mul(x);
     ViewCenter.add(dx);
 
     var dy = Y1.clone();
     var dy2 = Y1.clone();
     dy2.mul(0.8);
-    addLine(CenterPoint, dy2, 0x00FF00);
+    addTronLine(CenterPoint, dy2, 0x00FF00);
 
     dy.mul(y);
     ViewCenter.add(dy);
     console.log("C=[" + ViewCenter.x + "," + ViewCenter.y + "," + ViewCenter.z + "]");
     console.log("CP=[" + CenterPoint.x + "," + CenterPoint.y + "," + CenterPoint.z + "]");
-    addLine(CenterPoint, ViewCenter, 0xFFFF00);
+    addTronLine(CenterPoint, ViewCenter, 0xFFFF00);
 
     updateCamera(new tuple3d(ViewCenter.x * TronThreeRadius, ViewCenter.y * TronThreeRadius, ViewCenter.z * TronThreeRadius));
     Renderer.clear();

@@ -20,7 +20,7 @@ var Angle31 = 360;
 var outputDone = 0;
 var times = 0;
 var initVelo = 0.01;
-var ColombK = -0.00001;
+var ColombK = -0.01;
 
 // defines
 var huge = 9999999999;
@@ -442,19 +442,24 @@ function calcNewVelocityOne(idx)
 		if (len2 < 0.0000001) {
 			len2 = 0.0000001;
 		}
-		//var len = Math.sqrt(len2);
-		//d.mul(ColombK/(len*len2));
-		d.mul(ColombK/len2);
+        
+		var len = Math.sqrt(len2);
+		d.mul(ColombK/(len*len2));
+
+		//d.mul(ColombK / len2);
+
 		newVelo.add(d);
 	}
-	var r = tron.point.clone();
-	//if (r.length2() > 1.0) {
+	tron.velo = newVelo;
+    /*
+    //if (r.length2() > 1.0) {
 		r.unify();
 		rComp = r.dot(newVelo);
 		r.setLength(rComp);
 		newVelo.sub(r);
 	//}
 	tron.velo.add(newVelo);
+    */
 }
 
 // return moving distance
@@ -474,7 +479,7 @@ function progressOne(idx)
     	//tron.point.add(shakeV);
 	oldTron.sub(tron.point);
 	len = oldTron.length();
-    	return len;
+    return len;
 }
 
 function _sleep(millisec){

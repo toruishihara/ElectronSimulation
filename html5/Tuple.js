@@ -101,6 +101,12 @@ function tuple3d_sub(tuple) {
 function tuple3d_length() {
 	return Math.sqrt(this.x*this.x + this.y*this.y + this.z*this.z);
 }
+function tuple3d_lengthBetween(tuple) {
+    var x = tuple.x - this.x;
+    var y = tuple.y - this.y;
+    var z = tuple.z - this.z;
+    return Math.sqrt(x * x + y * y + z * z);
+}
 function tuple3d_length2() {
 	return this.x*this.x + this.y*this.y + this.z*this.z;
 }

@@ -13,6 +13,8 @@ var totalMove = 0;
 var aveMove = 0;
 var closestPair = "";
 var closestAngle = 360;
+var ShortestLength = 0.0;
+var ShortestDot = 0.0;
 var loneliestPair = "";
 var loneliestAngle = 360;
 var Angle21 = 360;
@@ -21,6 +23,7 @@ var outputDone = 0;
 var times = 0;
 var initVelo = 0.01;
 var ColombK = -0.01;
+var totalEnergy = 0.0;
 
 // defines
 var huge = 9999999999;
@@ -78,6 +81,7 @@ function ModelProgress() {
     }
     if (times % 100 == 0) {
         updateAngles();
+        updateEnergy();
     }
 	times ++;
 }
@@ -132,9 +136,34 @@ function updateAngles() {
 	}
 }
 
+function updateEnergy() {
+    totalEnergy = 0.0;
+    for (var i = 0; i < Trons.length; ++i) {
+        var pi = Trons[i].point;
+        for (var j = i + 1; j < Trons.length; ++j) {
+            var e = 1.0 / pi.dis(Trons[j].point);
+            totalEnergy = totalEnergy + e;
+        }
+    }
+}
+
+function getEnergyOnTron(index) {
+    var sum = 0.0;
+    var pi = Trons[index].point;
+    for (var j = 0; j < Trons.length; ++j) {
+        if (j == index)
+            continue;
+        var e = 1.0 / pi.dis(Trons[j].point);
+        sum = sum + e;
+    }
+    return sum;
+}
+
 function updateClosest() {
 	// find closest pair
-	var maxDot = -1*huge;
+    var maxDot = -1*huge;
+    var i0;
+    var i1;
 	for(var i=0;i<Trons.length;++i) {
 		var ti = Trons[i].point;
 		for(var j=0;j<Trons.length;++j) {
@@ -143,10 +172,16 @@ function updateClosest() {
 			if (maxDot < dot) {
 				maxDot = dot;
 				closestPair = i.toFixed(0) + " and " + j.toFixed(0);
+				i0 = i;
+				i1 = j;
 			}
 		}
 	}
-	closestAngle = 180*Math.acos(maxDot)/Math.PI;
+	closestAngle = 180 * Math.acos(maxDot) / Math.PI;
+	var p = Trons[i0].point.clone();
+	p.sub(Trons[i1].point);
+	ShortestLength = p.length();
+	ShortestDot = Trons[i0].point.dot(Trons[i1].point);
 }
 
 function FindFreePoint() {
@@ -227,6 +262,9 @@ function updateLoneliest() {
 function getAveMove() {
 	return aveMove;
 }
+function TotalEnergy() {
+    return totalEnergy;
+}
 function ClosestPair() {
 	return closestPair;
 }
@@ -246,7 +284,8 @@ function getAngle31() {
 	return Angle31;
 }
 function ModelMovePole() {
-    return ModelMovePoleIndex();
+    return ModelMovePoleMaxEnergyTron();
+    //return ModelMovePoleNextIndex();
 }
 function MovePointByBase(p, basePoint) {
 	var tmpPoleZ = basePoint.clone();
@@ -283,12 +322,16 @@ function MovePointByBase(p, basePoint) {
 	return ret;
 }
 
-var poleIndex = -1;
-function ModelMovePoleIndex() {
-    poleIndex = poleIndex + 1;
-    var nearIdx = FindNearestTronIndexFromIndex(poleIndex);
+var PoleIndex = -1;
+function ModelMovePoleNextIndex() {
+    ModelMovePoleOnIndex(PoleIndex + 1);
+}
+
+function ModelMovePoleOnIndex(index) {
+    PoleIndex = index;
+    var nearIdx = FindNearestTronIndexFromIndex(index);
         
-	var newPoleZ = Trons[poleIndex].point.clone();	
+    var newPoleZ = Trons[index].point.clone();
 	var newPoleY = newPoleZ.cross(Trons[nearIdx].point);
 	newPoleY.unify();
 	var newPoleX = newPoleY.cross(newPoleZ);
@@ -304,6 +347,23 @@ function ModelMovePoleIndex() {
 		Trons[i].velo.z = v.dot(newPoleZ);
 	}
 }
+
+// Move the pole to less closest Tron. Typically center of pentagon
+function ModelMovePoleMaxEnergyTron() {
+    var maxEnergy = 0.0;
+    var maxIndex = 0;
+    for (var i = 0; i < Trons.length; ++i) {
+        console.log("getEnergy i=%d", i);
+        var e = getEnergyOnTron(i);
+        console.log("i=%d e=%f", i, e);
+        if (e > maxEnergy) {
+            maxEnergy = e;
+            maxIndex = i;
+        }
+    }
+    ModelMovePoleOnIndex(maxIndex)
+}
+
 function ModelMovePoleLoneliest() {
     updateLoneliest();
 	var ls = loneliestPair.split(',');

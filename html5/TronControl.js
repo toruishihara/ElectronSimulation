@@ -156,6 +156,7 @@ function drawMapView() {
 function drawInfos() {
 	document.getElementById("progress").innerText = Times.toFixed(0);
 	document.getElementById("totalMove").innerText = TotalMove().toFixed(6);
+	document.getElementById("totalEnergy").innerText = TotalEnergy();
 	document.getElementById("closestPair").innerText = ClosestPair();
 	document.getElementById("closestAngle").innerText = ClosestAngle().toFixed(6);
 	document.getElementById("loneliestPair").innerText = LoneliestPair();

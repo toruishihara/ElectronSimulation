@@ -180,6 +180,7 @@ function clearMapView() {
 function drawInfos() {
 	document.getElementById("progress").innerText = NumTrons.toFixed(0);
 	document.getElementById("aveMove").innerText = getAveMove().toFixed(12);
+	document.getElementById("totalEnergy").innerText = TotalEnergy();
 	document.getElementById("closestPair").innerText = ClosestPair();
 	document.getElementById("closestAngle").innerText = ClosestAngle().toFixed(6);
 	document.getElementById("loneliestPair").innerText = LoneliestPair();
@@ -197,7 +198,35 @@ function load(){
 	drawViews();
 }
 
-function startSimulation(){
+function performanceTest()
+{
+    var st = new Date();
+    document.getElementById("result").innerText += "start=" + st.getTime();
+
+    var sum = 0.0;
+    var i;
+    for (i = 1; i < 1000000000; i=i+2)
+    {
+        if (i % 4 == 1)
+        {
+            sum = sum + 1.0 / i;
+        }
+        else
+        {
+            sum = sum - 1.0 / i;
+        }
+    }
+    sum = sum * 4;
+    var ed = new Date();
+    document.getElementById("result").innerText += "end=" + ed.getTime();
+    var diff = ed.getTime() - st.getTime();
+    console.log("diff = " + diff);
+    document.getElementById("result").innerText += "diff=" + diff + " pie=" + sum;
+
+}
+
+function startSimulation() {
+    performanceTest();
 	Times = 0;
 	init();
     
@@ -346,6 +375,12 @@ function readJsonImpl(num) {
     console.log("N=" + NumTrons);
     drawTrons();
     drawViews();
+
+    updateClosest();
+    updateLoneliest();
+    updateAngles();
+    updateEnergy();
+    drawInfos();
 }
 
 function readJsonAndMove(num) {

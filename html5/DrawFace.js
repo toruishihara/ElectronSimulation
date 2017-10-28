@@ -437,19 +437,11 @@ function writePlotSVG()
 		str += "\" fill=\"blue\">" + i.toString() + "</text>\n";
     	document.getElementById("result").innerText += str;
 	}
-	var shortest = 9999999;
-	for(i=0;i<FacePoints.length;++i) {
-		for(j=i+1;j<FacePoints.length;++j) {
-			var dis = FacePoints[i].point.dis2(FacePoints[j].point);
-			if (shortest > dis) {
-				shortest = dis;
-			}
-		}	
-	}
 	for (i = 0; i < FacePoints.length / 2; ++i) {
 	    for (j = i + 1; j < FacePoints.length / 2; ++j) {
-	        var dis2 = FacePoints[i].point.dis2(FacePoints[j].point);
-	        if (dis2 < 3 * shortest) {
+	        var dis2 = FacePoints[i].point.dis(FacePoints[j].point);
+	        console.log("i=%d j=%d FSdis=%f shortest=%f", i, j, dis2, ShortestLength);
+	        if (dis2 < ShortestLength) {
 	            str = "  <line x1=\"";
 	            var p = FacePoints[i].point.clone();
 	            str += (500 + (p.x) * 400).toString();
@@ -479,8 +471,9 @@ function writePlotSVG()
 	// Draw tron and facepoint line
 	for (i = 0; i < sortedTrons.length / 2; ++i) {
 	    for (j = 0; j < FacePoints.length / 2; ++j) {
-	        var dis2 = sortedTrons[i].point.dis2(FacePoints[j].point);
-	        if (dis2 < 2 * shortest) {
+	        var dis2 = sortedTrons[i].point.dis(FacePoints[j].point);
+	        console.log("i=%d j=%d FTdis=%f shortest=%f", i, j, dis2, ShortestLength);
+	        if (dis2 < ShortestLength) {
 	            str = "  <line x1=\"";
 	            var p = sortedTrons[i].point.clone();
 	            str += (500 + (p.x) * 400).toString();

@@ -22,7 +22,7 @@ var Angle31 = 360;
 var outputDone = 0;
 var times = 0;
 var initVelo = 0.01;
-var ColombK = -0.01;
+var ColombK = -0.001;
 var totalEnergy = 0.0;
 
 // defines
@@ -89,7 +89,7 @@ function ModelProgress() {
 function updateAngles() {
 	var diffDot12 = 0;
 	var diffDot13 = 0;
-	console.log("updateAngle");
+	//console.log("updateAngle");
 	for(var i=0;i<Trons.length;++i) {
 		var maxDot = -1*huge;
 		var maxDot2 = -1*huge;
@@ -104,7 +104,7 @@ function updateAngles() {
 			if (maxDot < dot) {
 				maxDot = dot;
 				maxJ = j;
-				console.log("angle1[" + i + "," + j + "]=" + 180*Math.acos(maxDot)/Math.PI);
+				//console.log("angle1[" + i + "," + j + "]=" + 180*Math.acos(maxDot)/Math.PI);
 			}
 		}
 		for(var j=0;j<Trons.length;++j) {
@@ -113,7 +113,7 @@ function updateAngles() {
 			if (maxDot2 < dot) {
 				maxDot2 = dot;
 				maxJ2 = j;
-				console.log("angle2[" + i + "," + j + "]=" + 180*Math.acos(maxDot2)/Math.PI);
+				//console.log("angle2[" + i + "," + j + "]=" + 180*Math.acos(maxDot2)/Math.PI);
 			}
 		}
 		for(var j=0;j<Trons.length;++j) {
@@ -122,7 +122,7 @@ function updateAngles() {
 			if (maxDot3 < dot) {
 				maxDot3 = dot;
 				maxJ3 = j;
-				console.log("angle3[" + i + "," + j + "]=" + 180*Math.acos(maxDot3)/Math.PI);
+				//console.log("angle3[" + i + "," + j + "]=" + 180*Math.acos(maxDot3)/Math.PI);
 			}
 		}
 		if (maxDot - maxDot2 > diffDot12) {
@@ -159,6 +159,17 @@ function getEnergyOnTron(index) {
     return sum;
 }
 
+function getEnergyOnPoint(p) {
+    var sum = 0.0;
+    for (var j = 0; j < Trons.length; ++j) {
+        if (p.dis(Trons[j].point) < 0.0000000001)
+            continue;
+        var e = 1.0 / p.dis(Trons[j].point);
+        sum = sum + e;
+    }
+    return sum;
+}
+
 function updateClosest() {
 	// find closest pair
     var maxDot = -1*huge;
@@ -185,6 +196,43 @@ function updateClosest() {
 }
 
 function FindFreePoint() {
+    return FindFreePointByEnergy();
+}
+
+function FindFreePointByEnergy() {
+    var lowestEnergy = 9999999.9;
+    var pi = Trons[0].point;
+    // for 2point case, set retrun value something random
+    var lowestPoint = new tuple3d(pi.y, pi.z, pi.x);
+    for (var i = 0; i < Trons.length; ++i) {
+        pi = Trons[i].point;
+        for (var j = i + 1; j < Trons.length; ++j) {
+            if (pi.dis(Trons[j].point) > 1.42 * ShortestLength)
+                continue;
+            var pj = Trons[j].point;
+            for (var k = j + 1; k < Trons.length; ++k) {
+                if (pi.dis(Trons[k].point) > 1.42 * ShortestLength)
+                    continue;
+                // p3 is middle point of pi,pj,pk
+                var p3 = Trons[k].point.clone();
+                p3.add(pj);
+                p3.add(pi);
+                p3.unify();
+                var e = getEnergyOnPoint(p3);
+                if (e < lowestEnergy) {
+                    lowestPoint = p3.clone();
+                    var pp = p3.clone();
+                    p3.mul(TronThreeRadius);
+                    //drawDot(p3, 0x000000, 2);
+                    console.log("LowestE=%f", e);
+                }
+            }
+        }
+    }
+    return lowestPoint;
+}
+
+function FindFreePointBy2DMesh() {
     var fine = 512.0; //1024.0;
 	var minDot = 1.0;
     var size = 1;

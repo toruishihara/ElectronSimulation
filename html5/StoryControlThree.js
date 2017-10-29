@@ -19,12 +19,12 @@ function storyLoop()
         }
         drawMapView();
         drawInfos();
-        if ((NumTrons-12)%60 == 0 || NumTrons <= 12) {
+        if (NumTrons == 32 || NumTrons == 72 || NumTrons == 132 || NumTrons == 192) {
             if (getAveMove() < CriticalLimit && calc_cnt > 300) {
                 phase = 1;
             }
         } else {
-            if (getAveMove() < Limit && calc_cnt > 300) {
+            if (getAveMove() < RegularLimit && calc_cnt > 300) {
                 phase = 1;
             }
         }

@@ -29,10 +29,10 @@ var ShowFaceEdge = 0;
 var AllLight = 0;
 var LogFaceToJson = 0;
 var TronThreeRadius = 100.5;
-//var RegularLimit = 0.0000001; // Finest
-var RegularLimit = 0.00001;
-//var CriticalLimit = 0.000000001; // Finest
-var CriticalLimit = 0.00001;
+var RegularLimit = 0.0000001; // Finest
+//var RegularLimit = 0.00001;
+var CriticalLimit = 0.000000001; // Finest
+//var CriticalLimit = 0.00001;
 var Looping = false;
 
 var WhiteFace = 0;

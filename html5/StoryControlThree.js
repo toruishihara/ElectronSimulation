@@ -4,12 +4,15 @@ var story_tour_cnt = 0;
 
 function storyLoop()
 {
-    console.log("num=" + NumTrons + " cnt=" + calc_cnt + " move=" + getAveMove());
     var wait = 0;
     if (phase == 0) {
-        calc_cnt++;
+        console.log("num=" + NumTrons + " cnt=" + calc_cnt + " move=" + getAveMove() + " E=" + TotalEnergy() );
     	hideEdge();
-        ModelProgress();
+        // requestAnimationFrame is slow
+	for(var ii=0;ii<1000;++ii) {
+          calc_cnt++;
+          ModelProgress();
+        }
         updateThree(TronThreeRadius);
         if (Edge) {
             drawEdge();
@@ -19,7 +22,7 @@ function storyLoop()
         }
         drawMapView();
         drawInfos();
-        if (NumTrons == 32 || NumTrons == 72 || NumTrons == 132 || NumTrons == 192) {
+        if (NumTrons <= 32 || NumTrons == 72 || NumTrons == 132 || NumTrons == 192) {
             if (getAveMove() < CriticalLimit && calc_cnt > 300) {
                 phase = 1;
             }

@@ -224,7 +224,7 @@ function FindFreePointByEnergy() {
                     var pp = p3.clone();
                     p3.mul(TronThreeRadius);
                     //drawDot(p3, 0x000000, 2);
-                    console.log("LowestE=%f", e);
+                    //console.log("LowestE=%f", e);
                 }
             }
         }
@@ -432,7 +432,8 @@ function ModelMovePoleLoneliest() {
 	}
 }
 function logJson() {
-    var d = new Date().toString();
+    var dt = new Date();
+    var d = dt.getDate() +  " " + dt.getHours() + ":" + dt.getMinutes() + ":" + dt.getSeconds() + "." + dt.getMilliseconds();
     var e = TotalEnergy().toFixed(9);
     var a1 = ClosestAngle().toFixed(6);
     var a2 = LoneliestAngle().toFixed(6);

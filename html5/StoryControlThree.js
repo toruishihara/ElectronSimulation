@@ -4,11 +4,11 @@ var story_tour_cnt = 0;
 
 function storyLoop()
 {
-    //console.log("phase=" + phase + " cnt=" + calc_cnt + " cnt2=" + story_tour_cnt);
+    console.log("num=" + NumTrons + " cnt=" + calc_cnt + " move=" + getAveMove());
     var wait = 0;
     if (phase == 0) {
         calc_cnt++;
-	    hideEdge();
+    	hideEdge();
         ModelProgress();
         updateThree(TronThreeRadius);
         if (Edge) {
@@ -104,7 +104,8 @@ function storyLoop()
     Renderer.render(ThreeScene, ThreeCamera);
 
     if (Looping) {
-    	window.requestAnimationFrame(storyLoop);
+    	//window.requestAnimationFrame(storyLoop);
+    	requestAnimationFrame(storyLoop);
     }
 }
 

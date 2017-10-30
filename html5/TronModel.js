@@ -432,21 +432,20 @@ function ModelMovePoleLoneliest() {
 	}
 }
 function logJson() {
+    var d = new Date().toString();
+    var e = TotalEnergy().toFixed(9);
     var a1 = ClosestAngle().toFixed(6);
     var a2 = LoneliestAngle().toFixed(6);
 	var a21 = Angle21.toFixed(6);
 	var a31 = Angle31.toFixed(6);
     var ps = Array(Trons.length*3);
-    var pv = Array(Trons.length*3);
+    //var pv = Array(Trons.length*3);
     for(var i=0;i<Trons.length;++i) {
         ps[3*i+0] = Trons[i].point.x;
         ps[3*i+1] = Trons[i].point.y;
         ps[3*i+2] = Trons[i].point.z;
-        pv[3*i+0] = Trons[i].velo.x;
-        pv[3*i+1] = Trons[i].velo.y;
-        pv[3*i+2] = Trons[i].velo.z;
     }
-    var jsonObj = {num:Trons.length, vertex:ps, velocity:pv, angle1:a1, angle2:a2, angle21:a21, angle31:a31};
+    var jsonObj = {num:Trons.length, energy:e, angle1:a1, angle2:a2, date:d, vertex:ps };
     var str = JSON.stringify(jsonObj);
     console.log(str);
     document.getElementById("result").innerText += str + "\n";

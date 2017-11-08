@@ -24,7 +24,7 @@ var Face = false;
 var Timer1;
 var Times = 0;
 var Interval = 50;
-var NumTrons = 6;
+var NumTrons = 192;
 var ShowFaceEdge = 0;
 var AllLight = 0;
 var LogFaceToJson = 0;
@@ -93,7 +93,7 @@ function init() {
 		}
 	}
 	ModelInit();
-    addTronsOnModel();
+    //addTronsOnModel();
 }
 
 function addTronsOnModel() {
@@ -383,6 +383,17 @@ function readJsonImpl(num) {
     updateAngles();
     updateEnergy();
     drawInfos();
+}
+
+function readJsonIcosahedronPoints()
+{
+    if (IcosahedronPoints.length == 12)
+        return;
+    var jsonObj = JSON.parse(results[12]);
+    for (var i = 0; i < jsonObj.num; ++i) {
+        var p = new tuple3d(jsonObj.vertex[3 * i], jsonObj.vertex[3 * i + 1], jsonObj.vertex[3 * i + 2]);
+        IcosahedronPoints.push(p);
+    }
 }
 
 function readJsonAndMove(num) {

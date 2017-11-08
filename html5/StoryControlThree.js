@@ -9,9 +9,18 @@ function storyLoop()
         console.log("num=" + NumTrons + " cnt=" + calc_cnt + " move=" + getAveMove() + " E=" + TotalEnergy() );
     	hideEdge();
         // requestAnimationFrame is slow
-	for(var ii=0;ii<1000;++ii) {
+	    for(var ii=0;ii<100;++ii) {
           calc_cnt++;
           ModelProgress();
+        }
+        if (getAveMove() < RegularLimit * 10) {
+            for (var ii = 0; ii < 1000; ++ii) {
+                var monteCarloResult = 0;
+                monteCarloResult += ProgressMonteCarloOne();
+            }
+            console.log("Monte Carlo result=%d", monteCarloResult);
+            //ProgressAdjustToIcosahedron();
+            //console.log("ProgressAdjustToIcosahedron");
         }
         updateThree(TronThreeRadius);
         if (Edge) {
@@ -88,12 +97,13 @@ function storyLoop()
             hideTron();
             //clearMapView();
             //ModelInit();
-			if (Is60) {
-				for (var i=0;i<60;++i) {
-            		NumTrons ++;
-            		var color = new tronColor("hsl", (NumTrons*47)%360, "100%", "50%");
-            		launchTron(color);
-				}
+            if (Is60) {
+                AddTronsOnIcosahedronPoints();
+				//for (var i=0;i<60;++i) {
+            	//	NumTrons ++;
+            	//	var color = new tronColor("hsl", (NumTrons*47)%360, "100%", "50%");
+            	//	launchTron(color);
+				//}
 			} else {
             	NumTrons ++;
             	var color = new tronColor("hsl", (NumTrons*47)%360, "100%", "50%");

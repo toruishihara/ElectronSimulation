@@ -425,9 +425,9 @@ function writePlotSVG()
 		str += (500 + (p.x)*400).toString();
 		str += "\" y=\"";			
 		str += (500 + (p.y)*400).toString();
-		str += "\" fill=\"red\">" + i.toString() + "</text>\n";
+		str += "\" fill=\"red\">" + "E" + i.toString() + "</text>\n";
     	document.getElementById("result").innerText += str;
-	}
+    }
 	for (i = 0; i < FacePoints.length / 2; ++i) {
 		str = "  <text x=\"";
 		var p = FacePoints[i].point;
@@ -435,10 +435,10 @@ function writePlotSVG()
 		str += "\" y=\"";			
 		str += (500 + (p.y)*400).toString();
 		str += "\" fill=\"blue\">" + i.toString() + "</text>\n";
-    	document.getElementById("result").innerText += str;
+    	//document.getElementById("result").innerText += str;
 	}
-	for (i = 0; i < FacePoints.length / 2; ++i) {
-	    for (j = i + 1; j < FacePoints.length / 2; ++j) {
+	for (i = 0; i < 0.65 * FacePoints.length; ++i) {
+	    for (j = i + 1; j < 0.65 * FacePoints.length; ++j) {
 	        var dis2 = FacePoints[i].point.dis(FacePoints[j].point);
 	        console.log("i=%d j=%d FSdis=%f shortest=%f", i, j, dis2, ShortestLength);
 	        if (dis2 < ShortestLength) {
@@ -485,7 +485,7 @@ function writePlotSVG()
 	            str += "\" y2=\"";
 	            str += (500 + (p.y) * 400).toString();
 	            str += "\" style=\"stroke:blue;stroke-width:1\">" + i.toString() + "</line>\n";
-	            document.getElementById("result").innerText += str;
+	            //document.getElementById("result").innerText += str;
 
 	            var dis = sortedTrons[i].point.dis(FacePoints[j].point);
 	            str = "  <text x=\"";
@@ -496,7 +496,7 @@ function writePlotSVG()
 	            str += "\" y=\"";
 	            str += (500 + (p.y) * 400).toString();
 	            str += "\" fill=\"blue\">" + dis.toFixed(5) + "</text>\n";
-	            document.getElementById("result").innerText += str;
+	            //document.getElementById("result").innerText += str;
 	        }
 	    }
 	}

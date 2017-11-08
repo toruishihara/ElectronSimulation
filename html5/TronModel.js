@@ -5,6 +5,8 @@
 
 // Global variables
 var Trons = new Array(); // Array of Electrons
+
+var IcosahedronPoints = new Array();
 var Shake = 0.0;
 //var TronsVelo = new Array(); // Trons' velocity
 
@@ -284,6 +286,117 @@ function FindNearestTronIndexFromIndex(idx)
     return ret;
 }
 
+function AddTronsOnIcosahedronPoints() {
+    var ar = ListIcosahedronTrons();
+    for (idx in ar) {
+        var nearIdx = FindNearestTronIndexFromIndex(idx);
+        var r1 = Trons[nearIdx].point.clone();
+        r1.sub(Trons[idx].point);
+        var dis = r1.length();
+        r1.unify();
+        var r2 = r1.cross(Trons[idx].point);
+        for (var th = 36; th < 360; th += 72) {
+            var r = r1.clone();
+            r.mul(Math.cos(th));
+            var r22 = r2.clone();
+            r22.mul(Math.sin(th));
+            r.add(r22);
+            r.setLength(0.1 * dis);
+            r.add(Trons[idx].point);
+            r.xy2sp();
+            NumTrons++;
+            AddTron(r.y, r.z, Trons[idx].color);
+        }
+    }
+}
+var IcosahedronAngle = 63.434949;
+function ListIcosahedronTrons()
+{
+    var ret = [];
+    var idx = FindMaxEnergyTron();
+    ret.push(idx);
+    var dotOnIcosahedronPoint = Math.cos(IcosahedronAngle * Math.PI / 180.0);
+    var minDiff = huge;
+    var child = -1;
+    var diffs = [];
+    for (var i = 0; i < Trons.length; ++i) {
+        var dot = Trons[idx].point.dot(Trons[i].point);
+        var d = Math.abs(dot - dotOnIcosahedronPoint);
+        diffs.push({ id:i, diff:d });
+    }
+    console.log(diffs);
+    diffs.sort(function (a, b) { return a.diff - b.diff; });
+    console.log(diffs);
+    for (var i = 0; i < 5; ++i) {
+        console.log("Icosahed id=" + diffs[i].id + " diff=" + diffs[i].diff);
+        ret.push(diffs[i].id);
+    }
+    idx = diffs[diffs.length - 1].id;
+    diffs = [];
+    for (var i = 0; i < Trons.length; ++i) {
+        var dot = Trons[idx].point.dot(Trons[i].point);
+        var diff = Math.abs(dot - dotOnIcosahedronPoint);
+        diffs.push({id:i, diff:diff});
+    }
+    diffs.sort(function (a, b) { return a.diff - b.diff; });
+    console.log(diffs);
+    //for (var item in diffs) {
+    //    console.log("Icosahed i=%d diff=%f", item.id, item.diff);
+    //}
+    for (var i = 0; i < 5; ++i) {
+        console.log("Icosahed " + diffs[i]);
+        ret.push(diffs[i].id);
+    }
+    ret.push(idx);
+
+    return ret;
+}
+
+function FindIcosahedronTronIndexFromIndex(idx)
+{
+    var dotOnIcosahedronPoint = Math.cos(IcosahedronAngle * Math.PI / 180.0);
+    var minDiff = huge;
+    var ret = -1;
+	for(var i=0;i<Trons.length;++i) {
+	    var dot = Trons[idx].point.dot(Trons[i].point);
+	    if (Math.abs(dot - dotOnIcosahedronPoint) < minDiff) {
+	        minDiff = Math.abs(dot - dotOnIcosahedronPoint);
+	        ret = i;
+	        //console.log("Icosahed i=%d diff=%f", i, minDiff);
+        }
+    }
+    return ret;
+}
+
+function FindNearestTronIndex(p) {
+    var maxDot = -1 * huge;
+    var ret = -1;
+    for (var i = 0; i < Trons.length; ++i) {
+        var dot = p.dot(Trons[i].point);
+        if (maxDot < dot) {
+            maxDot = dot;
+            ret = i;
+        }
+    }
+    console.log("FindNearest(%f %f %f) dotDiff=%f idx=%d dis=%f", p.x, p.y, p.z, maxDot, ret, p.dis(Trons[ret].point));
+
+    return ret;
+}
+
+function FindNearestTronIndexFromIndex(idx) {
+    var maxDot = -1 * huge;
+    var ret = -1;
+    for (var i = 0; i < Trons.length; ++i) {
+        if (i == idx) continue;
+        var dot = Trons[idx].point.dot(Trons[i].point);
+        if (maxDot < dot) {
+            maxDot = dot;
+            ret = i;
+        }
+    }
+    return ret;
+}
+
 function updateLoneliest() {
 	// find loneliest
 	var lonelyDot = -1*huge;
@@ -332,9 +445,11 @@ function getAngle31() {
 	return Angle31;
 }
 function ModelMovePole() {
-    return ModelMovePoleMaxEnergyTron();
-    //return ModelMovePoleNextIndex();
+    ModelMovePoleMaxEnergyTron();
+    //ModelMovePoleNextIndex();
+    Trons.sort(TronSort);
 }
+
 function MovePointByBase(p, basePoint) {
 	var tmpPoleZ = basePoint.clone();
 	var tmpPoleY;
@@ -377,12 +492,13 @@ function ModelMovePoleNextIndex() {
 
 function ModelMovePoleOnIndex(index) {
     PoleIndex = index;
-    var nearIdx = FindNearestTronIndexFromIndex(index);
+    //var nearIdx = FindNearestTronIndexFromIndex(index);
+    var nearIdx = FindIcosahedronTronIndexFromIndex(index);
         
     var newPoleZ = Trons[index].point.clone();
-	var newPoleY = newPoleZ.cross(Trons[nearIdx].point);
-	newPoleY.unify();
-	var newPoleX = newPoleY.cross(newPoleZ);
+    var newPoleX = Trons[nearIdx].point.cross(newPoleZ);
+	newPoleX.unify();
+	var newPoleY = newPoleX.cross(newPoleZ);
 	
 	for(var i=0;i<Trons.length;++i) {
 		var p = Trons[i].point.clone();
@@ -398,18 +514,23 @@ function ModelMovePoleOnIndex(index) {
 
 // Move the pole to less closest Tron. Typically center of pentagon
 function ModelMovePoleMaxEnergyTron() {
+    var idx = FindMaxEnergyTron();
+    ModelMovePoleOnIndex(idx);
+}
+
+function FindMaxEnergyTron() {
     var maxEnergy = 0.0;
     var maxIndex = 0;
     for (var i = 0; i < Trons.length; ++i) {
-        console.log("getEnergy i=%d", i);
+        //console.log("getEnergy i=%d", i);
         var e = getEnergyOnTron(i);
-        console.log("i=%d e=%f", i, e);
+        //console.log("i=%d e=%f", i, e);
         if (e > maxEnergy) {
             maxEnergy = e;
             maxIndex = i;
         }
     }
-    ModelMovePoleOnIndex(maxIndex)
+    return maxIndex;
 }
 
 function ModelMovePoleLoneliest() {
@@ -576,7 +697,7 @@ function progressOne(idx)
 	var oldTron = Trons[idx].point.clone();
 	var tron = Trons[idx];
     var len;
-    var shakeV;
+    //var shakeV;
 
 	tron.point.add(tron.velo);
 
@@ -588,6 +709,42 @@ function progressOne(idx)
 	oldTron.sub(tron.point);
 	len = oldTron.length();
     return len;
+}
+
+function ProgressMonteCarloOne() {
+    var i = Math.floor(Math.random() * Trons.length);
+    var x = Math.random() * ShortestLength * 0.1;
+    var y = Math.random() * ShortestLength * 0.1;
+    var z = Math.random() * ShortestLength * 0.1;
+
+    var velo = new tuple3d(x, y, z);
+
+    var oldP = Trons[i].point.clone();
+    Trons[i].point.add(velo);
+    Trons[i].point.unify();
+    var oldTotalEnergy = totalEnergy;
+    updateEnergy();
+    if (totalEnergy < oldTotalEnergy) {
+        console.log("monte calro success i=%d x=%f y=%f z=%f newE=%f", i, x, y, z, totalEnergy);
+        return 1;
+    }else{
+        //console.log("monte calro failed");
+        Trons[i].point = oldP;
+        totalEnergy = oldTotalEnergy;
+        return 0;
+    }
+}
+
+function ProgressAdjustToIcosahedron()
+{
+    readJsonIcosahedronPoints();
+    ModelMovePoleMaxEnergyTron();
+    for (var i = 0; i < IcosahedronPoints.length; ++i) {
+        var idx = FindNearestTronIndex(IcosahedronPoints[i]);
+        var dis = Trons[idx].point.dis(IcosahedronPoints[i]);
+        console.log("ProgressAdjustToIcosahedron i=%d idx=%d dis=%f", i, idx, dis);
+        Trons[idx].point = IcosahedronPoints[i].clone();
+    }
 }
 
 function _sleep(millisec){
